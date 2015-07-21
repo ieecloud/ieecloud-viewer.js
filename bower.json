@@ -1,0 +1,12 @@
+{
+  "name": "ieecloud-viewer.js",
+  "description": "3d Viewer",
+  "version": "0.0.0",
+  "homepage": "https://github.com/ieecloud/ieecloud-viewer.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "signals": "~1.0.0",
+    "jquery": "2.1.4"
+  }
+}

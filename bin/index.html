@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>ieecloud viewer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	</head>
+	<body>
+
+    <style>
+
+        .viewer {
+          position: relative;
+          margin-top: 50px;
+          height: 800px;
+          width: 1500px;
+          background-color: #fff;
+        }
+
+    </style>
+
+    <!-- compiled JavaScript -->
+    <script type="text/javascript" src="ieecloud-viewer.js-0.0.0.min.js"></script>
+    
+
+    <div class="viewer">
+        <button id="loadModel" class="btn">Load Model</button>
+        <button id="showRulerBtn" class="btn">Ruler</button>
+        <button id="showProtractorVBtn" class="btn">Protractor V</button>
+        <button id="showProtractorHBtn" class="btn">Protractor H</button>
+        <div id="viewer" class = "viewer">
+        </div>
+    </div>
+
+
+    <script>
+
+         $("#viewer").ieecloudEditor({
+            textureUrl: "",
+            mode: "viewer",
+            resultDigits: 3,
+            drawResults: false,
+            gridVisible: true,
+            resultColor:"white",
+            backgroundColor:"#d4d4d4",
+            resultTextColor:"white",
+            id: "1"
+        });
+
+        $("#showRulerBtn").click(function(){
+             $("#viewer").ieecloudEditor('showRuler', true);
+        });
+
+        $("#showProtractorVBtn").click(function(){
+             $("#viewer").ieecloudEditor('showVProtractor', true);
+        });
+
+        $("#showProtractorHBtn").click(function(){
+             $("#viewer").ieecloudEditor('showHProtractor', true);
+        });
+
+        $("#loadModel").click(function(){
+            $.getJSON("../resources/testmodel.json", function(json) {
+                 $("#viewer").ieecloudEditor('addModel', json);
+             });
+        });
+
+    </script>
+
+	</body>
+</html>
