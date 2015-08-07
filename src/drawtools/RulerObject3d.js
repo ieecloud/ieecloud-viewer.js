@@ -294,6 +294,9 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         this.userData.rotateVSign = -1;
         this.userData.rotateSinSign = 1;
+
+        this.userData.rotateHAngle = 0;
+        this.userData.rotateVAngle = 0;
     }
 
     this.getLeftCornerVerticalPosition = function () {
@@ -310,6 +313,14 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
     this.setRotateSinSign = function (value) {
           this.userData.rotateSinSign = value;
+    }
+
+    this.setRotateHAngle = function (value) {
+        this.userData.rotateHAngle = value;
+    }
+
+    this.setRotateVAngle = function (value) {
+        this.userData.rotateVAngle = value;
     }
 
     this.hide = function () {
@@ -344,6 +355,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
            me.dispatchEvent(searchNearest);
            var intersects = getIntersects(pointer, plane);
            SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
+           changeEvent.moved = true;
            me.dispatchEvent(changeEvent);
            return;
 
@@ -450,6 +462,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         if(SELECTED){
            SELECTED.position.copy(nearestPoint.position);
            nearestPoint.hide();
+           changeEvent.moved = false;
            me.dispatchEvent(changeEvent);
         }
 

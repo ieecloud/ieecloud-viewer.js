@@ -17,6 +17,14 @@ var Viewport = function (editor) {
     info.setColor('#ffffff');
     container.add(info);
 
+    var rulerInfo = new UI.Text();
+    rulerInfo.setPosition('absolute');
+    rulerInfo.setRight('245px');
+    rulerInfo.setBottom('5px');
+    rulerInfo.setFontSize('12px');
+    rulerInfo.setColor('#ffffff');
+    container.add(rulerInfo);
+
     var scene = editor.scene;
     var sceneAxis = editor.sceneAxis;
     var sceneHelpers = editor.sceneHelpers;
@@ -118,6 +126,8 @@ var Viewport = function (editor) {
 
 
      var ruler = new THREE.ToolsGizmo(camera, container.dom, plane, nearestPoint, highlighter,sceneHelpers);
+     rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' +  ruler.userData.rotateVAngle);
+
      ruler.addEventListener("disableMainControl", function(event){
          controls.enabled = false;
          highlighter.hide();
@@ -130,11 +140,18 @@ var Viewport = function (editor) {
 
      ruler.addEventListener("change", function(event){
         var intersects = event.intersects;
+         var isRulerMoved = event.moved;
          if(!intersects){
-               highlighter.hide();
+              highlighter.hide();
+              if(!isRulerMoved){
+                 mainMouseMove = true;
+              }
               render();
             return;
          }
+
+         mainMouseMove = false;
+         nearestPoint.hide();
 
         var intersect = intersects[0];
          if (intersect) {
@@ -206,9 +223,13 @@ var Viewport = function (editor) {
         var intersects = event.intersects;
          if(!intersects){
             highlighterProtractor.hide();
+             mainMouseMove = true;
             render();
             return;
          }
+
+         mainMouseMove = false;
+         nearestPoint.hide();
 
         var intersect = intersects[0];
          if (intersect) {
@@ -264,9 +285,12 @@ var Viewport = function (editor) {
          var intersects = event.intersects;
           if(!intersects){
              highlighterProtractor.hide();
+              mainMouseMove = true;
              render();
              return;
           }
+          mainMouseMove = false;
+          nearestPoint.hide();
 
          var intersect = intersects[0];
           if (intersect) {
@@ -662,6 +686,7 @@ var Viewport = function (editor) {
         textResultPosition.y = nearestPoint.position.y;
         textResultPosition.z = nearestPoint.position.z;
         textResultMesh.position.copy(textResultPosition);
+        unRotatedObjects.push(textResultMesh);
         var key  = resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z;
         textResults[key] = textResultMesh;
         textResultMesh.update(nearestPoint);
@@ -797,7 +822,7 @@ var Viewport = function (editor) {
         }
         var intersects = getIntersects(event, objects);
         if (intersects.length > 0) {
-             // runNearestAlgorithm(intersects);
+             runNearestAlgorithm(intersects);
         }
     };
 
@@ -850,6 +875,9 @@ var Viewport = function (editor) {
 
 
          ruler.setRotateSinSign(Math.sign(Math.sin(THREE.Math.degToRad(degree))));
+         ruler.setRotateVAngle(degree);
+
+         rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' +  ruler.userData.rotateVAngle);
 
          if(Math.sign(cosAngle) < 0){
             rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, -1), Math.PI);
@@ -888,6 +916,8 @@ var Viewport = function (editor) {
               ruler.setRotateVSign(-1); // default direction
               calculateCrossVector();
          }
+
+          ruler.setRotateHAngle(degree);
 
           highlighterProtractor.userData = {angle:0};
           highlighterProtractor.hide();
