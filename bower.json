@@ -4,7 +4,17 @@
   "version": "0.0.0",
   "homepage": "https://github.com/ieecloud/ieecloud-viewer.js",
   "license": "MIT",
-  "private": true,
+  "main": "bin/ieecloud-viewer.js-0.0.0.min.js",
+  "ignore": [
+    ".gitignore",
+    ".jshintrc",
+    ".travis.xml",
+    "build",
+    "bower.json",
+    "gruntFile.js",
+    "package.json",
+    "README.md"
+  ],
   "dependencies": {
     "signals": "~1.0.0",
     "jquery": "2.1.4"
