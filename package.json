@@ -1,10 +1,12 @@
 {
   "name": "ieecloud-viewer.js",
   "author": "ieecloud team",
-  "private": true,
   "version": "0.0.0",
   "description": "3d editor",
-  "repository": "https://github.com/ieecloud/ieecloud-viewer.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ieecloud/ieecloud-viewer.js"
+  },
   "homepage": "https://ieecloud.com/",
   "bugs": "",
   "licenses": {
