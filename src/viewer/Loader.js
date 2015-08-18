@@ -88,7 +88,9 @@ var Loader = function (editor, textureUrl) {
 
     this.computeBoundingBox = function (modelRotation) {
        var commonBoundingBox =  new THREE.Box3().setFromObject( editor.lastModel );
-       editor.calculateSpaceScale(commonBoundingBox, modelRotation);
+       if(commonBoundingBox.max.length < Infinity && commonBoundingBox.min.length < Infinity){
+           editor.calculateSpaceScale(commonBoundingBox, modelRotation);
+       }
     }
 
 
