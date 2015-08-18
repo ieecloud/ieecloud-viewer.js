@@ -60,8 +60,8 @@
         });
 
         $("#loadModel").click(function(){
-            $.getJSON("../resources/testmodel.json", function(json) {
-                 $("#viewer").ieecloudEditor('addModel', json);
+             $.getJSON("../resources/testmodel.json", function(json) {
+                 $("#viewer").ieecloudEditor('reloadModel', json);
              });
         });
 

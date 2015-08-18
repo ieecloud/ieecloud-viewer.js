@@ -212,6 +212,11 @@ var Loader = function (editor, textureUrl) {
         editor.removeAllObjects();
     }
 
+    this.reloadModel = function (data) {
+        editor.removeAllObjects();
+        scope.handleJSONData(data);
+    }
+
 
     this.handleJSONData = function (data) {
         editor.onRenderStart();

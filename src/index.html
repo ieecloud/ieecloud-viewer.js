@@ -61,9 +61,11 @@
 
         $("#loadModel").click(function(){
              $.getJSON("../resources/testmodel.json", function(json) {
-                 $("#viewer").ieecloudEditor('addModel', json);
+                 $("#viewer").ieecloudEditor('reloadModel', json);
              });
         });
+
+
 
     </script>
 

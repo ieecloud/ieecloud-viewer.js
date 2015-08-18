@@ -68,6 +68,10 @@ function Viewer(target, options) {
         this.threeEditor.loader.handleJSONData(modelJsn);
     };
 
+    Viewer.prototype.reloadModel = function (modelJsn) {
+        this.threeEditor.loader.reloadModel(modelJsn);
+    };
+
     Viewer.prototype.removeModel = function () {
         this.threeEditor.loader.removeModel();
     };
