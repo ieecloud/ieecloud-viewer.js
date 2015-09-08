@@ -256,6 +256,8 @@ var Loader = function (editor, textureUrl) {
         traverse(data.tree);
         scope.objectsTree = data.tree;
 
+        editor.onTreeLoad(data.tree);
+
         scope.computeBoundingBox(pictureInfo.modelRotation);
         editor.onRenderDone();
     }

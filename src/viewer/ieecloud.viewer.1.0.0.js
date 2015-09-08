@@ -52,6 +52,13 @@ function Viewer(target, options) {
           }
         });
 
+
+        $this.threeEditor.signals.treeLoad.add(function (tree) {
+          if($this.options.onTreeLoad){
+             $this.options.onTreeLoad(tree);
+          }
+        });
+
     };
 
 

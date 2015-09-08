@@ -18,6 +18,7 @@ var Editor = function (options) {
         objectColorUnSelected: new SIGNALS.Signal(),
         updateSelectTree: new SIGNALS.Signal(),
         endRender: new SIGNALS.Signal(),
+        treeLoad: new SIGNALS.Signal(),
         startRender: new SIGNALS.Signal(),
         showRuler: new SIGNALS.Signal(),
         showVProtractor: new SIGNALS.Signal(),
@@ -63,6 +64,10 @@ Editor.prototype = {
 
     onRenderDone: function () {
         this.signals.endRender.dispatch();
+    },
+
+    onTreeLoad: function (tree) {
+        this.signals.treeLoad.dispatch(tree);
     },
 
     selectObject: function (object) {
