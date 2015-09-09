@@ -270,6 +270,8 @@ var Loader = function (editor, textureUrl) {
         traverse(data.tree);
         scope.objectsTree = data.tree;
 
+        console.log(data.tree)
+
         editor.onTreeLoad(data.tree);
 
         scope.computeBoundingBox(pictureInfo.modelRotation);
@@ -432,6 +434,8 @@ var Loader = function (editor, textureUrl) {
         var groups = geometryObject.groups; // group names
         var results = geometryObject.results; // group names
 
+        var complexObjectName = geometryObject.name;
+
         var edgeGroups = geometryObject.edges;
         var faceGroups = geometryObject.faces;
         var uvGroups = geometryObject.uvCoords;
@@ -478,7 +482,7 @@ var Loader = function (editor, textureUrl) {
             pictureGeometryElement.edgesGeometry = lineGeometry;
             pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
             pictureGeometryElement.name = groups[j];
-            pictureGeometryElement.parentName = name;
+            pictureGeometryElement.parentName = complexObjectName;
             if (drawResults) { // Draw face with spectral texture according to results
                 pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                     map: colorMapTexture,
