@@ -134,12 +134,20 @@ var Loader = function (editor, textureUrl) {
                 var objName = objectElement[j].name;
                 if (objName.indexOf("EDGE") != -1) {
                     lines.name = objectElement[j].name;
+                    lines.uniqueId =lines.uuid;
                     lines.parentName = objectElement[j].parentName;
                     lines.defaultColor = edgesMaterial.color.clone();
                     meshesData[key].push(lines);
 
                 } else if (objName.indexOf("FACE") != -1) {
                     mesh.name = objectElement[j].name;
+                    mesh.uniqueId =mesh.uuid;
+                    mesh.parentName = objectElement[j].parentName;
+                    mesh.defaultColor = facesMaterial.color.clone();
+                    meshesData[key].push(mesh);
+                } else if(objName.indexOf("GROUP") != -1){
+                    mesh.name = objectElement[j].name;
+                    mesh.uniqueId =mesh.uuid;
                     mesh.parentName = objectElement[j].parentName;
                     mesh.defaultColor = facesMaterial.color.clone();
                     meshesData[key].push(mesh);
@@ -226,14 +234,17 @@ var Loader = function (editor, textureUrl) {
 
         var result = scope.loadMeshes(pictureInfo);
 
-
         var traverse = function (obj) {
             if (obj instanceof Array) {
                 for (var i = 0; i < obj.length; i++) {
                     if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREEext.Line)) {
                         var node = obj[i];
                         if (node.index != -1) {
-                            node.children = result[node.index] ? result[node.index] : [];
+                            if(result[node.index]){
+                                node.children = result[node.index];
+                                node.uniqueId =THREE.Math.generateUUID() ;
+                            }
+
                         }
                         traverse(obj[i]);
                     } else {
@@ -244,7 +255,10 @@ var Loader = function (editor, textureUrl) {
                     if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREEext.Line)) {
                         var node = obj[prop];
                         if (node.index != -1) {
-                            node.children = result[node.index] ? result[node.index] : [];
+                            if(result[node.index]){
+                               node.children = result[node.index];
+                               node.uniqueId =THREE.Math.generateUUID() ;
+                            }
                         }
                         traverse(obj[prop]);
                     } else {
