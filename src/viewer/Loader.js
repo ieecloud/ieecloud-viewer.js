@@ -138,14 +138,14 @@ var Loader = function (editor, textureUrl) {
                     lines.parentName = objectElement[j].parentName;
                     lines.defaultColor = edgesMaterial.color.clone();
                     meshesData[key].push(lines);
-
                 } else if (objName.indexOf("FACE") != -1) {
                     mesh.name = objectElement[j].name;
                     mesh.uniqueId =mesh.uuid;
                     mesh.parentName = objectElement[j].parentName;
                     mesh.defaultColor = facesMaterial.color.clone();
                     meshesData[key].push(mesh);
-                } else if(objName.indexOf("GROUP") != -1){
+                } else if(objName.indexOf("GROUP") != -1 &&  (objectGeometry.faces.length > 0 ||
+                       objectGeometry.vertices.length > 0 || edgesGeometry.faces.length > 0 || edgesGeometry.vertices.length > 0)){
                     mesh.name = objectElement[j].name;
                     mesh.uniqueId =mesh.uuid;
                     mesh.parentName = objectElement[j].parentName;
