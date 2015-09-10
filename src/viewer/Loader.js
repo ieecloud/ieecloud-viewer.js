@@ -130,29 +130,26 @@ var Loader = function (editor, textureUrl) {
                 modelGroup.add(lines);
                 modelGroup.add(mesh);
 
+                lines.name = objectElement[j].name;
+                lines.uniqueId =lines.uuid;
+                lines.parentName = objectElement[j].parentName;
+                lines.defaultColor = edgesMaterial.color.clone();
 
-                var objName = objectElement[j].name;
-                if (objName.indexOf("EDGE") != -1) {
-                    lines.name = objectElement[j].name;
-                    lines.uniqueId =lines.uuid;
-                    lines.parentName = objectElement[j].parentName;
-                    lines.defaultColor = edgesMaterial.color.clone();
-                    meshesData[key].push(lines);
-                } else if (objName.indexOf("FACE") != -1) {
-                    mesh.name = objectElement[j].name;
-                    mesh.uniqueId =mesh.uuid;
-                    mesh.parentName = objectElement[j].parentName;
-                    mesh.defaultColor = facesMaterial.color.clone();
-                    meshesData[key].push(mesh);
-                } else if(objName.indexOf("GROUP") != -1 &&  (objectGeometry.faces.length > 0 ||
-                       objectGeometry.vertices.length > 0 || edgesGeometry.faces.length > 0 || edgesGeometry.vertices.length > 0)){
-                    mesh.name = objectElement[j].name;
-                    mesh.uniqueId =mesh.uuid;
-                    mesh.parentName = objectElement[j].parentName;
-                    mesh.defaultColor = facesMaterial.color.clone();
-                    meshesData[key].push(mesh);
+                mesh.name = objectElement[j].name;
+                mesh.uniqueId =mesh.uuid;
+                mesh.parentName = objectElement[j].parentName;
+                mesh.defaultColor = facesMaterial.color.clone();
+
+                if((objectGeometry.faces.length > 0  && edgesGeometry.vertices.length > 0)){
+                        lines.name = objectElement[j].name + ".EDGE";
+                        mesh.name = objectElement[j].name + ".FACE";
+                        meshesData[key].push(lines);
+                        meshesData[key].push(mesh);
+                }else if(objectGeometry.faces.length === 0  && edgesGeometry.vertices.length > 0){
+                        meshesData[key].push(lines);
+                } else if(objectGeometry.faces.length > 0  && edgesGeometry.vertices.length === 0){
+                        meshesData[key].push(mesh);
                 }
-
 
                 var simpleShapes = objectElement[j].simpleShapes;
                 var v = 0;

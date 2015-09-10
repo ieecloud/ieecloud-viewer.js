@@ -738,22 +738,6 @@ var Viewport = function (editor) {
                         editor.selectTree(obj);
                     }
 
-                } else {
-                    var firstObj = intersects[0].object;
-                    var parentName = firstObj.parentName;
-
-                    for (var i = 0; i < objects.length; i++) {
-                        if (objects[i].parentName && parentName === objects[i].parentName) {
-                            obj = objects[i];
-                            if (obj.selectedFlag) {
-                                editor.unSelectObject(obj);
-                                editor.unSelectTree(obj);
-                            } else {
-                                editor.selectObject(obj);
-                                editor.selectTree(obj);
-                            }
-                        }
-                    }
                 }
             } else {
 
