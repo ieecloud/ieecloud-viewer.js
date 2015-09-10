@@ -16,7 +16,7 @@ var Editor = function (options) {
         scaleChanged: new SIGNALS.Signal(),
         objectColorSelected: new SIGNALS.Signal(),
         objectColorUnSelected: new SIGNALS.Signal(),
-        updateSelectTree: new SIGNALS.Signal(),
+        selectTree: new SIGNALS.Signal(),
         endRender: new SIGNALS.Signal(),
         treeLoad: new SIGNALS.Signal(),
         startRender: new SIGNALS.Signal(),
@@ -72,7 +72,10 @@ Editor.prototype = {
 
     selectObject: function (object) {
         this.signals.objectColorSelected.dispatch(object);
-        this.signals.updateSelectTree.dispatch(object);
+    },
+
+    selectTree: function (object) {
+        this.signals.selectTree.dispatch(object, true);
     },
 
     saveModelPosition : function(){
@@ -82,7 +85,10 @@ Editor.prototype = {
 
     unSelectObject: function (object) {
         this.signals.objectColorUnSelected.dispatch(object);
-        this.signals.updateSelectTree.dispatch(object);
+    },
+
+    unSelectTree: function (object) {
+        this.signals.selectTree.dispatch(object, false);
     },
 
     addObject: function (object) {

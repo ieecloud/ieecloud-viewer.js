@@ -723,15 +723,19 @@ var Viewport = function (editor) {
                     var obj = searchNearestObject(intersects, THREEext.Line);
                     if (obj.selectedFlag) {
                         editor.unSelectObject(obj);
+                        editor.unSelectTree(obj);
                     } else {
                         editor.selectObject(obj);
+                        editor.selectTree(obj);
                     }
                 } else if (event && (event.ctrlKey || event.metaKey)) {
                      obj = searchNearestObject(intersects, THREE.Mesh);
                     if (obj.selectedFlag) {
                         editor.unSelectObject(obj);
+                        editor.unSelectTree(obj);
                     } else {
                         editor.selectObject(obj);
+                        editor.selectTree(obj);
                     }
 
                 } else {
@@ -743,8 +747,10 @@ var Viewport = function (editor) {
                             obj = objects[i];
                             if (obj.selectedFlag) {
                                 editor.unSelectObject(obj);
+                                editor.unSelectTree(obj);
                             } else {
                                 editor.selectObject(obj);
+                                editor.selectTree(obj);
                             }
                         }
                     }
