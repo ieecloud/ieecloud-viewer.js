@@ -36,7 +36,10 @@ function Viewer(target, options) {
 
     var signalsListen = function ($this) {
         $this.threeEditor.signals.updateSelectTree.add(function (object) {
-            $this.options.onChange(object);
+          if($this.options.onSelectObject){
+              $this.options.onSelectObject(object);
+          }
+
         });
 
         $this.threeEditor.signals.startRender.add(function () {

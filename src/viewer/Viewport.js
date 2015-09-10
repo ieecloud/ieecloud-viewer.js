@@ -556,6 +556,11 @@ var Viewport = function (editor) {
 
     var onMouseDown = function (event) {
         event.preventDefault();
+
+        var array = getMousePosition( container.dom, event.clientX, event.clientY );
+        onMouseDownPosition.fromArray(array);
+
+
         document.addEventListener('mouseup', onMouseUp, false);
 
     };
@@ -705,11 +710,9 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseUpEditorHandler = function (event) {
-        var rect = container.dom.getBoundingClientRect();
 
-        var x = (event.clientX - rect.left) / rect.width;
-        var y = (event.clientY - rect.top) / rect.height;
-        onMouseUpPosition.set(x, y);
+        var array = getMousePosition( container.dom, event.clientX, event.clientY );
+        onMouseUpPosition.fromArray( array );
 
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
 
@@ -718,14 +721,14 @@ var Viewport = function (editor) {
 
                 if (event && (event.altKey || event.metaKey)) {
                     var obj = searchNearestObject(intersects, THREEext.Line);
-                    if (obj.selected) {
+                    if (obj.selectedFlag) {
                         editor.unSelectObject(obj);
                     } else {
                         editor.selectObject(obj);
                     }
                 } else if (event && (event.ctrlKey || event.metaKey)) {
                      obj = searchNearestObject(intersects, THREE.Mesh);
-                    if (obj.selected) {
+                    if (obj.selectedFlag) {
                         editor.unSelectObject(obj);
                     } else {
                         editor.selectObject(obj);
@@ -738,7 +741,7 @@ var Viewport = function (editor) {
                     for (var i = 0; i < objects.length; i++) {
                         if (objects[i].parentName && parentName === objects[i].parentName) {
                             obj = objects[i];
-                            if (obj.selected) {
+                            if (obj.selectedFlag) {
                                 editor.unSelectObject(obj);
                             } else {
                                 editor.selectObject(obj);
