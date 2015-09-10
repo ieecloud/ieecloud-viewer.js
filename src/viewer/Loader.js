@@ -88,7 +88,7 @@ var Loader = function (editor, textureUrl) {
 
     this.computeBoundingBox = function (modelRotation) {
        var commonBoundingBox =  new THREE.Box3().setFromObject( editor.lastModel );
-       if(commonBoundingBox.max.length < Infinity && commonBoundingBox.min.length < Infinity){
+       if(commonBoundingBox.max.length() < Infinity && commonBoundingBox.min.length() < Infinity){
            editor.calculateSpaceScale(commonBoundingBox, modelRotation);
        }
     }
@@ -269,8 +269,6 @@ var Loader = function (editor, textureUrl) {
 
         traverse(data.tree);
         scope.objectsTree = data.tree;
-
-        console.log(data.tree)
 
         editor.onTreeLoad(data.tree);
 
