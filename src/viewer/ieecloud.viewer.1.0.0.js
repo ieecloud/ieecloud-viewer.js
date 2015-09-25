@@ -130,6 +130,10 @@ function Viewer(target, options) {
     Viewer.prototype.printScreen = function (objData) {
         this.threeEditor.printScreen(objData);
     };
+
+    Viewer.prototype.setMode = function (mode) {
+        this.threeEditor.setMode(mode);
+    };
     init(this);
 }
 
@@ -165,7 +169,7 @@ function Viewer(target, options) {
     $.fn.ieecloudEditor.defaults = {
         textureUrl: undefined,
         id: undefined,
-        mode: "viewer",
+        mode: "3d_point",
         resultDigits: 2,
         drawResults: true,
         gridVisible: true,

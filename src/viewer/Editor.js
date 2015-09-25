@@ -26,12 +26,14 @@ var Editor = function (options) {
         toggleRotate: new SIGNALS.Signal(),
         saveModelPosition: new SIGNALS.Signal(),
         printScreen: new SIGNALS.Signal(),
-        materialChanged: new SIGNALS.Signal()
+        materialChanged: new SIGNALS.Signal(),
+        setMode: new SIGNALS.Signal()
 
     };
 
-    this.MODE_VIEWER = "viewer";
-    this.MODE_EDITOR = "editor";
+    this.MODE_FACES_EDGES = "faces_and_nodes";
+    this.MODE_3D_POINT = "3d_point";
+    this.MODE_3D_GEOMETRY = "3d_geometry";
 
     this.options = options;
     this.id = options.id;
@@ -137,6 +139,11 @@ Editor.prototype = {
 
     toggleRotate: function (flag) {
         this.signals.toggleRotate.dispatch(flag);
+    },
+
+    setMode: function (mode) {
+        this.mode = mode;
+        this.signals.setMode.dispatch();
     },
 
 

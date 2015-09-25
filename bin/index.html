@@ -28,6 +28,8 @@
         <button id="showRulerBtn" class="btn">Ruler</button>
         <button id="showProtractorVBtn" class="btn">Protractor V</button>
         <button id="showProtractorHBtn" class="btn">Protractor H</button>
+        <input id="modeInput" />
+        <button id="setModeBtn" class="btn">Set Mode</button>
         <div id="viewer" class = "viewer">
         </div>
     </div>
@@ -37,7 +39,7 @@
 
          $("#viewer").ieecloudEditor({
             textureUrl: "",
-            mode: "viewer",
+            mode: "3d_point",
             resultDigits: 3,
             drawResults: false,
             gridVisible: true,
@@ -57,6 +59,10 @@
 
         $("#showProtractorHBtn").click(function(){
              $("#viewer").ieecloudEditor('showHProtractor', true);
+        });
+
+        $("#setModeBtn").click(function(){
+             $("#viewer").ieecloudEditor('setMode', $("#modeInput").val());
         });
 
         $("#loadModel").click(function(){

@@ -709,13 +709,10 @@ var Viewport = function (editor) {
         render();
     };
 
-    scope.onMouseUpEditorHandler = function (event) {
-
+    scope.onMouseUpFacesEdgesHandler = function (event) {
         var array = getMousePosition( container.dom, event.clientX, event.clientY );
         onMouseUpPosition.fromArray( array );
-
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
-
             var intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
 
@@ -737,29 +734,51 @@ var Viewport = function (editor) {
                         editor.selectObject(obj);
                         editor.selectTree(obj);
                     }
-
                 }
             } else {
-
                 editor.select(camera);
-
             }
-
             render();
-
         }
+        document.removeEventListener('mouseup', onMouseUp);
+    };
 
+    scope.onMouseUp3dGeometryHandler = function (event) {
+        var array = getMousePosition( container.dom, event.clientX, event.clientY );
+        onMouseUpPosition.fromArray( array );
+        if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
+            var intersects = getIntersects(event, objects);
+            if (intersects.length > 0) {
+                scene.traverse(function (object) {
+                    if (object instanceof THREE.Mesh || object instanceof THREEext.Line) {
+                        if (object.selectedFlag) {
+                            editor.unSelectObject(object);
+                            editor.unSelectTree(object);
+                        }else{
+                            editor.selectObject(object);
+                            editor.selectTree(object);
+                        }
+
+                    }
+                });
+            } else {
+                editor.select(camera);
+            }
+            render();
+        }
         document.removeEventListener('mouseup', onMouseUp);
     };
 
     var onMouseUp = function (event) {
 
-        if (editor.mode === editor.MODE_EDITOR) {
-            scope.onMouseUpEditorHandler(event);
-        } else {
+        if (editor.mode === editor.MODE_FACES_EDGES) {
+            scope.onMouseUpFacesEdgesHandler(event);
+        } else if(editor.mode === editor.MODE_3D_POINT){
 //            not implemented yet
+        } else if(editor.mode === editor.MODE_3D_GEOMETRY){
+//            not implemented yet
+            scope.onMouseUp3dGeometryHandler(event);
         }
-
     };
 
 
@@ -825,17 +844,17 @@ var Viewport = function (editor) {
 
 
     var onMouseMove = function (event) {
-        if (editor.mode === editor.MODE_EDITOR) {
+        if (editor.mode === editor.MODE_FACES_EDGES || editor.mode === editor.MODE_3D_GEOMETRY) {
             scope.onMouseMoveEditorHandler(event);
-        } else {
+        } else if(editor.mode === editor.MODE_3D_POINT)  {
             scope.onMouseMoveViewerHandler(event);
         }
     };
 
     var onDoubleClick = function (event) {
-        if (editor.mode === editor.MODE_EDITOR) {
+        if(editor.mode === editor.MODE_FACES_EDGES || editor.mode === editor.MODE_3D_GEOMETRY) {
 //          not implemented yet
-        } else {
+        } else if(editor.mode === editor.MODE_3D_POINT){
             scope.onMouseDblClickViewerHandler(event);
         }
 
@@ -1026,6 +1045,12 @@ var Viewport = function (editor) {
 
         render();
 
+    });
+
+
+    signals.setMode.add(function () {
+        nearestPoint.hide();
+        render();
     });
 
 
