@@ -9,6 +9,16 @@ var Viewport = function (editor) {
     container.setPosition('absolute');
     container.setBackgroundColor('#aaa');
 
+    var infoMode = new UI.Text();
+    infoMode.setPosition('absolute');
+    infoMode.setRight('5px');
+    infoMode.setTop('5px');
+    infoMode.setFontSize('12px');
+    infoMode.setColor('#ffffff');
+    infoMode.setValue('mode=' + editor.mode)
+    container.add(infoMode);
+
+
     var info = new UI.Text();
     info.setPosition('absolute');
     info.setRight('5px');
@@ -1050,6 +1060,7 @@ var Viewport = function (editor) {
 
     signals.setMode.add(function () {
         nearestPoint.hide();
+        infoMode.setValue('mode=' + editor.mode);
         render();
     });
 
