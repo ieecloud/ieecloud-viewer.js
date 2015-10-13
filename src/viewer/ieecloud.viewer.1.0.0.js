@@ -42,6 +42,13 @@ function Viewer(target, options) {
 
         });
 
+
+        $this.threeEditor.signals.select3dPoint.add(function (point) {
+          if($this.options.onSelect3dPoint){
+              $this.options.onSelect3dPoint(point);
+          }
+        });
+
         $this.threeEditor.signals.startRender.add(function () {
          if($this.options.onStartRender){
              $this.options.onStartRender();

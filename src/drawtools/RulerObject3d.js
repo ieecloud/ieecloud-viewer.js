@@ -62,6 +62,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
     var searchNearest = { type: "searchNearest" };
+    var select3dPoint = { type: "select3dPoint" };
     var disableMainControl = { type: "disableMainControl" };
     var enableMainControl = { type: "enableMainControl" };
     var disableMainMove = { type: "disableMainMove" };
@@ -431,12 +432,12 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
             me.getWorldQuaternion( quaternion );
 
             result.set( 1, 0, 0).applyQuaternion( quaternion );
-            console.log("highlighter.userData.value", highlighter.userData.value)
             var directionNorm = result.normalize().multiplyScalar(highlighter.userData.value)
             var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y , directionNorm.z);
 
             var result = pointA.clone().add(pointB);
-            console.log("result point---------", result)
+             select3dPoint.point = result;
+             me.dispatchEvent(select3dPoint);
          }
 
            me.dispatchEvent(disableMainControl);

@@ -144,6 +144,10 @@ var Viewport = function (editor) {
      });
 
 
+     ruler.addEventListener("select3dPoint", function(event){
+         editor.select3dPoint(event.point);
+     });
+
      ruler.addEventListener("enableMainControl", function(event){
          controls.enabled = true;
      });

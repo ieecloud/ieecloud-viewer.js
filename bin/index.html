@@ -39,14 +39,16 @@
 
          $("#viewer").ieecloudEditor({
             textureUrl: "",
-            mode: "3d_point",
+            mode: "3d_geometry",
             resultDigits: 3,
             drawResults: false,
             gridVisible: true,
             resultColor:"white",
             backgroundColor:"#d4d4d4",
             resultTextColor:"white",
-            id: "1"
+            id: "1",
+            onSelect3dPoint: function (point) {
+            }
         });
 
         $("#showRulerBtn").click(function(){
