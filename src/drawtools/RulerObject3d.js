@@ -57,6 +57,8 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
     var me = this;
     me.INTERSECTED = {};
     var SELECTED;
+    var onMouseDownPosition = new THREE.Vector2();
+    var onMouseUpPosition = new THREE.Vector2();
     var INTERSECTED;
     var INTERSECTED_DELIMITER;
     var raycaster = new THREE.Raycaster();
@@ -291,7 +293,6 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         var height = subVector.length();
         radius = 7.76;
-        console.log(radius)
 
         this.userData.rotateVSign = -1;
         this.userData.rotateSinSign = 1;
@@ -387,17 +388,17 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
      this.getPointDirectionVector = function(  ) {
           var pointA = new THREE.Vector3(nearestPoint.position.x, nearestPoint.position.y, nearestPoint.position.z);
-                    var result = new THREE.Vector3();
-                    var quaternion = new THREE.Quaternion();
+          var result = new THREE.Vector3();
+          var quaternion = new THREE.Quaternion();
 
-                    me.getWorldQuaternion( quaternion );
+          me.getWorldQuaternion( quaternion );
 
-                    result.set( 1, 0, 0).applyQuaternion( quaternion );
-                    var directionNorm = result.normalize().multiplyScalar(1)
-                    var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y , directionNorm.z);
+          result.set( 1, 0, 0).applyQuaternion( quaternion );
+          var directionNorm = result.normalize().multiplyScalar(1)
+          var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y , directionNorm.z);
 
-                    var result = pointA.clone().add(pointB);
-       return   result;
+           var result = pointA.clone().add(pointB);
+           return   result;
      }
 
      this.getDirectionNorm = function(  ) {
@@ -416,29 +417,16 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
            return;
        }
        event.preventDefault();
+       event.stopPropagation();
+
+       var array = getMousePosition(domElement, event.clientX, event.clientY );
+       onMouseDownPosition.fromArray(array);
 
        var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
        var intersects = getIntersects(pointer, me);
 
        if ( intersects.length > 0 ) {
-
-
-          if(highlighter.visible){
-            var pointA = new THREE.Vector3(nearestPoint.position.x, nearestPoint.position.y, nearestPoint.position.z);
-            var result = new THREE.Vector3();
-            var quaternion = new THREE.Quaternion();
-
-            me.getWorldQuaternion( quaternion );
-
-            result.set( 1, 0, 0).applyQuaternion( quaternion );
-            var directionNorm = result.normalize().multiplyScalar(highlighter.userData.value)
-            var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y , directionNorm.z);
-
-            var result = pointA.clone().add(pointB);
-             select3dPoint.point = result;
-             me.dispatchEvent(select3dPoint);
-         }
 
            me.dispatchEvent(disableMainControl);
            SELECTED = me;
@@ -458,6 +446,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
            return;
        }
        event.preventDefault();
+       event.stopPropagation();
 
        var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
         if(SELECTED){
@@ -465,8 +454,25 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
            nearestPoint.hide();
            changeEvent.moved = false;
            me.dispatchEvent(changeEvent);
-        }
+           var rect = domElement.getBoundingClientRect();
+           var array =  getMousePosition(domElement, event.clientX, event.clientY );
+           onMouseUpPosition.fromArray(array);
+           if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
+               var pointA = new THREE.Vector3(nearestPoint.position.x, nearestPoint.position.y, nearestPoint.position.z);
+                var result = new THREE.Vector3();
+                var quaternion = new THREE.Quaternion();
 
+                me.getWorldQuaternion( quaternion );
+
+                result.set( 1, 0, 0).applyQuaternion( quaternion );
+                var directionNorm = result.normalize().multiplyScalar(highlighter.userData.value)
+                var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y , directionNorm.z);
+
+                var result = pointA.clone().add(pointB);
+                select3dPoint.point = result;
+                me.dispatchEvent(select3dPoint);
+           }
+        }
         if ( INTERSECTED ) {
 
            plane.position.copy( me.position );
