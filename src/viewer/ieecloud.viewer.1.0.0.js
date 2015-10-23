@@ -85,6 +85,10 @@ function Viewer(target, options) {
         this.threeEditor.loader.handleJSONData(modelJsn);
     };
 
+    Viewer.prototype.resize = function () {
+       scope.threeEditor.signals.windowResize.dispatch();
+    };
+
     Viewer.prototype.reloadModel = function (modelJsn) {
         this.threeEditor.loader.reloadModel(modelJsn);
     };

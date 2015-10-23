@@ -348,6 +348,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
            return;
        }
        event.preventDefault();
+       event.stopPropagation();
 
        var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
