@@ -451,7 +451,9 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
        var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
         if(SELECTED){
-           SELECTED.position.copy(nearestPoint.position);
+           if(changeEvent.moved){
+              SELECTED.position.copy(nearestPoint.position);
+           }
            nearestPoint.hide();
            changeEvent.moved = false;
            me.dispatchEvent(changeEvent);
