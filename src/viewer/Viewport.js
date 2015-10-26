@@ -783,14 +783,21 @@ var Viewport = function (editor) {
         document.removeEventListener('mouseup', onMouseUp);
     };
 
-    var onMouseUp = function (event) {
+     scope.onMouseUp3dPointHandler = function (event) {
+        var array = getMousePosition( container.dom, event.clientX, event.clientY );
+        onMouseUpPosition.fromArray( array );
+        if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0 && nearestPoint.visible) {
+              editor.select3dPoint(nearestPoint.position);
+        }
+        document.removeEventListener('mouseup', onMouseUp);
+    };
 
+    var onMouseUp = function (event) {
         if (editor.mode === editor.MODE_FACES_EDGES) {
             scope.onMouseUpFacesEdgesHandler(event);
         } else if(editor.mode === editor.MODE_3D_POINT){
-//            not implemented yet
+            scope.onMouseUp3dPointHandler(event);
         } else if(editor.mode === editor.MODE_3D_GEOMETRY){
-//            not implemented yet
             scope.onMouseUp3dGeometryHandler(event);
         }
     };

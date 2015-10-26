@@ -447,7 +447,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
            return;
        }
        event.preventDefault();
-       event.stopPropagation();
+//       event.stopPropagation();
 
        var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
         if(SELECTED){
@@ -461,7 +461,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
            var array =  getMousePosition(domElement, event.clientX, event.clientY );
            onMouseUpPosition.fromArray(array);
            if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
-               var pointA = new THREE.Vector3(nearestPoint.position.x, nearestPoint.position.y, nearestPoint.position.z);
+               var pointA = new THREE.Vector3(me.position.x, me.position.y, me.position.z);
                 var result = new THREE.Vector3();
                 var quaternion = new THREE.Quaternion();
 
