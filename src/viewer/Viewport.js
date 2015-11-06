@@ -1153,10 +1153,13 @@ var Viewport = function (editor) {
         camera.lookAt(center);
         camera.updateProjectionMatrix();
 
-
-
-        var boundLength = subVector.length();
-        scope.scaleTools = boundLength * 0.1;
+        ruler.update();
+        protractorV.update();
+        protractorH.update();
+        nearestPoint.update();
+        highlighter.update();
+        highlighterProtractor.update();
+        axis.update();
 
         render();
     });
@@ -1360,6 +1363,14 @@ var Viewport = function (editor) {
         camera.updateProjectionMatrix();
 
         renderer.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
+
+        ruler.update();
+        protractorV.update();
+        protractorH.update();
+        nearestPoint.update();
+        highlighter.update();
+        highlighterProtractor.update();
+        axis.update();
 
         render();
 

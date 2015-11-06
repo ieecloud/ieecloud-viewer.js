@@ -392,14 +392,18 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
 
 
      this.update = function () {
+       var pixW = 1200 + 500;
+       var pixH = domElement.offsetHeight;
 
-        var vFOV = camera.fov * Math.PI / 180;
-        var height = 2 * Math.tan( vFOV / 2 ) * distance;
-        var fraction = radius / height;
-        var heightInPixels = 1000 * fraction;
-        var scaleFactorH = 1000/heightInPixels;
-        this.scale.x = scaleFactorH * 0.4
-        this.scale.z = scaleFactorH * 0.4
+       var vFOV = camera.fov * Math.PI / 180;
+       var focalLength = 2 * Math.tan( vFOV / 2 );
+       var scaleFactor = focalLength / (focalLength + distance);
+
+       this.scale.x = scaleFactor * pixW;
+       this.scale.y = scaleFactor * pixW;
+       this.scale.z = scaleFactor * pixW;
+
+
     }
 
     this.init();

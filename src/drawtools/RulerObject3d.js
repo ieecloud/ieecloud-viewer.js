@@ -218,28 +218,6 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         object.rotation.setFromRotationMatrix(object.matrix);
     };
 
-    var boundingBox = function(obj) {
-        var me = this;
-        if (obj instanceof THREE.Mesh) {
-
-            var geometry = obj.geometry;
-            geometry.computeBoundingBox();
-            return  geometry.boundingBox;
-
-        }
-
-        if (obj instanceof THREE.Object3D) {
-
-            var bb = new THREE.Box3();
-            for (var i=0;i < obj.children.length;i++) {
-                bb.union(me.boundingBox(obj.children[i]));
-            }
-            return bb;
-        }
-    }
-
-
-
     this.init = function () {
 
         THREE.Object3D.call(this);
@@ -287,9 +265,9 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         distance = worldPosition.distanceTo(camPosition);
 
-        var boundingBox = new THREE.Box3().setFromObject( this );
+        this.boundingBox = new THREE.Box3().setFromObject( this );
         var subVector = new THREE.Vector3(0, 0, 0);
-        subVector.subVectors(boundingBox.min, boundingBox.max);
+        subVector.subVectors(this.boundingBox.min, this.boundingBox.max);
 
         var height = subVector.length();
         radius = 7.76;
@@ -443,7 +421,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
 
      var onMouseUp = function( event ) {
-       if(!me.visible){
+       if(!me.visible || event.button !== 0){
            return;
        }
        event.preventDefault();
@@ -600,21 +578,16 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
 
      this.update = function () {
-        var pixW = 5;
-        var pixH = 10;
-        var vFOV = camera.fov * Math.PI / 180;
-        var height = 2 * Math.tan( vFOV / 2 ) * distance;
-        var fraction = radius / height;
-        var heightInPixels = pixH * fraction;
-        var scaleFactorH = pixH/heightInPixels;
-        var aspect = pixW / pixH;
-        var width = height * aspect;
-        var fraction = radius / width;
-        var widthInPixels = pixW * fraction;
-        var scaleFactorW = pixW/widthInPixels;
-        this.scale.x = scaleFactorW;
-        this.scale.z = scaleFactorW;
-        this.updateDelimiters(scaleFactorW);
+
+       var pixW = 1200;
+       var vFOV = camera.fov * Math.PI / 180;
+       var focalLength = 2 * Math.tan( vFOV / 2 );
+       var scaleFactor = focalLength / (focalLength + distance);
+
+       this.scale.x = scaleFactor * pixW;
+       this.scale.y = scaleFactor * pixW;
+       this.scale.z = scaleFactor * pixW;
+       this.updateDelimiters(scaleFactor * pixW);
 
 
     }
