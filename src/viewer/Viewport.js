@@ -1248,18 +1248,19 @@ var Viewport = function (editor) {
 
 
     signals.objectsRemoved.add(function (objsToRemove) {
-
         var materialsNeedUpdate = false;
-         for ( i = objsToRemove.length - 1; i >= 0 ; i -- ) {
+        for ( i = objsToRemove.length - 1; i >= 0 ; i -- ) {
               obj = objsToRemove[ i ];
-              objects.splice(objects.indexOf(obj), 1);
-         }
-
-
+              obj.traverse(function (child) {
+                   if (child instanceof THREE.Light){
+                       materialsNeedUpdate = true;
+                   }
+                   objects.splice(objects.indexOf(child), 1);
+              });
+        }
         if (materialsNeedUpdate === true){
             updateMaterials();
         }
-
     });
 
 

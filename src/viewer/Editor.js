@@ -187,7 +187,7 @@ Editor.prototype = {
                   obj.parent.remove(obj);
                }
          }
-
+        this.lastModel = null;
         this.signals.objectsRemoved.dispatch(objsToRemove);
         this.signals.sceneGraphChanged.dispatch();
 
