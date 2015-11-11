@@ -763,18 +763,17 @@ var Viewport = function (editor) {
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
             var intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
-                scene.traverse(function (object) {
-                    if (object instanceof THREE.Mesh || object instanceof THREEext.Line) {
-                        if (object.selectedFlag) {
-                            editor.unSelectObject(object);
-                            editor.unSelectTree(object);
-                        }else{
-                            editor.selectObject(object);
-                            editor.selectTree(object);
-                        }
-
-                    }
-                });
+                 editor.loader.traverseTree(editor.loader.objectsTree, function (child) {
+                       if(child.parentName ===  intersects[0].object.parentName){
+                          if (child.selectedFlag) {
+                              editor.unSelectObject(child);
+                              editor.unSelectTree(child);
+                          }else{
+                              editor.selectObject(child);
+                              editor.selectTree(child);
+                          }
+                       }
+                    });
             } else {
                 editor.select(camera);
             }
