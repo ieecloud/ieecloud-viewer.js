@@ -70,6 +70,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
     var disableMainMove = { type: "disableMainMove" };
     var enableMainMove = { type: "enableMainMove" };
     var changeEvent = { type: "change" };
+    var rotateEvent = { type: "rotateEvent" };
     var offset = new THREE.Vector3();
     me.RULER_SIZE = 15;
     me.RULER_INNER_LIMIT = 2.1;
@@ -277,6 +278,10 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         this.userData.rotateHAngle = 0;
         this.userData.rotateVAngle = 0;
+        this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+        
+
+//         window.addEventListener( "keydown", onKeyPress, false );
     }
 
     this.getLeftCornerVerticalPosition = function () {
@@ -305,9 +310,10 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
     this.hide = function () {
       me.dispatchEvent(enableMainMove);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mousedown', onMouseDown);
-      document.removeEventListener('mouseup', onMouseUp);
+      domElement.removeEventListener('mousemove', onMouseMove);
+      domElement.removeEventListener('mousedown', onMouseDown);
+      domElement.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('keydown', onKeyPress);
       me.visible = false;
     }
 
@@ -317,7 +323,42 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
        domElement.addEventListener( "mousemove", onMouseMove, false );
        domElement.addEventListener( "mousedown", onMouseDown, false );
        domElement.addEventListener( "mouseup", onMouseUp, false );
+
+       document.addEventListener( "keydown", onKeyPress, false );
+
        this.update();
+    }
+
+    var onKeyPress = function( event ) {
+        event.preventDefault();
+        event.stopPropagation();
+        switch ( event.keyCode ) {
+
+            case me.keys.UP:
+               rotateEvent.angle =   -90;
+               rotateEvent.direction = "vertical";
+               me.dispatchEvent(rotateEvent);
+                break;
+
+            case me.keys.BOTTOM:
+                 rotateEvent.angle =  90;
+                 rotateEvent.direction = "vertical";
+                 me.dispatchEvent(rotateEvent);
+                break;
+
+            case me.keys.LEFT:
+                rotateEvent.angle = -90;
+                rotateEvent.direction = "horizontal";
+                me.dispatchEvent(rotateEvent);
+                break;
+
+            case me.keys.RIGHT:
+                   rotateEvent.angle = 90;
+                   rotateEvent.direction = "horizontal";
+                   me.dispatchEvent(rotateEvent);
+                break;
+
+        }
     }
 
 
@@ -329,8 +370,6 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
        event.stopPropagation();
 
        var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
-
-
 
         if ( SELECTED ) {
            me.dispatchEvent(searchNearest);
@@ -578,7 +617,6 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
 
      this.update = function () {
-
        var pixW = 1200;
        var vFOV = camera.fov * Math.PI / 180;
        var focalLength = 2 * Math.tan( vFOV / 2 );
