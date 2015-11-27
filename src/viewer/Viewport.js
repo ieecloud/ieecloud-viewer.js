@@ -923,25 +923,13 @@ var Viewport = function (editor) {
      var directionNorm = ruler.getDirectionNorm();
      var projection = directionNorm.projectOnPlane(normal);
      var projectionLength  = Math.round(projection.length());
-
-     var angleBTWOXY = THREE.Math.radToDeg(Math.atan2(projection.y, projection.x));
      var result = degree ;
-
-
-     //calculate angle btn ruler ray and OXY
-     var rulerRay = ruler.getPointDirectionVector();
-     var rulerRayProjection = new THREE.Vector3(rulerRay.x, rulerRay.y, rulerRay.z).projectOnPlane(normal);
-     var cross =  new THREE.Vector3();
-     cross.crossVectors(rulerRay, rulerRayProjection);
-     var sinAngleBTWZAndOXY = cross.length()/(rulerRay.length()*rulerRayProjection.length());
-     var rulerRayAngleWithOXY = Math.round(THREE.Math.radToDeg(Math.asin(sinAngleBTWZAndOXY)));
-     if(rulerRayAngleWithOXY !== 90){
+     if(projectionLength != 0){
           rotateAroundWorldAxis(ruler, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
           rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
           ruler.setRotateVSign(-1); // default direction
           calculateCrossVector();
      }
-
       ruler.setRotateHAngle(degree);
  }
               render();
@@ -994,14 +982,14 @@ var Viewport = function (editor) {
          var result = degree - (360 + angleBTWOXY);
 
 
-         //calculate angle btn ruler ray and OXY
-         var rulerRay = ruler.getPointDirectionVector();
-         var rulerRayProjection = new THREE.Vector3(rulerRay.x, rulerRay.y, rulerRay.z).projectOnPlane(normal);
-         var cross =  new THREE.Vector3();
-         cross.crossVectors(rulerRay, rulerRayProjection);
-         var sinAngleBTWZAndOXY = cross.length()/(rulerRay.length()*rulerRayProjection.length());
-         var rulerRayAngleWithOXY = Math.round(THREE.Math.radToDeg(Math.asin(sinAngleBTWZAndOXY)));
-         if(rulerRayAngleWithOXY !== 90){
+//         //calculate angle btn ruler ray and OXY
+//         var rulerRay = ruler.getPointDirectionVector();
+//         var rulerRayProjection = new THREE.Vector3(rulerRay.x, rulerRay.y, rulerRay.z).projectOnPlane(normal);
+//         var cross =  new THREE.Vector3();
+//         cross.crossVectors(rulerRay, rulerRayProjection);
+//         var sinAngleBTWZAndOXY = cross.length()/(rulerRay.length()*rulerRayProjection.length());
+//         var rulerRayAngleWithOXY = Math.round(THREE.Math.radToDeg(Math.asin(sinAngleBTWZAndOXY)));
+         if(projectionLength !== 0){
               rotateAroundWorldAxis(ruler, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
               rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
               ruler.setRotateVSign(-1); // default direction
