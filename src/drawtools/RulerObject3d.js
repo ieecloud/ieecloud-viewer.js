@@ -347,13 +347,13 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
                 break;
 
             case me.keys.LEFT:
-                rotateEvent.angle = -90;
+                rotateEvent.angle = 90;
                 rotateEvent.direction = "horizontal";
                 me.dispatchEvent(rotateEvent);
                 break;
 
             case me.keys.RIGHT:
-                   rotateEvent.angle = 90;
+                   rotateEvent.angle = -90;
                    rotateEvent.direction = "horizontal";
                    me.dispatchEvent(rotateEvent);
                 break;
