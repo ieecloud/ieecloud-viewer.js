@@ -922,9 +922,10 @@ var Viewport = function (editor) {
      var normal = new THREE.Vector3(0,0,1);
      var directionNorm = ruler.getDirectionNorm();
      var projection = directionNorm.projectOnPlane(normal);
-     var projectionLength  = Math.round(projection.length());
+     var projectionLength  = projection.length();
      var result = degree ;
-     if(projectionLength != 0){
+
+     if(parseFloat(projectionLength.toFixed(12)) != 0){
           rotateAroundWorldAxis(ruler, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
           rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
           ruler.setRotateVSign(-1); // default direction
@@ -989,7 +990,7 @@ var Viewport = function (editor) {
 //         cross.crossVectors(rulerRay, rulerRayProjection);
 //         var sinAngleBTWZAndOXY = cross.length()/(rulerRay.length()*rulerRayProjection.length());
 //         var rulerRayAngleWithOXY = Math.round(THREE.Math.radToDeg(Math.asin(sinAngleBTWZAndOXY)));
-         if(projectionLength !== 0){
+         if(parseFloat(projectionLength.toFixed(12)) != 0){
               rotateAroundWorldAxis(ruler, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
               rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
               ruler.setRotateVSign(-1); // default direction
