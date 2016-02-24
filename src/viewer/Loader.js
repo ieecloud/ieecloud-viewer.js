@@ -31,7 +31,7 @@ var Loader = function (editor, textureUrl) {
 
         callback(node);
         for (var i = 0, l = node.children.length; i < l; i++) {
-            scope.traverseTree(node.children[ i ], callback);
+            scope.traverseTree(node.children[i], callback);
 
         }
     };
@@ -87,10 +87,10 @@ var Loader = function (editor, textureUrl) {
     }
 
     this.computeBoundingBox = function (modelRotation) {
-       var commonBoundingBox =  new THREE.Box3().setFromObject( editor.lastModel );
-       if(commonBoundingBox.max.length() < Infinity && commonBoundingBox.min.length() < Infinity){
-           editor.calculateSpaceScale(commonBoundingBox, modelRotation);
-       }
+        var commonBoundingBox = new THREE.Box3().setFromObject(editor.lastModel);
+        if (commonBoundingBox.max.length() < Infinity && commonBoundingBox.min.length() < Infinity) {
+            editor.calculateSpaceScale(commonBoundingBox, modelRotation);
+        }
     }
 
 
@@ -118,37 +118,37 @@ var Loader = function (editor, textureUrl) {
 
                 var mesh = new THREE.Mesh(objectGeometry, facesMaterial);
                 mesh.userData.pointsTable = pointsTable;
-                mesh.userData.name =  objectElement[j].name;
+                mesh.userData.name = objectElement[j].name;
                 mesh.userData.totalObjVertices = vertices;
                 mesh.userData.totalObjResults = results;
 //            http://stackoverflow.com/questions/17146650/combining-multiple-line-geometries-into-a-single-geometry
                 var lines = new THREEext.Line(edgesGeometry, edgesMaterial, THREE.LinePieces);
                 lines.userData.pointsTable = pointsTable;
-                 lines.userData.name =  objectElement[j].name;
+                lines.userData.name = objectElement[j].name;
                 lines.userData.totalObjVertices = vertices;
                 lines.userData.totalObjResults = results;
                 modelGroup.add(lines);
                 modelGroup.add(mesh);
 
                 lines.name = objectElement[j].name;
-                lines.uniqueId =lines.uuid;
+                lines.uniqueId = lines.uuid;
                 lines.parentName = objectElement[j].parentName;
                 lines.defaultColor = edgesMaterial.color.clone();
 
                 mesh.name = objectElement[j].name;
-                mesh.uniqueId =mesh.uuid;
+                mesh.uniqueId = mesh.uuid;
                 mesh.parentName = objectElement[j].parentName;
                 mesh.defaultColor = facesMaterial.color.clone();
 
-                if((objectGeometry.faces.length > 0  && edgesGeometry.vertices.length > 0)){
-                        lines.name = objectElement[j].name + ".EDGE";
-                        mesh.name = objectElement[j].name + ".FACE";
-                        meshesData[key].push(lines);
-                        meshesData[key].push(mesh);
-                }else if(objectGeometry.faces.length === 0  && edgesGeometry.vertices.length > 0){
-                        meshesData[key].push(lines);
-                } else if(objectGeometry.faces.length > 0  && edgesGeometry.vertices.length === 0){
-                        meshesData[key].push(mesh);
+                if ((objectGeometry.faces.length > 0 && edgesGeometry.vertices.length > 0)) {
+                    lines.name = objectElement[j].name + ".EDGE";
+                    mesh.name = objectElement[j].name + ".FACE";
+                    meshesData[key].push(lines);
+                    meshesData[key].push(mesh);
+                } else if (objectGeometry.faces.length === 0 && edgesGeometry.vertices.length > 0) {
+                    meshesData[key].push(lines);
+                } else if (objectGeometry.faces.length > 0 && edgesGeometry.vertices.length === 0) {
+                    meshesData[key].push(mesh);
                 }
 
                 var simpleShapes = objectElement[j].simpleShapes;
@@ -171,21 +171,21 @@ var Loader = function (editor, textureUrl) {
                 }
 
                 var shapes = new THREE.Mesh(simpleShapesGeometry, facesMaterial);
-                 modelGroup.add(shapes);
+                modelGroup.add(shapes);
 
             }
         }
 
         var textData = pictureInfo.textData;
         for (var key in textData) {
-           var textElement = textData[key];
-           for (var i in textElement) {
-               var textMesh = scope.createText2D(textElement[i].label, textElement[i].color, null, textElement[i].size);
-               textMesh.userData = {}
-               textMesh.userData.quaternion = "camera";
-               textMesh.position.copy(textElement[i].position);
-               modelGroup.add(textMesh);
-           }
+            var textElement = textData[key];
+            for (var i in textElement) {
+                var textMesh = scope.createText2D(textElement[i].label, textElement[i].color, null, textElement[i].size);
+                textMesh.userData = {}
+                textMesh.userData.quaternion = "camera";
+                textMesh.position.copy(textElement[i].position);
+                modelGroup.add(textMesh);
+            }
         }
 
         editor.addModelGroup(modelGroup);
@@ -197,7 +197,7 @@ var Loader = function (editor, textureUrl) {
 
         var canvas = scope.createTextCanvas(text, color, font, 256);
 
-        var plane = new THREE.PlaneBufferGeometry (canvas.width / canvas.height * size, size);
+        var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
         var tex = new THREE.Texture(canvas);
 
         tex.needsUpdate = true;
@@ -237,9 +237,9 @@ var Loader = function (editor, textureUrl) {
                     if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREEext.Line)) {
                         var node = obj[i];
                         if (node.index != -1) {
-                            if(result[node.index]){
+                            if (result[node.index]) {
                                 node.children = result[node.index];
-                                node.uniqueId =THREE.Math.generateUUID() ;
+                                node.uniqueId = THREE.Math.generateUUID();
                             }
 
                         }
@@ -252,9 +252,9 @@ var Loader = function (editor, textureUrl) {
                     if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREEext.Line)) {
                         var node = obj[prop];
                         if (node.index != -1) {
-                            if(result[node.index]){
-                               node.children = result[node.index];
-                               node.uniqueId =THREE.Math.generateUUID() ;
+                            if (result[node.index]) {
+                                node.children = result[node.index];
+                                node.uniqueId = THREE.Math.generateUUID();
                             }
                         }
                         traverse(obj[prop]);
@@ -331,17 +331,17 @@ var Loader = function (editor, textureUrl) {
 
             // uniforms
             var uniforms = {
-                texture: { type: "t", value: texture },
-                texture2: { type: "t", value: texture2 },
-                offsetRepeat: { type: "v4", value: new THREE.Vector4(settings.texture.offsetX, settings.texture.offsetY,
-                    settings.texture.repeatX, settings.texture.repeatY),
+                texture: {type: "t", value: texture},
+                texture2: {type: "t", value: texture2},
+                offsetRepeat: {
+                    type: "v4", value: new THREE.Vector4(settings.texture.offsetX, settings.texture.offsetY,
+                        settings.texture.repeatX, settings.texture.repeatY),
                     transparency: {type: "f", value: (settings.transparancy > 0 ? (1 - settings.transparancy) : 1.0)}
                 }
             };
 
             // attributes
-            var attributes = {
-            };
+            var attributes = {};
             var material = new THREE.ShaderMaterial({
                 attributes: attributes,
                 uniforms: uniforms,
@@ -373,9 +373,9 @@ var Loader = function (editor, textureUrl) {
         while (offset < faces.length) {
             var face = new THREE.Face3();
             var ind = faceGeometry.vertices.length;
-            faceGeometry.vertices.push(vertices[faces[ offset ]]);
-            faceGeometry.vertices.push(vertices[faces[ offset + 1]]);
-            faceGeometry.vertices.push(vertices[faces[ offset + 2]]);
+            faceGeometry.vertices.push(vertices[faces[offset]]);
+            faceGeometry.vertices.push(vertices[faces[offset + 1]]);
+            faceGeometry.vertices.push(vertices[faces[offset + 2]]);
             face.a = ind;
             face.b = ind + 1;
             face.c = ind + 2;
@@ -387,7 +387,7 @@ var Loader = function (editor, textureUrl) {
                 resultsUV.push(new THREE.Vector2(0.0, scope.getV(results[faces[offset]], maxResult, minResult)));
                 resultsUV.push(new THREE.Vector2(0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult)));
                 resultsUV.push(new THREE.Vector2(0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult)));
-                faceGeometry.faceVertexUvs[ 0 ].push([ resultsUV[0], resultsUV[1], resultsUV[2] ]);
+                faceGeometry.faceVertexUvs[0].push([resultsUV[0], resultsUV[1], resultsUV[2]]);
             }
 
 
@@ -396,7 +396,7 @@ var Loader = function (editor, textureUrl) {
                 uvs.push(new THREE.Vector2(uv[offset * 2], uv[offset * 2 + 1]));
                 uvs.push(new THREE.Vector2(uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1]));
                 uvs.push(new THREE.Vector2(uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]));
-                faceGeometry.faceVertexUvs[ 0 ].push([ uvs[0], uvs[1], uvs[2] ]);
+                faceGeometry.faceVertexUvs[0].push([uvs[0], uvs[1], uvs[2]]);
             }
 
 
@@ -407,7 +407,7 @@ var Loader = function (editor, textureUrl) {
             face1.c = face.b;
 
             if (drawResults) { // if results exist generating vertex coordinates according to results.
-                faceGeometry.faceVertexUvs[ 0 ].push([ resultsUV[0], resultsUV[2], resultsUV[1] ]);
+                faceGeometry.faceVertexUvs[0].push([resultsUV[0], resultsUV[2], resultsUV[1]]);
             }
 
             if (drawTexture) {
@@ -415,7 +415,7 @@ var Loader = function (editor, textureUrl) {
                 uvs.push(new THREE.Vector2(1 - uv[offset * 2], uv[offset * 2 + 1]));
                 uvs.push(new THREE.Vector2(1 - uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1]));
                 uvs.push(new THREE.Vector2(1 - uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]));
-                faceGeometry.faceVertexUvs[ 0 ].push([ uvs[0], uvs[2], uvs[1] ]);
+                faceGeometry.faceVertexUvs[0].push([uvs[0], uvs[2], uvs[1]]);
             }
 
             faceGeometry.faces.push(face1);
@@ -522,7 +522,11 @@ var Loader = function (editor, textureUrl) {
 
             }
 
-            pictureGeometryElement.edgesMaterial = new THREE.LineBasicMaterial({ color: settings.lineColor, opacity: 1, linewidth: settings.lineWidth});
+            pictureGeometryElement.edgesMaterial = new THREE.LineBasicMaterial({
+                color: settings.lineColor,
+                opacity: 1,
+                linewidth: settings.lineWidth
+            });
 
             pictureGeometryElement.simpleShapes = [];  //Simple shapes
 
@@ -537,7 +541,7 @@ var Loader = function (editor, textureUrl) {
     }
 
 
-    this.parseModelPart = function (geometryObject, names, pictureInfo, colorMapTexture, index,  maxResult, minResult) {
+    this.parseModelPart = function (geometryObject, names, pictureInfo, colorMapTexture, index, maxResult, minResult) {
         var name = geometryObject.name;
         var scale = 1;
         names.push(name);
@@ -553,9 +557,9 @@ var Loader = function (editor, textureUrl) {
         var offset = 0;
         while (offset < coords.length) { //reading vertices
             var vertex = new THREE.Vector3();
-            vertex.x = coords[ offset++ ] * scale;
-            vertex.y = coords[ offset++ ] * scale;
-            vertex.z = coords[ offset++ ] * scale;
+            vertex.x = coords[offset++] * scale;
+            vertex.y = coords[offset++] * scale;
+            vertex.z = coords[offset++] * scale;
             vertices.push(vertex);
         }
 
@@ -590,24 +594,24 @@ var Loader = function (editor, textureUrl) {
     }
 
     this.getV = function (result, maxResult, minResult) {
-        return  (result - minResult) / (maxResult - minResult);
+        return (result - minResult) / (maxResult - minResult);
     }
 
-    this.createJsonModelWithRotation = function(currentModelRotation){
+    this.createJsonModelWithRotation = function (currentModelRotation) {
 
-       var modelRotation  = this.modelRotation;
-       if(!modelRotation){
-          return;
-       }
-       var message = "position:  x = " + currentModelRotation.position.x + " y =" + currentModelRotation.position.y + " z =" + currentModelRotation.position.z + ",  fov =" + currentModelRotation.fov + "\n";
-       if(modelRotation.results){
-          for(var i=0; i< modelRotation.results.length; i++){
-              var result = modelRotation.results[i];
-              console.log(result)
-              message+= "result = " + result.resultValue + "  position: x = " + result.position.x + " y =" + result.position.y + " z =" + result.position.z +  "\n";
-          }
-       }
-       alert(message)
+        var modelRotation = this.modelRotation;
+        if (!modelRotation) {
+            return;
+        }
+        var message = "position:  x = " + currentModelRotation.position.x + " y =" + currentModelRotation.position.y + " z =" + currentModelRotation.position.z + ",  fov =" + currentModelRotation.fov + "\n";
+        if (modelRotation.results) {
+            for (var i = 0; i < modelRotation.results.length; i++) {
+                var result = modelRotation.results[i];
+                console.log(result)
+                message += "result = " + result.resultValue + "  position: x = " + result.position.x + " y =" + result.position.y + " z =" + result.position.z + "\n";
+            }
+        }
+        alert(message)
     }
 
 

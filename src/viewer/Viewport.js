@@ -63,7 +63,7 @@ var Viewport = function (editor) {
     var grid = new THREEext.GridHelper(500, 25);
     sceneHelpers.add(grid);
 
-    if(!editor.options.gridVisible){
+    if (!editor.options.gridVisible) {
         grid.hide();
     }
 
@@ -76,7 +76,7 @@ var Viewport = function (editor) {
 
 
     // renderer
-    var renderer2 = new THREE.CanvasRenderer({ alpha: true } );
+    var renderer2 = new THREE.CanvasRenderer({alpha: true});
     renderer2.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
     container2.dom.appendChild(renderer2.domElement);
 
@@ -95,252 +95,248 @@ var Viewport = function (editor) {
 
     var selectedResultPoints = {};
     var textResults = {};
-    var nearestPoint = new THREE.NearestPointObject3d(camera, container.dom, {material : {color: editor.options.nearestPointColor}});
+    var nearestPoint = new THREE.NearestPointObject3d(camera, container.dom, {material: {color: editor.options.nearestPointColor}});
     nearestPoint.hide();
 
 
     sceneHelpers.add(nearestPoint);
 
-    var highlighter = new THREE.NearestPointObject3d(camera, container.dom, {material : {color: editor.options.nearestPointColor}});
+    var highlighter = new THREE.NearestPointObject3d(camera, container.dom, {material: {color: editor.options.nearestPointColor}});
     highlighter.hide();
     sceneHelpers.add(highlighter);
 
 
-
-    var highlighterProtractor = new THREE.NearestPointObject3d(camera, container.dom, {material : {color: editor.options.nearestPointColor}});
+    var highlighterProtractor = new THREE.NearestPointObject3d(camera, container.dom, {material: {color: editor.options.nearestPointColor}});
     highlighterProtractor.hide();
     sceneHelpers.add(highlighterProtractor);
 
 
-     var projectionPoint = new THREE.NearestPointObject3d(camera, container.dom, {material : {color: "white"}});
-        projectionPoint.hide();
-        sceneHelpers.add(projectionPoint);
+    var projectionPoint = new THREE.NearestPointObject3d(camera, container.dom, {material: {color: "white"}});
+    projectionPoint.hide();
+    sceneHelpers.add(projectionPoint);
 
     var plane = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry( 1000, 1000, 8, 8 ),
-        new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true } )
+        new THREE.PlaneBufferGeometry(1000, 1000, 8, 8),
+        new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.25, transparent: true})
     );
 
     plane.material.side = THREE.DoubleSide;
 
-    plane.userData.name="PLANE"
+    plane.userData.name = "PLANE"
 
-     var xAxis = new THREE.Vector3(1, 0, 0);
-    rotateAroundObjectAxis(plane, xAxis, Math.PI/2 );
+    var xAxis = new THREE.Vector3(1, 0, 0);
+    rotateAroundObjectAxis(plane, xAxis, Math.PI / 2);
 
     plane.visible = false;
 
 
-
-    sceneHelpers.add( plane );
-
-
-     var ruler = new THREE.ToolsGizmo(camera, container.dom, plane, nearestPoint, highlighter,sceneHelpers);
-     rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' +  ruler.userData.rotateVAngle);
-
-     ruler.addEventListener("disableMainControl", function(event){
-         controls.enabled = false;
-         highlighter.hide();
-     });
+    sceneHelpers.add(plane);
 
 
-     ruler.addEventListener("select3dPoint", function(event){
-         editor.select3dPoint(event.point);
-     });
+    var ruler = new THREE.ToolsGizmo(camera, container.dom, plane, nearestPoint, highlighter, sceneHelpers);
+    rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' + ruler.userData.rotateVAngle);
 
-     ruler.addEventListener("enableMainControl", function(event){
-         controls.enabled = true;
-     });
+    ruler.addEventListener("disableMainControl", function (event) {
+        controls.enabled = false;
+        highlighter.hide();
+    });
 
-     ruler.addEventListener("change", function(event){
+
+    ruler.addEventListener("select3dPoint", function (event) {
+        editor.select3dPoint(event.point);
+    });
+
+    ruler.addEventListener("enableMainControl", function (event) {
+        controls.enabled = true;
+    });
+
+    ruler.addEventListener("change", function (event) {
         var intersects = event.intersects;
-         var isRulerMoved = event.moved;
-         if(!intersects){
-              highlighter.hide();
-              if(!isRulerMoved){
-                 mainMouseMove = true;
-              }
-              render();
-            return;
-         }
-
-         mainMouseMove = false;
-         nearestPoint.hide();
-
-        var intersect = intersects[0];
-         if (intersect) {
-
-             var vertices = intersect.object.parent.parent.userData.totalObjVertices;
-             var pointsTable = intersect.object.parent.parent.userData.pointsTable;
-             var valueTable = intersect.object.parent.parent.userData.valueTable;
-             var distance = intersect.distance;
-             var c = intersect.point;
-             if (!pointsTable || !vertices) {
-                 return;
-             }
-
-               var wordVertices = [];
-               for (var i = 0; i < vertices.length; i++) {
-                    wordVertices.push(ruler.localToWorld(vertices[i].clone()));
-               }
-
-             highlighter.show();
-             var list = nearest(c, distance, pointsTable, wordVertices);
-             if (list.length > 0) {
-                 var resultIndex = list[0].index;
-                 var rulerValue = valueTable[resultIndex];
-                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
-                 highlighter.position.copy(position);
-                 highlighter.userData = {value : valueTable[resultIndex]};
-                 event.intersects = null;
-                 render();
-             }
-         }
-        render();
-        event.intersects = null;
-     });
-
-     ruler.addEventListener("searchNearest", function(event){
-        searchNearestPointRuler();
-     });
-
-     ruler.addEventListener("disableMainMove", function(event){
-         mainMouseMove = false;
-     });
-
-     ruler.addEventListener("enableMainMove", function(event){
-         mainMouseMove = true;
-     });
-     ruler.hide();
-     sceneHelpers.add( ruler );
-
-     var protractorV = new THREE.Protractor(camera, container.dom, THREE.ProtractorModes.VERTICAL, highlighterProtractor);
-     protractorV.addEventListener('reRenderProtractor', function (event) {
-        render();
-     });
-
-     crossVector = new THREE.Vector3(0, 0 , 0);
-
-     calculateCrossVector();
-
-     protractorV.addEventListener('disableMainMove', function (event) {
-
-        mainMouseMove = false;
-     });
-
-     protractorV.addEventListener('enableMainMove', function (event) {
-        mainMouseMove = true;
-     });
-
-     protractorV.addEventListener('highlightEvent', function (event) {
-
-        var intersects = event.intersects;
-         if(!intersects){
-            highlighterProtractor.hide();
-             mainMouseMove = true;
+        var isRulerMoved = event.moved;
+        if (!intersects) {
+            highlighter.hide();
+            if (!isRulerMoved) {
+                mainMouseMove = true;
+            }
             render();
             return;
-         }
-
-         mainMouseMove = false;
-         nearestPoint.hide();
-
-        var intersect = intersects[0];
-         if (intersect) {
-
-             var vertices = intersect.object.parent.parent.userData.totalObjVertices;
-             var pointsTable = intersect.object.parent.parent.userData.pointsTable;
-             var distance = intersect.distance;
-             var c = intersect.point;
-             if (!pointsTable || !vertices) {
-                 return;
-             }
-
-               var wordVertices = [];
-               for (var i = 0; i < vertices.length; i++) {
-                    wordVertices.push(protractorV.localToWorld(vertices[i].clone()));
-               }
-
-             highlighterProtractor.show();
-             var list = nearest(c, distance, pointsTable, wordVertices);
-             if (list.length > 0) {
-                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
-                 highlighterProtractor.position.copy(position);
-                 highlighterProtractor.userData = {angle : list[0].index * Math.round(THREE.Math.radToDeg(protractorV.DIVISION_STEP))};
-                 event.intersects = null;
-                 render();
-             }
-         }
-
-
-     });
-
-     protractorV.hide();
-     sceneHelpers.add( protractorV );
-
-
-     var protractorH = new THREE.Protractor(camera, container.dom, THREE.ProtractorModes.HORIZONTAL, highlighterProtractor);
-     protractorH.addEventListener('reRenderProtractor', function (event) {
-        render();
-     });
-
-     protractorH.addEventListener('disableMainMove', function (event) {
+        }
 
         mainMouseMove = false;
-     });
+        nearestPoint.hide();
 
-     protractorH.addEventListener('enableMainMove', function (event) {
+        var intersect = intersects[0];
+        if (intersect) {
+
+            var vertices = intersect.object.parent.parent.userData.totalObjVertices;
+            var pointsTable = intersect.object.parent.parent.userData.pointsTable;
+            var valueTable = intersect.object.parent.parent.userData.valueTable;
+            var distance = intersect.distance;
+            var c = intersect.point;
+            if (!pointsTable || !vertices) {
+                return;
+            }
+
+            var wordVertices = [];
+            for (var i = 0; i < vertices.length; i++) {
+                wordVertices.push(ruler.localToWorld(vertices[i].clone()));
+            }
+
+            highlighter.show();
+            var list = nearest(c, distance, pointsTable, wordVertices);
+            if (list.length > 0) {
+                var resultIndex = list[0].index;
+                var rulerValue = valueTable[resultIndex];
+                var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
+                highlighter.position.copy(position);
+                highlighter.userData = {value: valueTable[resultIndex]};
+                event.intersects = null;
+                render();
+            }
+        }
+        render();
+        event.intersects = null;
+    });
+
+    ruler.addEventListener("searchNearest", function (event) {
+        searchNearestPointRuler();
+    });
+
+    ruler.addEventListener("disableMainMove", function (event) {
+        mainMouseMove = false;
+    });
+
+    ruler.addEventListener("enableMainMove", function (event) {
         mainMouseMove = true;
-     });
+    });
+    ruler.hide();
+    sceneHelpers.add(ruler);
+
+    var protractorV = new THREE.Protractor(camera, container.dom, THREE.ProtractorModes.VERTICAL, highlighterProtractor);
+    protractorV.addEventListener('reRenderProtractor', function (event) {
+        render();
+    });
+
+    crossVector = new THREE.Vector3(0, 0, 0);
+
+    calculateCrossVector();
+
+    protractorV.addEventListener('disableMainMove', function (event) {
+
+        mainMouseMove = false;
+    });
+
+    protractorV.addEventListener('enableMainMove', function (event) {
+        mainMouseMove = true;
+    });
+
+    protractorV.addEventListener('highlightEvent', function (event) {
+
+        var intersects = event.intersects;
+        if (!intersects) {
+            highlighterProtractor.hide();
+            mainMouseMove = true;
+            render();
+            return;
+        }
+
+        mainMouseMove = false;
+        nearestPoint.hide();
+
+        var intersect = intersects[0];
+        if (intersect) {
+
+            var vertices = intersect.object.parent.parent.userData.totalObjVertices;
+            var pointsTable = intersect.object.parent.parent.userData.pointsTable;
+            var distance = intersect.distance;
+            var c = intersect.point;
+            if (!pointsTable || !vertices) {
+                return;
+            }
+
+            var wordVertices = [];
+            for (var i = 0; i < vertices.length; i++) {
+                wordVertices.push(protractorV.localToWorld(vertices[i].clone()));
+            }
+
+            highlighterProtractor.show();
+            var list = nearest(c, distance, pointsTable, wordVertices);
+            if (list.length > 0) {
+                var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
+                highlighterProtractor.position.copy(position);
+                highlighterProtractor.userData = {angle: list[0].index * Math.round(THREE.Math.radToDeg(protractorV.DIVISION_STEP))};
+                event.intersects = null;
+                render();
+            }
+        }
 
 
-      protractorH.addEventListener('highlightEvent', function (event) {
+    });
 
-         var intersects = event.intersects;
-          if(!intersects){
-             highlighterProtractor.hide();
-              mainMouseMove = true;
-             render();
-             return;
-          }
-          mainMouseMove = false;
-          nearestPoint.hide();
-
-         var intersect = intersects[0];
-          if (intersect) {
-
-              var vertices = intersect.object.parent.parent.userData.totalObjVertices;
-              var pointsTable = intersect.object.parent.parent.userData.pointsTable;
-              var distance = intersect.distance;
-              var c = intersect.point;
-              if (!pointsTable || !vertices) {
-                  return;
-              }
-
-                var wordVertices = [];
-                for (var i = 0; i < vertices.length; i++) {
-                     wordVertices.push(protractorH.localToWorld(vertices[i].clone()));
-                }
-
-              highlighterProtractor.show();
-              var list = nearest(c, distance, pointsTable, wordVertices);
-              if (list.length > 0) {
-                  var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
-                  highlighterProtractor.position.copy(position);
-                  highlighterProtractor.userData = {angle : list[0].index * Math.round(THREE.Math.radToDeg(protractorV.DIVISION_STEP))};
-                  event.intersects = null;
-                  render();
-              }
-          }
+    protractorV.hide();
+    sceneHelpers.add(protractorV);
 
 
-      });
+    var protractorH = new THREE.Protractor(camera, container.dom, THREE.ProtractorModes.HORIZONTAL, highlighterProtractor);
+    protractorH.addEventListener('reRenderProtractor', function (event) {
+        render();
+    });
+
+    protractorH.addEventListener('disableMainMove', function (event) {
+
+        mainMouseMove = false;
+    });
+
+    protractorH.addEventListener('enableMainMove', function (event) {
+        mainMouseMove = true;
+    });
 
 
+    protractorH.addEventListener('highlightEvent', function (event) {
 
-     protractorH.hide();
-     sceneHelpers.add( protractorH );
+        var intersects = event.intersects;
+        if (!intersects) {
+            highlighterProtractor.hide();
+            mainMouseMove = true;
+            render();
+            return;
+        }
+        mainMouseMove = false;
+        nearestPoint.hide();
 
+        var intersect = intersects[0];
+        if (intersect) {
+
+            var vertices = intersect.object.parent.parent.userData.totalObjVertices;
+            var pointsTable = intersect.object.parent.parent.userData.pointsTable;
+            var distance = intersect.distance;
+            var c = intersect.point;
+            if (!pointsTable || !vertices) {
+                return;
+            }
+
+            var wordVertices = [];
+            for (var i = 0; i < vertices.length; i++) {
+                wordVertices.push(protractorH.localToWorld(vertices[i].clone()));
+            }
+
+            highlighterProtractor.show();
+            var list = nearest(c, distance, pointsTable, wordVertices);
+            if (list.length > 0) {
+                var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
+                highlighterProtractor.position.copy(position);
+                highlighterProtractor.userData = {angle: list[0].index * Math.round(THREE.Math.radToDeg(protractorV.DIVISION_STEP))};
+                event.intersects = null;
+                render();
+            }
+        }
+
+
+    });
+
+
+    protractorH.hide();
+    sceneHelpers.add(protractorH);
 
 
     var object = new THREE.AxisHelper(100);
@@ -367,87 +363,86 @@ var Viewport = function (editor) {
     var oldFogDensity = 0.00025;
 
 
-	var raycaster = new THREE.Raycaster();
-	raycaster.linePrecision = 0.1;
-	var mouse = new THREE.Vector2();
+    var raycaster = new THREE.Raycaster();
+    raycaster.linePrecision = 0.1;
+    var mouse = new THREE.Vector2();
 
     // object picking
 
     var projector = new THREE.Projector();
 
 
+    function rotateAroundObjectAxis(object, axis, radians) {
+        var rotObjectMatrix = new THREE.Matrix4();
+        rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
+        object.matrix.multiply(rotObjectMatrix);
+        object.rotation.setFromRotationMatrix(object.matrix);
+    };
 
-     function rotateAroundObjectAxis(object, axis, radians) {
-         var rotObjectMatrix = new THREE.Matrix4();
-         rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
-         object.matrix.multiply(rotObjectMatrix);
-         object.rotation.setFromRotationMatrix(object.matrix);
-     };
+    function calculateCrossVector() {
+        var normal = new THREE.Vector3(0, 0, 1);
 
-     function calculateCrossVector() {
-         var normal = new THREE.Vector3(0,0,1);
+        var directionNorm = ruler.getDirectionNorm();
 
-         var directionNorm = ruler.getDirectionNorm();
-
-         var vectorToCross = directionNorm.projectOnPlane(normal);
-         crossVector.crossVectors(normal, vectorToCross);
-      };
-
-
-      function findVerticalAngle() {
-         var normal = new THREE.Vector3(0,0,1);
-         var rulerRay = ruler.getDirectionNorm();
-         var rulerRayProjection = new THREE.Vector3(rulerRay.x, rulerRay.y, rulerRay.z).projectOnPlane(normal);
-           var cross =  new THREE.Vector3();
-           cross.crossVectors(rulerRay, rulerRayProjection);
-           var sinAngleBTWZAndOXY = cross.length()/(rulerRay.length()*rulerRayProjection.length());
-            var result =THREE.Math.radToDeg(Math.asin(sinAngleBTWZAndOXY) );
-
-            if(isNaN(result)){
-               result = 90;
-            }
-
-           return result
+        var vectorToCross = directionNorm.projectOnPlane(normal);
+        crossVector.crossVectors(normal, vectorToCross);
+    };
 
 
-      };
+    function findVerticalAngle() {
+        var normal = new THREE.Vector3(0, 0, 1);
+        var rulerRay = ruler.getDirectionNorm();
+        var rulerRayProjection = new THREE.Vector3(rulerRay.x, rulerRay.y, rulerRay.z).projectOnPlane(normal);
+        var cross = new THREE.Vector3();
+        cross.crossVectors(rulerRay, rulerRayProjection);
+        var sinAngleBTWZAndOXY = cross.length() / (rulerRay.length() * rulerRayProjection.length());
+        var result = THREE.Math.radToDeg(Math.asin(sinAngleBTWZAndOXY));
 
+        if (isNaN(result)) {
+            result = 90;
+        }
 
-     function rotateAroundWorldAxis(object, axis, radians) {
-            var rotWorldMatrix = new THREE.Matrix4();
-            rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-            rotWorldMatrix.multiply(object.matrix);
-            object.matrix = rotWorldMatrix;
-            object.rotation.setFromRotationMatrix(object.matrix.extractRotation(rotWorldMatrix));
+        return result
 
-        };
-
-    // events
-
-    var getIntersects = function ( event, object ) {
-            var point  = new THREE.Vector2();
-            var array = getMousePosition( container.dom, event.clientX, event.clientY);
-
-            point.fromArray( array );
-
-    		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
-
-    		raycaster.setFromCamera( mouse, camera );
-
-    		if ( object instanceof Array ) {
-
-    			return raycaster.intersectObjects( object , true);
-
-    		}
-
-    		return raycaster.intersectObject( object , true);
 
     };
 
-    var getMousePosition = function ( dom, x, y ) {
+
+    function rotateAroundWorldAxis(object, axis, radians) {
+        var rotWorldMatrix = new THREE.Matrix4();
+        rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+        rotWorldMatrix.multiply(object.matrix);
+        object.matrix = rotWorldMatrix;
+        object.rotation.setFromRotationMatrix(object.matrix.extractRotation(rotWorldMatrix));
+
+    };
+
+    // events
+
+    var getIntersects = function (event, object) {
+        var point = new THREE.Vector2();
+        var array = getMousePosition(container.dom, event.clientX, event.clientY);
+
+        point.fromArray(array);
+
+        mouse.set(( point.x * 2 ) - 1, -( point.y * 2 ) + 1);
+
+        raycaster.setFromCamera(mouse, camera);
+
+        if (object instanceof Array) {
+
+            return raycaster.intersectObjects(object, true);
+
+        }
+
+        return raycaster.intersectObject(object, true);
+
+    };
+
+    var getMousePosition = function (dom, x, y) {
 
         var rect = dom.getBoundingClientRect();
-        return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+        return [( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height];
 
     };
 
@@ -474,23 +469,23 @@ var Viewport = function (editor) {
         if (index >= pointsTable.tableSize) {
             index = pointsTable.tableSize - 1;
         }
-        if(pointsTable.table[index]){
-          for (var i = 0; i < pointsTable.table[index].length; i++) {
-               var n = objVertices[pointsTable.table[index][i]];
-               n.index = pointsTable.table[index][i];
-               if (!n) {
-                 continue;
-               }
-               if (calculateR(n) < r - distance){
-                   continue;
-               }
-               if (calculateR(n) > r + distance){
-                   break;
-               }
-               if (calcDistance(n, c) < distance){
-                   list.push(n);
-               }
-          }
+        if (pointsTable.table[index]) {
+            for (var i = 0; i < pointsTable.table[index].length; i++) {
+                var n = objVertices[pointsTable.table[index][i]];
+                n.index = pointsTable.table[index][i];
+                if (!n) {
+                    continue;
+                }
+                if (calculateR(n) < r - distance) {
+                    continue;
+                }
+                if (calculateR(n) > r + distance) {
+                    break;
+                }
+                if (calcDistance(n, c) < distance) {
+                    list.push(n);
+                }
+            }
         }
         for (var i = index - 1; i >= 0 && dr * (index - i) < distance; i--) {
             for (var j = pointsTable.table[i].length - 1; j >= 0; j--) {
@@ -499,10 +494,10 @@ var Viewport = function (editor) {
                 if (!n) {
                     continue;
                 }
-                if (calculateR(n) < r - distance){
+                if (calculateR(n) < r - distance) {
                     break;
                 }
-                if (calcDistance(n, c) < distance){
+                if (calcDistance(n, c) < distance) {
                     list.push(n);
                 }
 
@@ -516,10 +511,10 @@ var Viewport = function (editor) {
                 if (!n) {
                     continue;
                 }
-                if (calculateR(n) > r + distance){
-                   break;
+                if (calculateR(n) > r + distance) {
+                    break;
                 }
-                if (calcDistance(n, c) < distance){
+                if (calcDistance(n, c) < distance) {
                     list.push(n);
                 }
             }
@@ -534,39 +529,37 @@ var Viewport = function (editor) {
         return list;
     };
 
-     function getFactorPos( val, factor, step ){
-         return step / factor * val;
-     }
+    function getFactorPos(val, factor, step) {
+        return step / factor * val;
+    }
 
 
     function addNewParticle(pos, scale) {
 
-        if( !scale )
-        {
+        if (!scale) {
             scale = 16;
         }
 
-        var particle = new THREE.Sprite( particleMaterialBlack );
+        var particle = new THREE.Sprite(particleMaterialBlack);
         particle.position.copy(pos);
         particle.scale.x = particle.scale.y = scale;
-        scene.add( particle );
+        scene.add(particle);
     };
 
 
-     var drawParticleLine = function(pointA, pointB){
+    var drawParticleLine = function (pointA, pointB) {
 
-        var scale  =1;
-        var color = new THREE.Color( "red" );
-         var geometry = new THREE.Geometry();
-         geometry.vertices.push(new THREE.Vector3( pointA.x,pointA.y,pointA.z ));
-         geometry.vertices.push(new THREE.Vector3( pointB.x,pointB.y,pointB.z ));
-         geometry.colors.push( color, color);
-         var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
-         var line = new THREEext.Line(geometry, material, THREE.LinePieces);
-         line.scale.x = line.scale.y = scale;
-         scene.add( line );
+        var scale = 1;
+        var color = new THREE.Color("red");
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push(new THREE.Vector3(pointA.x, pointA.y, pointA.z));
+        geometry.vertices.push(new THREE.Vector3(pointB.x, pointB.y, pointB.z));
+        geometry.colors.push(color, color);
+        var material = new THREE.LineBasicMaterial({vertexColors: THREE.VertexColors});
+        var line = new THREEext.Line(geometry, material, THREE.LinePieces);
+        line.scale.x = line.scale.y = scale;
+        scene.add(line);
     };
-
 
 
     var onMouseDownPosition = new THREE.Vector2();
@@ -575,7 +568,7 @@ var Viewport = function (editor) {
     var onMouseDown = function (event) {
         event.preventDefault();
 
-        var array = getMousePosition( container.dom, event.clientX, event.clientY );
+        var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseDownPosition.fromArray(array);
 
 
@@ -634,31 +627,31 @@ var Viewport = function (editor) {
         return intersect;
     };
 
-     var  getNearestIntersect = function (intersectLine, intersectMesh) {
-            if(!intersectMesh && intersectLine){
-                return intersectLine;
-            }
+    var getNearestIntersect = function (intersectLine, intersectMesh) {
+        if (!intersectMesh && intersectLine) {
+            return intersectLine;
+        }
 
-            if(intersectMesh && !intersectLine){
-                return intersectMesh;
-            }
+        if (intersectMesh && !intersectLine) {
+            return intersectMesh;
+        }
 
-            if(intersectMesh && intersectLine){
-                 var intersect = intersectMesh;
-                 if(intersectLine.distance < intersectMesh.distance){
-                     intersect = intersectLine;
-                 }
-                 return intersectMesh;
+        if (intersectMesh && intersectLine) {
+            var intersect = intersectMesh;
+            if (intersectLine.distance < intersectMesh.distance) {
+                intersect = intersectLine;
             }
+            return intersectMesh;
+        }
 
-            return null;
-        };
+        return null;
+    };
 
     scope.getSceneObjectByName = function (name, recursive) {
 
         for (var i = 0, l = sceneHelpers.children.length; i < l; i++) {
 
-            var child = sceneHelpers.children[ i ];
+            var child = sceneHelpers.children[i];
 
             if (child.name === name) {
 
@@ -701,7 +694,10 @@ var Viewport = function (editor) {
         }
 
 
-        var textResultMesh = new THREE.ResultTextObject3d(camera, container.dom, {value:resultVal, color: editor.options.resultTextColor});
+        var textResultMesh = new THREE.ResultTextObject3d(camera, container.dom, {
+            value: resultVal,
+            color: editor.options.resultTextColor
+        });
 
         textResultMesh.name = "result-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z;
         var textResultPosition = new THREE.Vector3(0, 0, 0);
@@ -710,13 +706,16 @@ var Viewport = function (editor) {
         textResultPosition.z = nearestPoint.position.z;
         textResultMesh.position.copy(textResultPosition);
         unRotatedObjects.push(textResultMesh);
-        var key  = resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z;
+        var key = resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z;
         textResults[key] = textResultMesh;
         textResultMesh.update(nearestPoint);
         sceneHelpers.add(textResultMesh);
 
 
-        var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {material: {color: editor.options.resultPointColor}, size:editor.options.resultPointSize});
+        var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {
+            material: {color: editor.options.resultPointColor},
+            size: editor.options.resultPointSize
+        });
         selectedResultPoint.name = "sphereResult-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z;
         selectedResultPoint.position.copy(nearestPoint.position);
         selectedResultPoints[key] = selectedResultPoint;
@@ -728,8 +727,8 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseUpFacesEdgesHandler = function (event) {
-        var array = getMousePosition( container.dom, event.clientX, event.clientY );
-        onMouseUpPosition.fromArray( array );
+        var array = getMousePosition(container.dom, event.clientX, event.clientY);
+        onMouseUpPosition.fromArray(array);
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
             var intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
@@ -744,7 +743,7 @@ var Viewport = function (editor) {
                         editor.selectTree(obj);
                     }
                 } else if (event && (event.ctrlKey || event.metaKey)) {
-                     obj = searchNearestObject(intersects, THREE.Mesh);
+                    obj = searchNearestObject(intersects, THREE.Mesh);
                     if (obj.selectedFlag) {
                         editor.unSelectObject(obj);
                         editor.unSelectTree(obj);
@@ -762,22 +761,22 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseUp3dGeometryHandler = function (event) {
-        var array = getMousePosition( container.dom, event.clientX, event.clientY );
-        onMouseUpPosition.fromArray( array );
+        var array = getMousePosition(container.dom, event.clientX, event.clientY);
+        onMouseUpPosition.fromArray(array);
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
             var intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
-                 editor.loader.traverseTree(editor.loader.objectsTree, function (child) {
-                       if(child.parentName ===  intersects[0].object.parentName){
-                          if (child.selectedFlag) {
-                              editor.unSelectObject(child);
-                              editor.unSelectTree(child);
-                          }else{
-                              editor.selectObject(child);
-                              editor.selectTree(child);
-                          }
-                       }
-                    });
+                editor.loader.traverseTree(editor.loader.objectsTree, function (child) {
+                    if (child.parentName === intersects[0].object.parentName) {
+                        if (child.selectedFlag) {
+                            editor.unSelectObject(child);
+                            editor.unSelectTree(child);
+                        } else {
+                            editor.selectObject(child);
+                            editor.selectTree(child);
+                        }
+                    }
+                });
             } else {
                 editor.select(camera);
             }
@@ -786,11 +785,11 @@ var Viewport = function (editor) {
         document.removeEventListener('mouseup', onMouseUp);
     };
 
-     scope.onMouseUp3dPointHandler = function (event) {
-        var array = getMousePosition( container.dom, event.clientX, event.clientY );
-        onMouseUpPosition.fromArray( array );
+    scope.onMouseUp3dPointHandler = function (event) {
+        var array = getMousePosition(container.dom, event.clientX, event.clientY);
+        onMouseUpPosition.fromArray(array);
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0 && nearestPoint.visible) {
-              editor.select3dPoint(nearestPoint.position);
+            editor.select3dPoint(nearestPoint.position);
         }
         document.removeEventListener('mouseup', onMouseUp);
     };
@@ -798,67 +797,67 @@ var Viewport = function (editor) {
     var onMouseUp = function (event) {
         if (editor.mode === editor.MODE_FACES_EDGES) {
             scope.onMouseUpFacesEdgesHandler(event);
-        } else if(editor.mode === editor.MODE_3D_POINT){
+        } else if (editor.mode === editor.MODE_3D_POINT) {
             scope.onMouseUp3dPointHandler(event);
-        } else if(editor.mode === editor.MODE_3D_GEOMETRY){
+        } else if (editor.mode === editor.MODE_3D_GEOMETRY) {
             scope.onMouseUp3dGeometryHandler(event);
         }
     };
 
 
-    var searchNearestPointRuler = function(){
-           var vector = ruler.getLeftCornerVerticalPosition();
-           raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
-           var intersects = raycaster.intersectObjects( objects );
+    var searchNearestPointRuler = function () {
+        var vector = ruler.getLeftCornerVerticalPosition();
+        raycaster.set(camera.position, vector.sub(camera.position).normalize());
+        var intersects = raycaster.intersectObjects(objects);
 
 
-           if(intersects.length > 0){
-               runNearestAlgorithm(intersects);
-           }
+        if (intersects.length > 0) {
+            runNearestAlgorithm(intersects);
+        }
     };
 
-     var runNearestAlgorithm = function(intersects){
-         var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
-         var intersectLine = searchNearestIntersect(intersects, THREEext.Line);
-         var intersect =  getNearestIntersect(intersectLine, intersectMesh);
-         if (intersect) {
-             var vertices = intersect.object.userData.totalObjVertices;
-             var results = intersect.object.userData.totalObjResults;
-             var pointsTable = intersect.object.userData.pointsTable;
+    var runNearestAlgorithm = function (intersects) {
+        var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
+        var intersectLine = searchNearestIntersect(intersects, THREEext.Line);
+        var intersect = getNearestIntersect(intersectLine, intersectMesh);
+        if (intersect) {
+            var vertices = intersect.object.userData.totalObjVertices;
+            var results = intersect.object.userData.totalObjResults;
+            var pointsTable = intersect.object.userData.pointsTable;
 
-             var distance = intersect.distance;
-             var c = intersect.point;
-             if (!pointsTable || !vertices) {
-                 return;
-             }
-             nearestPoint.show();
-             var list = nearest(c, distance, pointsTable, vertices);
-             if (list.length > 0) {
-                 var resultVal = 10;
-                 var resultIndex = list[0].index;
-                 if (resultIndex!==undefined) {
-                     resultVal = results[resultIndex] ? results[resultIndex] : 0;
-                     resultVal = !isNaN(resultVal) ? resultVal : 0;
+            var distance = intersect.distance;
+            var c = intersect.point;
+            if (!pointsTable || !vertices) {
+                return;
+            }
+            nearestPoint.show();
+            var list = nearest(c, distance, pointsTable, vertices);
+            if (list.length > 0) {
+                var resultVal = 10;
+                var resultIndex = list[0].index;
+                if (resultIndex !== undefined) {
+                    resultVal = results[resultIndex] ? results[resultIndex] : 0;
+                    resultVal = !isNaN(resultVal) ? resultVal : 0;
 
-                 }
-                 resultVal = resultVal.round(editor.resultDigits);
-                 info.setValue('x = ' + list[0].x + ' , y = ' + list[0].y + ' , z =  ' + list[0].z + ', result =  ' + resultVal);
-                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
-                 nearestPoint.position.copy( position );
-                 nearestPoint.userData.result = resultVal;
-                 nearestPoint.update();
-                 render();
-             }
-         }
-     };
+                }
+                resultVal = resultVal.round(editor.resultDigits);
+                info.setValue('x = ' + list[0].x + ' , y = ' + list[0].y + ' , z =  ' + list[0].z + ', result =  ' + resultVal);
+                var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
+                nearestPoint.position.copy(position);
+                nearestPoint.userData.result = resultVal;
+                nearestPoint.update();
+                render();
+            }
+        }
+    };
 
     scope.onMouseMoveViewerHandler = function (event) {
-        if(!mainMouseMove){
-           return;
+        if (!mainMouseMove) {
+            return;
         }
         var intersects = getIntersects(event, objects);
         if (intersects.length > 0) {
-             runNearestAlgorithm(intersects);
+            runNearestAlgorithm(intersects);
         }
     };
 
@@ -870,15 +869,15 @@ var Viewport = function (editor) {
     var onMouseMove = function (event) {
         if (editor.mode === editor.MODE_FACES_EDGES || editor.mode === editor.MODE_3D_GEOMETRY) {
             scope.onMouseMoveEditorHandler(event);
-        } else if(editor.mode === editor.MODE_3D_POINT)  {
+        } else if (editor.mode === editor.MODE_3D_POINT) {
             scope.onMouseMoveViewerHandler(event);
         }
     };
 
     var onDoubleClick = function (event) {
-        if(editor.mode === editor.MODE_FACES_EDGES || editor.mode === editor.MODE_3D_GEOMETRY) {
+        if (editor.mode === editor.MODE_FACES_EDGES || editor.mode === editor.MODE_3D_GEOMETRY) {
 //          not implemented yet
-        } else if(editor.mode === editor.MODE_3D_POINT){
+        } else if (editor.mode === editor.MODE_3D_POINT) {
             scope.onMouseDblClickViewerHandler(event);
         }
 
@@ -893,94 +892,93 @@ var Viewport = function (editor) {
     // otherwise controls.enabled doesn't work.
 
 
-   ruler.addEventListener('rotateEvent', function (event) {
+    ruler.addEventListener('rotateEvent', function (event) {
 
-           var degree = event.angle;
-           var sign = Math.sign(degree);
-           if(event.direction === "vertical"){
-                 var currentAngle =  findVerticalAngle();
-                var resultAngle =  THREE.Math.degToRad(degree) ;
-                rotateAroundWorldAxis(ruler,  crossVector , resultAngle);
-                highlighterProtractor.hide();
-                var directionNorm = ruler.getDirectionNorm();
-                var direction = protractorV.getDirectionNorm();
-                var dotProduct = directionNorm.dot(direction);
-                var cosAngle  =  dotProduct/ directionNorm.length() * direction.length();
+        var degree = event.angle;
+        var sign = Math.sign(degree);
+        if (event.direction === "vertical") {
+            var currentAngle = findVerticalAngle();
+            var resultAngle = THREE.Math.degToRad(degree);
+            rotateAroundWorldAxis(ruler, crossVector, resultAngle);
+            highlighterProtractor.hide();
+            var directionNorm = ruler.getDirectionNorm();
+            var direction = protractorV.getDirectionNorm();
+            var dotProduct = directionNorm.dot(direction);
+            var cosAngle = dotProduct / directionNorm.length() * direction.length();
 
 
-                ruler.setRotateSinSign(Math.sign(Math.sin(THREE.Math.degToRad(90 + currentAngle))));
-                ruler.setRotateVAngle(90 + currentAngle);
+            ruler.setRotateSinSign(Math.sign(Math.sin(THREE.Math.degToRad(90 + currentAngle))));
+            ruler.setRotateVAngle(90 + currentAngle);
 
-                rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' +  ruler.userData.rotateVAngle);
+            rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' + ruler.userData.rotateVAngle);
 
-                if(Math.sign(cosAngle) < 0){
-                   rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, -1), Math.PI);
-                   ruler.setRotateVSign(- ruler.userData.rotateVSign);
-                }
- }else if(event.direction === "horizontal"){
+            if (Math.sign(cosAngle) < 0) {
+                rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, -1), Math.PI);
+                ruler.setRotateVSign(-ruler.userData.rotateVSign);
+            }
+        } else if (event.direction === "horizontal") {
 
-     var normal = new THREE.Vector3(0,0,1);
-     var directionNorm = ruler.getDirectionNorm();
-     var projection = directionNorm.projectOnPlane(normal);
-     var projectionLength  = projection.length();
-     var result = degree ;
+            var normal = new THREE.Vector3(0, 0, 1);
+            var directionNorm = ruler.getDirectionNorm();
+            var projection = directionNorm.projectOnPlane(normal);
+            var projectionLength = projection.length();
+            var result = degree;
 
-     if(parseFloat(projectionLength.toFixed(12)) != 0){
-          rotateAroundWorldAxis(ruler, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
-          rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
-          ruler.setRotateVSign(-1); // default direction
-          calculateCrossVector();
-     }
-      ruler.setRotateHAngle(degree);
- }
-              render();
-       });
+            if (parseFloat(projectionLength.toFixed(12)) != 0) {
+                rotateAroundWorldAxis(ruler, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
+                rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
+                ruler.setRotateVSign(-1); // default direction
+                calculateCrossVector();
+            }
+            ruler.setRotateHAngle(degree);
+        }
+        render();
+    });
 
 
     protractorV.addEventListener('mouseDown', function (event) {
-          var degree = event.angle;
-          var currentAngle =  findVerticalAngle();
-          if(ruler.userData.rotateSinSign < 0){ // sin <0
-             currentAngle = 360 - currentAngle;
-          }
+        var degree = event.angle;
+        var currentAngle = findVerticalAngle();
+        if (ruler.userData.rotateSinSign < 0) { // sin <0
+            currentAngle = 360 - currentAngle;
+        }
 
 
-         var resultAngle =  ruler.userData.rotateVSign  *  THREE.Math.degToRad(degree - currentAngle) ;
-         rotateAroundWorldAxis(ruler,  crossVector , resultAngle);
-         highlighterProtractor.hide();
-         var directionNorm = ruler.getDirectionNorm();
-         var direction = protractorV.getDirectionNorm();
-         var dotProduct = directionNorm.dot(direction);
-         var cosAngle  =  dotProduct/ directionNorm.length() * direction.length();
+        var resultAngle = ruler.userData.rotateVSign * THREE.Math.degToRad(degree - currentAngle);
+        rotateAroundWorldAxis(ruler, crossVector, resultAngle);
+        highlighterProtractor.hide();
+        var directionNorm = ruler.getDirectionNorm();
+        var direction = protractorV.getDirectionNorm();
+        var dotProduct = directionNorm.dot(direction);
+        var cosAngle = dotProduct / directionNorm.length() * direction.length();
 
 
-         ruler.setRotateSinSign(Math.sign(Math.sin(THREE.Math.degToRad(degree))));
-         ruler.setRotateVAngle(degree);
+        ruler.setRotateSinSign(Math.sign(Math.sin(THREE.Math.degToRad(degree))));
+        ruler.setRotateVAngle(degree);
 
-         rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' +  ruler.userData.rotateVAngle);
+        rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' + ruler.userData.rotateVAngle);
 
-         if(Math.sign(cosAngle) < 0){
+        if (Math.sign(cosAngle) < 0) {
             rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, -1), Math.PI);
-            ruler.setRotateVSign(- ruler.userData.rotateVSign);
-         }
-          protractorV.hide();
-          ruler.show();
-          render();
+            ruler.setRotateVSign(-ruler.userData.rotateVSign);
+        }
+        protractorV.hide();
+        ruler.show();
+        render();
     });
 
     protractorH.addEventListener('mouseDown', function (event) {
-         var degree = event.angle;
-         var normal = new THREE.Vector3(0,0,1);
-         var directionNorm = ruler.getDirectionNorm();
+        var degree = event.angle;
+        var normal = new THREE.Vector3(0, 0, 1);
+        var directionNorm = ruler.getDirectionNorm();
 
-         var projection = directionNorm.projectOnPlane(normal);
-         var projectionLength  = Math.round(projection.length());
+        var projection = directionNorm.projectOnPlane(normal);
+        var projectionLength = Math.round(projection.length());
 
 
+        var angleBTWOXY = THREE.Math.radToDeg(Math.atan2(projection.y, projection.x));
 
-         var angleBTWOXY = THREE.Math.radToDeg(Math.atan2(projection.y, projection.x));
-
-         var result = degree - (360 + angleBTWOXY);
+        var result = degree - (360 + angleBTWOXY);
 
 
 //         //calculate angle btn ruler ray and OXY
@@ -990,32 +988,32 @@ var Viewport = function (editor) {
 //         cross.crossVectors(rulerRay, rulerRayProjection);
 //         var sinAngleBTWZAndOXY = cross.length()/(rulerRay.length()*rulerRayProjection.length());
 //         var rulerRayAngleWithOXY = Math.round(THREE.Math.radToDeg(Math.asin(sinAngleBTWZAndOXY)));
-         if(parseFloat(projectionLength.toFixed(12)) != 0){
-              rotateAroundWorldAxis(ruler, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
-              rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
-              ruler.setRotateVSign(-1); // default direction
-              calculateCrossVector();
-         }
+        if (parseFloat(projectionLength.toFixed(12)) != 0) {
+            rotateAroundWorldAxis(ruler, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
+            rotateAroundWorldAxis(protractorV, new THREE.Vector3(0, 0, 1), THREE.Math.degToRad(result));
+            ruler.setRotateVSign(-1); // default direction
+            calculateCrossVector();
+        }
 
-          ruler.setRotateHAngle(degree);
+        ruler.setRotateHAngle(degree);
 
-          highlighterProtractor.userData = {angle:0};
-          highlighterProtractor.hide();
-          protractorH.hide();
-          ruler.show();
-          render();
+        highlighterProtractor.userData = {angle: 0};
+        highlighterProtractor.hide();
+        protractorH.hide();
+        ruler.show();
+        render();
     });
 
 
     var controls = new THREE.EditorControls(editor.id, camera, container.dom);
     controls.addEventListener('change', function (event) {
-          axis.update();
+        axis.update();
 
-          for(var i=0; i<unRotatedObjects.length; i++){
-             unRotatedObjects[i].quaternion.copy(camera.quaternion);
-          }
+        for (var i = 0; i < unRotatedObjects.length; i++) {
+            unRotatedObjects[i].quaternion.copy(camera.quaternion);
+        }
 
-         signals.objectChanged.dispatch(camera);
+        signals.objectChanged.dispatch(camera);
 
     });
 
@@ -1027,8 +1025,8 @@ var Viewport = function (editor) {
             FIRST_LIMIT_FOV = 0.01;
         }
         var oldCameraFov = camera.fov;
-        var newCameraFov = oldCameraFov + event.distance*DEFAULT_STEP_ZOOM;
-        if(newCameraFov < FIRST_LIMIT_FOV){
+        var newCameraFov = oldCameraFov + event.distance * DEFAULT_STEP_ZOOM;
+        if (newCameraFov < FIRST_LIMIT_FOV) {
             newCameraFov = FIRST_LIMIT_FOV;
             DEFAULT_STEP_ZOOM = 0.0001;
             FIRST_LIMIT_FOV = SECOND_LIMIT_FOV;
@@ -1045,9 +1043,9 @@ var Viewport = function (editor) {
         highlighterProtractor.update();
         axis.update();
 
-        for(var key in selectedResultPoints){
-             selectedResultPoints[key].update();
-             textResults[key].update(selectedResultPoints[key]);
+        for (var key in selectedResultPoints) {
+            selectedResultPoints[key].update();
+            textResults[key].update(selectedResultPoints[key]);
         }
 
         signals.objectChanged.dispatch(camera);
@@ -1123,26 +1121,25 @@ var Viewport = function (editor) {
     });
 
 
-    var getFar = function(box) {
+    var getFar = function (box) {
         var matrix = new THREE.Matrix4();
-        matrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
+        matrix.copy(camera.matrixWorldInverse.getInverse(camera.matrixWorld));
         var maxz = -Infinity;
 
         for (var i = 0; i < 8; i++) {
             var x = i & 1 ? box.min.x : box.max.x;
             var y = i & 2 ? box.min.z : box.max.z;
             var z = i & 4 ? box.min.y : box.max.y;
-            var p =  new THREE.Vector3(x, z, y);
+            var p = new THREE.Vector3(x, z, y);
             p.applyMatrix4(matrix);
             z = -p.z;
-            if (z > maxz){
+            if (z > maxz) {
                 maxz = z;
             }
         }
 
         return maxz;
     };
-
 
 
     signals.scaleChanged.add(function (boundingBox, modelRotation) {
@@ -1152,49 +1149,55 @@ var Viewport = function (editor) {
 
         var height = subVector.length();
         var radius = height / 2;
-        var dist = Math.abs(camera.position.y - editor.lastModel.position.y - radius/2);
+        var dist = Math.abs(camera.position.y - editor.lastModel.position.y - radius / 2);
 
 
-        camera.fov =  2 * Math.atan( height / ( 2 * dist ) ) * ( 180 / Math.PI );
-        var newCameraFar =  getFar(boundingBox);
-        if(camera.far < newCameraFar){
+        camera.fov = 2 * Math.atan(height / ( 2 * dist )) * ( 180 / Math.PI );
+        var newCameraFar = getFar(boundingBox);
+        if (camera.far < newCameraFar) {
             camera.far = newCameraFar;
         }
         var addVector = new THREE.Vector3(0, 0, 0);
         addVector.addVectors(boundingBox.min, boundingBox.max);
         var center = addVector.multiplyScalar(0.5);
         controls.setCenter(center);
-        if(modelRotation){
-           camera.position.z = modelRotation.position.z;
-           camera.position.y =  modelRotation.position.y;
-           camera.position.x = modelRotation.position.x;
-           camera.fov = modelRotation.fov;
-           if(modelRotation.results){
-               for(var i=0; i< modelRotation.results.length; i++){
-                      var result =  modelRotation.results[i];
-                      var textResultMesh = new THREE.ResultTextObject3d(camera, container.dom, {value:result.resultValue, color: editor.options.resultTextColor});
-                      textResultMesh.name = "result-" + result.resultValue + result.position.x + result.position.y + result.position.z;
-                      textResultMesh.quaternion = camera.quaternion;
-                      var textResultPosition = new THREE.Vector3(0, 0, 0);
-                      textResultPosition.x = result.position.x;
-                      textResultPosition.y = result.position.y;
-                      textResultPosition.z = result.position.z;
-                      textResultMesh.position.copy( textResultPosition );
-                      var key  = result.resultValue + result.position.x + result.position.y + result.position.z;
-                      textResults[key] = textResultMesh;
-                      textResultMesh.update();
-                      sceneHelpers.add(textResultMesh);
+        if (modelRotation) {
+            camera.position.z = modelRotation.position.z;
+            camera.position.y = modelRotation.position.y;
+            camera.position.x = modelRotation.position.x;
+            camera.fov = modelRotation.fov;
+            if (modelRotation.results) {
+                for (var i = 0; i < modelRotation.results.length; i++) {
+                    var result = modelRotation.results[i];
+                    var textResultMesh = new THREE.ResultTextObject3d(camera, container.dom, {
+                        value: result.resultValue,
+                        color: editor.options.resultTextColor
+                    });
+                    textResultMesh.name = "result-" + result.resultValue + result.position.x + result.position.y + result.position.z;
+                    textResultMesh.quaternion = camera.quaternion;
+                    var textResultPosition = new THREE.Vector3(0, 0, 0);
+                    textResultPosition.x = result.position.x;
+                    textResultPosition.y = result.position.y;
+                    textResultPosition.z = result.position.z;
+                    textResultMesh.position.copy(textResultPosition);
+                    var key = result.resultValue + result.position.x + result.position.y + result.position.z;
+                    textResults[key] = textResultMesh;
+                    textResultMesh.update();
+                    sceneHelpers.add(textResultMesh);
 
-                      var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {material: {color: editor.options.resultPointColor}, size:editor.options.resultPointSize});
-                      selectedResultPoint.name = "sphereResult-" + result.resultValue + result.position.x + result.position.y + result.position.z;
-                      selectedResultPoint.position.copy(result.position);
-                      selectedResultPoints[key] = selectedResultPoint;
+                    var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {
+                        material: {color: editor.options.resultPointColor},
+                        size: editor.options.resultPointSize
+                    });
+                    selectedResultPoint.name = "sphereResult-" + result.resultValue + result.position.x + result.position.y + result.position.z;
+                    selectedResultPoint.position.copy(result.position);
+                    selectedResultPoints[key] = selectedResultPoint;
 
-                      sceneHelpers.add(selectedResultPoint);
-                      selectedResultPoint.update();
-               }
+                    sceneHelpers.add(selectedResultPoint);
+                    selectedResultPoint.update();
+                }
 
-           }
+            }
         }
 
         camera.lookAt(center);
@@ -1212,15 +1215,15 @@ var Viewport = function (editor) {
     });
 
 
-     signals.saveModelPosition.add(function () {
+    signals.saveModelPosition.add(function () {
 
-          var modelRotation = {};
-          modelRotation.position = {};
-          modelRotation.position.x = camera.position.z;
-          modelRotation.position.y = camera.position.y;
-          modelRotation.position.z = camera.position.z;
-          modelRotation.fov = camera.fov;
-          editor.createJsonModelWithRotation(modelRotation);
+        var modelRotation = {};
+        modelRotation.position = {};
+        modelRotation.position.x = camera.position.z;
+        modelRotation.position.y = camera.position.y;
+        modelRotation.position.z = camera.position.z;
+        modelRotation.fov = camera.fov;
+        editor.createJsonModelWithRotation(modelRotation);
     });
 
     signals.printScreen.add(function (url) {
@@ -1234,11 +1237,11 @@ var Viewport = function (editor) {
 
         object.traverse(function (child) {
 
-            if (child instanceof THREE.Light){
+            if (child instanceof THREE.Light) {
                 materialsNeedUpdate = true;
             }
-            if(child.userData){
-                if (child.userData.quaternion==="camera"){
+            if (child.userData) {
+                if (child.userData.quaternion === "camera") {
                     child.quaternion.copy(camera.quaternion);
                     unRotatedObjects.push(child);
                 }
@@ -1249,7 +1252,7 @@ var Viewport = function (editor) {
 
         });
 
-        if (materialsNeedUpdate === true){
+        if (materialsNeedUpdate === true) {
             updateMaterials();
         }
 
@@ -1259,9 +1262,9 @@ var Viewport = function (editor) {
         if (object !== camera) {
 
 
-            if (editor.helpers[ object.id ] !== undefined) {
+            if (editor.helpers[object.id] !== undefined) {
 
-                editor.helpers[ object.id ].update();
+                editor.helpers[object.id].update();
 
             }
 
@@ -1279,7 +1282,7 @@ var Viewport = function (editor) {
 
         object.traverse(function (child) {
 
-            if (child instanceof THREE.Light){
+            if (child instanceof THREE.Light) {
                 materialsNeedUpdate = true;
             }
 
@@ -1287,8 +1290,8 @@ var Viewport = function (editor) {
 
         });
 
-        if (materialsNeedUpdate === true){
-             updateMaterials();
+        if (materialsNeedUpdate === true) {
+            updateMaterials();
         }
 
     });
@@ -1296,16 +1299,16 @@ var Viewport = function (editor) {
 
     signals.objectsRemoved.add(function (objsToRemove) {
         var materialsNeedUpdate = false;
-        for ( i = objsToRemove.length - 1; i >= 0 ; i -- ) {
-              obj = objsToRemove[ i ];
-              obj.traverse(function (child) {
-                   if (child instanceof THREE.Light){
-                       materialsNeedUpdate = true;
-                   }
-                   objects.splice(objects.indexOf(child), 1);
-              });
+        for (i = objsToRemove.length - 1; i >= 0; i--) {
+            obj = objsToRemove[i];
+            obj.traverse(function (child) {
+                if (child instanceof THREE.Light) {
+                    materialsNeedUpdate = true;
+                }
+                objects.splice(objects.indexOf(child), 1);
+            });
         }
-        if (materialsNeedUpdate === true){
+        if (materialsNeedUpdate === true) {
             updateMaterials();
         }
     });
@@ -1350,7 +1353,6 @@ var Viewport = function (editor) {
     });
 
 
-
     signals.showVProtractor.add(function (show) {
         protractorV.position.copy(ruler.position);
         protractorH.hide();
@@ -1375,9 +1377,9 @@ var Viewport = function (editor) {
     signals.showRuler.add(function (show) {
 
         if (show) {
-          ruler.show();
+            ruler.show();
         } else {
-          ruler.hide();
+            ruler.hide();
         }
         highlighterProtractor.hide();
         protractorV.hide();
@@ -1428,7 +1430,7 @@ var Viewport = function (editor) {
 
     if (System.support.webgl === true) {
 
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer : true  });
+        renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: true});
 
     } else {
 
@@ -1497,7 +1499,7 @@ var Viewport = function (editor) {
 
                     for (var i = 0; i < node.material.materials.length; i++) {
 
-                        node.material.materials[ i ].needsUpdate = true;
+                        node.material.materials[i].needsUpdate = true;
 
                     }
 
@@ -1515,7 +1517,7 @@ var Viewport = function (editor) {
         camera2.quaternion.copy(camera.quaternion);
         camera2.position.copy(camera.position);
         camera2.position.setLength(CAM_DISTANCE);
-        if(editor.lastModel && ROTATE){
+        if (editor.lastModel && ROTATE) {
             editor.lastModel.rotation.z -= 0.005;
             render();
         }

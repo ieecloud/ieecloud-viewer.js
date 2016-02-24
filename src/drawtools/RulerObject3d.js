@@ -26,15 +26,15 @@ THREE.ToolsGizmoDivisionMaterial = function (parameters) {
     this.oldColor = this.color.clone();
     this.oldOpacity = this.opacity;
 
-    this.highlight = function( highlighted ) {
+    this.highlight = function (highlighted) {
 
-        if ( highlighted ) {
+        if (highlighted) {
 
-            this.color.setRGB( 139,0,0 );
+            this.color.setRGB(139, 0, 0);
             this.opacity = 1;
 
         } else {
-            this.color.setRGB( this.oldColor );
+            this.color.setRGB(this.oldColor);
             this.opacity = this.oldOpacity;
 
         }
@@ -63,14 +63,14 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
     var INTERSECTED_DELIMITER;
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
-    var searchNearest = { type: "searchNearest" };
-    var select3dPoint = { type: "select3dPoint" };
-    var disableMainControl = { type: "disableMainControl" };
-    var enableMainControl = { type: "enableMainControl" };
-    var disableMainMove = { type: "disableMainMove" };
-    var enableMainMove = { type: "enableMainMove" };
-    var changeEvent = { type: "change" };
-    var rotateEvent = { type: "rotateEvent" };
+    var searchNearest = {type: "searchNearest"};
+    var select3dPoint = {type: "select3dPoint"};
+    var disableMainControl = {type: "disableMainControl"};
+    var enableMainControl = {type: "enableMainControl"};
+    var disableMainMove = {type: "disableMainMove"};
+    var enableMainMove = {type: "enableMainMove"};
+    var changeEvent = {type: "change"};
+    var rotateEvent = {type: "rotateEvent"};
     var offset = new THREE.Vector3();
     me.RULER_SIZE = 15;
     me.RULER_INNER_LIMIT = 2.1;
@@ -109,12 +109,11 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
     };
 
 
-
     var createText2D = function (text, color, font, size, camera) {
 
         var canvas = createTextCanvas(text, color, font, 256);
 
-        var plane = new THREE.PlaneBufferGeometry (canvas.width / canvas.height * size, size);
+        var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
         var tex = new THREE.Texture(canvas);
 
         tex.needsUpdate = true;
@@ -127,92 +126,92 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         var mesh = new THREE.Mesh(plane, planeMat);
         mesh.material.depthTest = false;
-        if (camera){
+        if (camera) {
             mesh.quaternion = camera.quaternion;
         }
         return mesh;
 
     }
 
-    var createAndAddRulerDelimiter = function(numberText, yPos, container, sign, additional){
+    var createAndAddRulerDelimiter = function (numberText, yPos, container, sign, additional) {
         var material = new THREE.LineBasicMaterial({
             color: 0x000000, /*depthTest:false, */linewidth: 50
         });
 
         var geometry = new THREE.Geometry();
 
-        var vertices = [new THREE.Vector3(0, 0, 0 ), new THREE.Vector3(0, 0, -0.4 )];
+        var vertices = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -0.4)];
         for (var i = 0; i < vertices.length; i++) {
-             geometry.vertices.push(vertices[i] );
+            geometry.vertices.push(vertices[i]);
         }
 
 
-        var delimiter = new THREE.Line( geometry, material );
+        var delimiter = new THREE.Line(geometry, material);
 
 
         var pos = new THREE.Vector3(yPos, 0, 0);
         delimiter.position.copy(pos);
 
 
-        me.userData.totalObjVertices.push(new THREE.Vector3(yPos, 0, 0 ));
+        me.userData.totalObjVertices.push(new THREE.Vector3(yPos, 0, 0));
 
         delimiter.userData = {};
         delimiter.userData.index = numberText;
-        delimiter.userData.defaultTopVertices = new THREE.Vector3(yPos, 0, 0 );
+        delimiter.userData.defaultTopVertices = new THREE.Vector3(yPos, 0, 0);
         delimiter.userData.additional = additional;
-        delimiter.userData.half = additional ? (numberText*10)%5 === 0: false;
-        delimiter.userData.bigger = !additional ? numberText%5 === 0: false;
-        delimiter.userData.biggest = !additional ? numberText%10 === 0: false;
-        me.delimiters[sign*numberText] = delimiter;
+        delimiter.userData.half = additional ? (numberText * 10) % 5 === 0 : false;
+        delimiter.userData.bigger = !additional ? numberText % 5 === 0 : false;
+        delimiter.userData.biggest = !additional ? numberText % 10 === 0 : false;
+        me.delimiters[sign * numberText] = delimiter;
         delimiter.chief = container;
-        container.add( delimiter );
+        container.add(delimiter);
 
 
-       var textResultMesh = createText2D(numberText, "black", null, 0.4);
-       var xAxis = new THREE.Vector3(1, 0, 0);
-       if(sign > 0){
-          rotateAroundObjectAxis(textResultMesh, xAxis, sign*Math.PI / 2);
-       }else{
-          rotateAroundObjectAxis(textResultMesh, xAxis,  sign*Math.PI/2);
-          var zAxis = new THREE.Vector3(0, 0, 1);
-          rotateAroundObjectAxis(textResultMesh, zAxis,  sign*Math.PI);
-       }
+        var textResultMesh = createText2D(numberText, "black", null, 0.4);
+        var xAxis = new THREE.Vector3(1, 0, 0);
+        if (sign > 0) {
+            rotateAroundObjectAxis(textResultMesh, xAxis, sign * Math.PI / 2);
+        } else {
+            rotateAroundObjectAxis(textResultMesh, xAxis, sign * Math.PI / 2);
+            var zAxis = new THREE.Vector3(0, 0, 1);
+            rotateAroundObjectAxis(textResultMesh, zAxis, sign * Math.PI);
+        }
 
-       var textResultPosition = new THREE.Vector3(0, 0, 0);
-       textResultPosition.x =   yPos;
-       textResultPosition.z = - 0.6;
-       textResultMesh.position.copy(textResultPosition);
-       textResultMesh.userData = {};
-       textResultMesh.userData.defaultTopVertices = textResultPosition;
-       textResultMesh.userData.additional = additional;
-       textResultMesh.userData.half = additional ? (numberText*10)%5 === 0: false;
-       textResultMesh.userData.bigger = !additional ? numberText%5 === 0: false;
-       textResultMesh.userData.biggest = !additional ? numberText%10 === 0: false;
-       textResultMesh.chief = container;
-       me.textResults[sign*numberText] = textResultMesh;
-       container.add(textResultMesh);
+        var textResultPosition = new THREE.Vector3(0, 0, 0);
+        textResultPosition.x = yPos;
+        textResultPosition.z = -0.6;
+        textResultMesh.position.copy(textResultPosition);
+        textResultMesh.userData = {};
+        textResultMesh.userData.defaultTopVertices = textResultPosition;
+        textResultMesh.userData.additional = additional;
+        textResultMesh.userData.half = additional ? (numberText * 10) % 5 === 0 : false;
+        textResultMesh.userData.bigger = !additional ? numberText % 5 === 0 : false;
+        textResultMesh.userData.biggest = !additional ? numberText % 10 === 0 : false;
+        textResultMesh.chief = container;
+        me.textResults[sign * numberText] = textResultMesh;
+        container.add(textResultMesh);
     };
 
-    this.createRulerSide = function(container, maxSizeDelimiters, step, digits, scaleFactorW, revertOrder){
+    this.createRulerSide = function (container, maxSizeDelimiters, step, digits, scaleFactorW, revertOrder) {
 
-         var number = -1;
-         for (var i=0; i<= maxSizeDelimiters; i+=step) {
-             number++;
-             createAndAddRulerDelimiter(i.round(digits), (i/scaleFactorW), container,  revertOrder ? -1 : 1);
-             if(!revertOrder){
-                 this.userData.pointsTable.table.push([number]);
-                 this.userData.valueTable.push((step*number).round(digits));
-             }
+        var number = -1;
+        for (var i = 0; i <= maxSizeDelimiters; i += step) {
+            number++;
+            createAndAddRulerDelimiter(i.round(digits), (i / scaleFactorW), container, revertOrder ? -1 : 1);
+            if (!revertOrder) {
+                this.userData.pointsTable.table.push([number]);
+                this.userData.valueTable.push((step * number).round(digits));
+            }
 
-         }
+        }
 
-         if(!revertOrder){
-             this.userData.pointsTable.tableSize = this.userData.pointsTable.table.length;
-         }
+        if (!revertOrder) {
+            this.userData.pointsTable.tableSize = this.userData.pointsTable.table.length;
+        }
     };
 
     var rotObjectMatrix;
-    var rotateAroundObjectAxis = function(object, axis, radians) {
+    var rotateAroundObjectAxis = function (object, axis, radians) {
         rotObjectMatrix = new THREE.Matrix4();
         rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
         object.matrix.multiply(rotObjectMatrix);
@@ -226,32 +225,30 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         this.frontSide = new THREE.Object3D();
         this.userData.totalObjVertices = [];
         this.userData.delimitersToRemove = [];
-        var geometry = new THREE.PlaneBufferGeometry (me.RULER_SIZE, 2, 10);
-        var material = new THREE.ToolsGizmoMaterial( {color: 0xffff00,  transparent: true,  opacity: 0.5} );
+        var geometry = new THREE.PlaneBufferGeometry(me.RULER_SIZE, 2, 10);
+        var material = new THREE.ToolsGizmoMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
         geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-geometry.attributes.position.array[0], -geometry.attributes.position.array[1], geometry.attributes.position.array[2]));
-        this.rulerMeshFront = new THREE.Mesh( geometry, material );
+        this.rulerMeshFront = new THREE.Mesh(geometry, material);
 
         var xAxis = new THREE.Vector3(1, 0, 0);
-        rotateAroundObjectAxis(this.rulerMeshFront, xAxis, Math.PI/2 );
+        rotateAroundObjectAxis(this.rulerMeshFront, xAxis, Math.PI / 2);
 
 
+        this.frontSide.add(this.rulerMeshFront);
 
-        this.frontSide.add( this.rulerMeshFront );
-
-        this.userData.pointsTable =  {"maxR" : 0.0,"minR" : 0.0,"tableSize" : 0,"table" : []};
-        this.userData.valueTable=[];
-        this.userData.removedDelimiters =[];
+        this.userData.pointsTable = {"maxR": 0.0, "minR": 0.0, "tableSize": 0, "table": []};
+        this.userData.valueTable = [];
+        this.userData.removedDelimiters = [];
 
         this.backSide = new THREE.Object3D();
 
-        geometry = new THREE.PlaneBufferGeometry (me.RULER_SIZE, 2, 10);
-        material = new THREE.ToolsGizmoMaterial( {color: 0xffff00,  transparent: true,  opacity: 0.5} );
-         geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-geometry.attributes.position.array[0], geometry.attributes.position.array[1], geometry.attributes.position.array[2]));
-        var rulerMesh = new THREE.Mesh( geometry, material );
+        geometry = new THREE.PlaneBufferGeometry(me.RULER_SIZE, 2, 10);
+        material = new THREE.ToolsGizmoMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
+        geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-geometry.attributes.position.array[0], geometry.attributes.position.array[1], geometry.attributes.position.array[2]));
+        var rulerMesh = new THREE.Mesh(geometry, material);
         var xAxis = new THREE.Vector3(1, 0, 0);
-        rotateAroundObjectAxis(rulerMesh, xAxis, -Math.PI/2 );
-        this.backSide.add( rulerMesh );
-
+        rotateAroundObjectAxis(rulerMesh, xAxis, -Math.PI / 2);
+        this.backSide.add(rulerMesh);
 
 
         this.add(this.frontSide);
@@ -266,7 +263,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         distance = worldPosition.distanceTo(camPosition);
 
-        this.boundingBox = new THREE.Box3().setFromObject( this );
+        this.boundingBox = new THREE.Box3().setFromObject(this);
         var subVector = new THREE.Vector3(0, 0, 0);
         subVector.subVectors(this.boundingBox.min, this.boundingBox.max);
 
@@ -278,26 +275,26 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         this.userData.rotateHAngle = 0;
         this.userData.rotateVAngle = 0;
-        this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
-        
+        this.keys = {LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40};
+
 
 //         window.addEventListener( "keydown", onKeyPress, false );
     }
 
     this.getLeftCornerVerticalPosition = function () {
-         var geometry = this.rulerMeshFront.geometry;
-         var leftCornerPosition = new THREE.Vector3(-geometry.attributes.position.array[0],-geometry.attributes.position.array[1],geometry.attributes.position.array[2] );
-         leftCornerPosition.applyMatrix4(this.matrixWorld);
-         return leftCornerPosition;
+        var geometry = this.rulerMeshFront.geometry;
+        var leftCornerPosition = new THREE.Vector3(-geometry.attributes.position.array[0], -geometry.attributes.position.array[1], geometry.attributes.position.array[2]);
+        leftCornerPosition.applyMatrix4(this.matrixWorld);
+        return leftCornerPosition;
 
     }
 
     this.setRotateVSign = function (value) {
-          this.userData.rotateVSign = value;
+        this.userData.rotateVSign = value;
     }
 
     this.setRotateSinSign = function (value) {
-          this.userData.rotateSinSign = value;
+        this.userData.rotateSinSign = value;
     }
 
     this.setRotateHAngle = function (value) {
@@ -309,41 +306,39 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
     }
 
     this.hide = function () {
-      me.dispatchEvent(enableMainMove);
-      domElement.removeEventListener('mousemove', onMouseMove);
-      domElement.removeEventListener('mousedown', onMouseDown);
-      domElement.removeEventListener('mouseup', onMouseUp);
-      document.removeEventListener('keydown', onKeyPress);
-      me.visible = false;
+        me.dispatchEvent(enableMainMove);
+        domElement.removeEventListener('mousemove', onMouseMove);
+        domElement.removeEventListener('mousedown', onMouseDown);
+        domElement.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('keydown', onKeyPress);
+        me.visible = false;
     }
 
     this.show = function () {
-       me.dispatchEvent(disableMainMove);
-       me.visible = true;
-       domElement.addEventListener( "mousemove", onMouseMove, false );
-       domElement.addEventListener( "mousedown", onMouseDown, false );
-       domElement.addEventListener( "mouseup", onMouseUp, false );
+        me.dispatchEvent(disableMainMove);
+        me.visible = true;
+        domElement.addEventListener("mousemove", onMouseMove, false);
+        domElement.addEventListener("mousedown", onMouseDown, false);
+        domElement.addEventListener("mouseup", onMouseUp, false);
 
-       document.addEventListener( "keydown", onKeyPress, false );
+        document.addEventListener("keydown", onKeyPress, false);
 
-       this.update();
+        this.update();
     }
 
-    var onKeyPress = function( event ) {
-        event.preventDefault();
-        event.stopPropagation();
-        switch ( event.keyCode ) {
+    var onKeyPress = function (event) {
+        switch (event.keyCode) {
 
             case me.keys.UP:
-               rotateEvent.angle =   -90;
-               rotateEvent.direction = "vertical";
-               me.dispatchEvent(rotateEvent);
+                rotateEvent.angle = -90;
+                rotateEvent.direction = "vertical";
+                me.dispatchEvent(rotateEvent);
                 break;
 
             case me.keys.BOTTOM:
-                 rotateEvent.angle =  90;
-                 rotateEvent.direction = "vertical";
-                 me.dispatchEvent(rotateEvent);
+                rotateEvent.angle = 90;
+                rotateEvent.direction = "vertical";
+                me.dispatchEvent(rotateEvent);
                 break;
 
             case me.keys.LEFT:
@@ -353,207 +348,207 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
                 break;
 
             case me.keys.RIGHT:
-                   rotateEvent.angle = -90;
-                   rotateEvent.direction = "horizontal";
-                   me.dispatchEvent(rotateEvent);
+                rotateEvent.angle = -90;
+                rotateEvent.direction = "horizontal";
+                me.dispatchEvent(rotateEvent);
                 break;
 
         }
     }
 
 
-    var onMouseMove = function( event ) {
-       if(!me.visible){
-           return;
-       }
-       event.preventDefault();
-       event.stopPropagation();
+    var onMouseMove = function (event) {
+        if (!me.visible) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
 
-       var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+        var pointer = event.changedTouches ? event.changedTouches[0] : event;
 
-        if ( SELECTED ) {
-           me.dispatchEvent(searchNearest);
-           var intersects = getIntersects(pointer, plane);
-           SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
-           changeEvent.moved = true;
-           me.dispatchEvent(changeEvent);
-           return;
+        if (SELECTED) {
+            me.dispatchEvent(searchNearest);
+            var intersects = getIntersects(pointer, plane);
+            SELECTED.position.copy(intersects[0].point.sub(offset));
+            changeEvent.moved = true;
+            me.dispatchEvent(changeEvent);
+            return;
 
-       }
+        }
 
-       var intersects = getIntersects(pointer, me);
+        var intersects = getIntersects(pointer, me);
 
-       if ( intersects.length > 0 ) {
-            if(!intersects[0].object.visible){
-                      return;
+        if (intersects.length > 0) {
+            if (!intersects[0].object.visible) {
+                return;
             }
 
             INTERSECTED = me;
-            plane.position.copy( INTERSECTED.position );
+            plane.position.copy(INTERSECTED.position);
             domElement.style.cursor = 'pointer';
             changeEvent.intersects = intersects;
             me.dispatchEvent(changeEvent);
 
-       } else {
+        } else {
 
-           INTERSECTED = null;
+            INTERSECTED = null;
 
-           domElement.style.cursor = 'auto';
-           me.dispatchEvent(changeEvent);
+            domElement.style.cursor = 'auto';
+            me.dispatchEvent(changeEvent);
 
-       }
+        }
     }
 
-     this.getPointDirectionVector = function(  ) {
-          var pointA = new THREE.Vector3(nearestPoint.position.x, nearestPoint.position.y, nearestPoint.position.z);
-          var result = new THREE.Vector3();
-          var quaternion = new THREE.Quaternion();
-
-          me.getWorldQuaternion( quaternion );
-
-          result.set( 1, 0, 0).applyQuaternion( quaternion );
-          var directionNorm = result.normalize().multiplyScalar(1)
-          var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y , directionNorm.z);
-
-           var result = pointA.clone().add(pointB);
-           return   result;
-     }
-
-     this.getDirectionNorm = function(  ) {
+    this.getPointDirectionVector = function () {
+        var pointA = new THREE.Vector3(nearestPoint.position.x, nearestPoint.position.y, nearestPoint.position.z);
         var result = new THREE.Vector3();
         var quaternion = new THREE.Quaternion();
 
-        me.getWorldQuaternion( quaternion );
+        me.getWorldQuaternion(quaternion);
 
-        result.set( 1, 0, 0).applyQuaternion( quaternion );
+        result.set(1, 0, 0).applyQuaternion(quaternion);
         var directionNorm = result.normalize().multiplyScalar(1)
-       return   directionNorm;
-     }
+        var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y, directionNorm.z);
 
-     var onMouseDown = function( event ) {
-       if(!me.visible){
-           return;
-       }
-       event.preventDefault();
-       event.stopPropagation();
+        var result = pointA.clone().add(pointB);
+        return result;
+    }
 
-       var array = getMousePosition(domElement, event.clientX, event.clientY );
-       onMouseDownPosition.fromArray(array);
+    this.getDirectionNorm = function () {
+        var result = new THREE.Vector3();
+        var quaternion = new THREE.Quaternion();
 
-       var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+        me.getWorldQuaternion(quaternion);
 
-       var intersects = getIntersects(pointer, me);
+        result.set(1, 0, 0).applyQuaternion(quaternion);
+        var directionNorm = result.normalize().multiplyScalar(1)
+        return directionNorm;
+    }
 
-       if ( intersects.length > 0 ) {
+    var onMouseDown = function (event) {
+        if (!me.visible) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
 
-           me.dispatchEvent(disableMainControl);
-           SELECTED = me;
+        var array = getMousePosition(domElement, event.clientX, event.clientY);
+        onMouseDownPosition.fromArray(array);
 
-           var intersects = raycaster.intersectObject( plane );
-           offset.copy( intersects[ 0 ].point ).sub( plane.position );
+        var pointer = event.changedTouches ? event.changedTouches[0] : event;
 
-           domElement.style.cursor = 'move';
+        var intersects = getIntersects(pointer, me);
 
-       }
+        if (intersects.length > 0) {
 
-     }
+            me.dispatchEvent(disableMainControl);
+            SELECTED = me;
+
+            var intersects = raycaster.intersectObject(plane);
+            offset.copy(intersects[0].point).sub(plane.position);
+
+            domElement.style.cursor = 'move';
+
+        }
+
+    }
 
 
-     var onMouseUp = function( event ) {
-       if(!me.visible || event.button !== 0){
-           return;
-       }
-       event.preventDefault();
+    var onMouseUp = function (event) {
+        if (!me.visible || event.button !== 0) {
+            return;
+        }
+        event.preventDefault();
 //       event.stopPropagation();
 
-       var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
-        if(SELECTED){
-           if(changeEvent.moved){
-              SELECTED.position.copy(nearestPoint.position);
-           }
-           nearestPoint.hide();
-           changeEvent.moved = false;
-           me.dispatchEvent(changeEvent);
-           var rect = domElement.getBoundingClientRect();
-           var array =  getMousePosition(domElement, event.clientX, event.clientY );
-           onMouseUpPosition.fromArray(array);
-           if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
-               var pointA = new THREE.Vector3(me.position.x, me.position.y, me.position.z);
+        var pointer = event.changedTouches ? event.changedTouches[0] : event;
+        if (SELECTED) {
+            if (changeEvent.moved) {
+                SELECTED.position.copy(nearestPoint.position);
+            }
+            nearestPoint.hide();
+            changeEvent.moved = false;
+            me.dispatchEvent(changeEvent);
+            var rect = domElement.getBoundingClientRect();
+            var array = getMousePosition(domElement, event.clientX, event.clientY);
+            onMouseUpPosition.fromArray(array);
+            if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
+                var pointA = new THREE.Vector3(me.position.x, me.position.y, me.position.z);
                 var result = new THREE.Vector3();
                 var quaternion = new THREE.Quaternion();
 
-                me.getWorldQuaternion( quaternion );
+                me.getWorldQuaternion(quaternion);
 
-                result.set( 1, 0, 0).applyQuaternion( quaternion );
+                result.set(1, 0, 0).applyQuaternion(quaternion);
                 var directionNorm = result.normalize().multiplyScalar(highlighter.userData.value)
-                var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y , directionNorm.z);
+                var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y, directionNorm.z);
 
                 var result = pointA.clone().add(pointB);
                 select3dPoint.point = result;
                 me.dispatchEvent(select3dPoint);
-           }
+            }
         }
-        if ( INTERSECTED ) {
+        if (INTERSECTED) {
 
-           plane.position.copy( me.position );
+            plane.position.copy(me.position);
 
-           SELECTED = null;
+            SELECTED = null;
 
         }
 
-       SELECTED = null;
-       domElement.style.cursor = 'auto';
-       me.dispatchEvent(enableMainControl);
+        SELECTED = null;
+        domElement.style.cursor = 'auto';
+        me.dispatchEvent(enableMainControl);
 
-     }
-
-
-      var getIntersects = function ( event, object ) {
-         var point  = new THREE.Vector2();
-         var array = getMousePosition(domElement, event.clientX, event.clientY);
-
-         point.fromArray( array );
-
-         mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
-
-         raycaster.setFromCamera( mouse, camera );
-
-         if ( object instanceof Array ) {
-
-             return raycaster.intersectObjects( object , true);
-
-         }
-
-         return raycaster.intersectObject( object , true);
-
-     };
-
-     var getMousePosition = function ( dom, x, y ) {
-
-         var rect = dom.getBoundingClientRect();
-         return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
-
-     };
+    }
 
 
-     this.removeAllDelimiters = function () {
-         for (var key in  this.delimiters) {
-               this.delimiters[key].chief.remove(this.delimiters[key]);
-         }
+    var getIntersects = function (event, object) {
+        var point = new THREE.Vector2();
+        var array = getMousePosition(domElement, event.clientX, event.clientY);
 
-         for (var key in  this.textResults) {
-               this.textResults[key].chief.remove(this.textResults[key]);
-         }
-         this.delimiters = null;
-         this.textResults = null;
-     }
+        point.fromArray(array);
 
-     this.updateDelimiters = function (scaleFactorW) {
-        var width =  scaleFactorW*this.RULER_SIZE;
+        mouse.set(( point.x * 2 ) - 1, -( point.y * 2 ) + 1);
+
+        raycaster.setFromCamera(mouse, camera);
+
+        if (object instanceof Array) {
+
+            return raycaster.intersectObjects(object, true);
+
+        }
+
+        return raycaster.intersectObject(object, true);
+
+    };
+
+    var getMousePosition = function (dom, x, y) {
+
+        var rect = dom.getBoundingClientRect();
+        return [( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height];
+
+    };
+
+
+    this.removeAllDelimiters = function () {
+        for (var key in  this.delimiters) {
+            this.delimiters[key].chief.remove(this.delimiters[key]);
+        }
+
+        for (var key in  this.textResults) {
+            this.textResults[key].chief.remove(this.textResults[key]);
+        }
+        this.delimiters = null;
+        this.textResults = null;
+    }
+
+    this.updateDelimiters = function (scaleFactorW) {
+        var width = scaleFactorW * this.RULER_SIZE;
         var maxSizeDelimiters = Math.floor(width);
 
 
-        this.userData.totalObjVertices =[];
+        this.userData.totalObjVertices = [];
         this.userData.pointsTable.table = [];
         this.userData.valueTable = [];
 
@@ -564,68 +559,68 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         this.textResults = {};
         var step = 1;
         var digits = 1;
-        if(maxSizeDelimiters > 25){
-           step = 5;
+        if (maxSizeDelimiters > 25) {
+            step = 5;
         }
 
-        if(maxSizeDelimiters > 100){
-           step = 10;
+        if (maxSizeDelimiters > 100) {
+            step = 10;
         }
 
-        if(maxSizeDelimiters > 200){
-           step = 20;
+        if (maxSizeDelimiters > 200) {
+            step = 20;
         }
 
-        if(maxSizeDelimiters < 8){
+        if (maxSizeDelimiters < 8) {
             step = 0.5;
             maxSizeDelimiters = width;
         }
 
-        if(maxSizeDelimiters < 4){
-             step = 0.25;
-             digits = 2;
-             maxSizeDelimiters = width;
+        if (maxSizeDelimiters < 4) {
+            step = 0.25;
+            digits = 2;
+            maxSizeDelimiters = width;
         }
 
-        if(maxSizeDelimiters < 2){
+        if (maxSizeDelimiters < 2) {
             step = 0.1;
             digits = 1;
             maxSizeDelimiters = width;
         }
 
-        if(width < 0.3){
+        if (width < 0.3) {
             step = 0.01;
             digits = 2;
             maxSizeDelimiters = width;
         }
 
-        if(width < 0.013){
+        if (width < 0.013) {
             step = 0.001;
             digits = 3;
             maxSizeDelimiters = width;
         }
 
-         if(width < 0.001){
+        if (width < 0.001) {
             step = 0.0001;
             digits = 4;
             maxSizeDelimiters = width;
         }
 
         this.createRulerSide(this.frontSide, maxSizeDelimiters, step, digits, scaleFactorW, false);
-        this.createRulerSide(this.backSide, maxSizeDelimiters, step, digits, scaleFactorW,  true);
-     }
+        this.createRulerSide(this.backSide, maxSizeDelimiters, step, digits, scaleFactorW, true);
+    }
 
 
-     this.update = function () {
-       var pixW = 1200;
-       var vFOV = camera.fov * Math.PI / 180;
-       var focalLength = 2 * Math.tan( vFOV / 2 );
-       var scaleFactor = focalLength / (focalLength + distance);
+    this.update = function () {
+        var pixW = 1200;
+        var vFOV = camera.fov * Math.PI / 180;
+        var focalLength = 2 * Math.tan(vFOV / 2);
+        var scaleFactor = focalLength / (focalLength + distance);
 
-       this.scale.x = scaleFactor * pixW;
-       this.scale.y = scaleFactor * pixW;
-       this.scale.z = scaleFactor * pixW;
-       this.updateDelimiters(scaleFactor * pixW);
+        this.scale.x = scaleFactor * pixW;
+        this.scale.y = scaleFactor * pixW;
+        this.scale.z = scaleFactor * pixW;
+        this.updateDelimiters(scaleFactor * pixW);
 
 
     }

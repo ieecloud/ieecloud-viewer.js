@@ -6,7 +6,7 @@ THREE.ResultTextObject3dMaterial = function (parameters) {
 
     this.depthTest = false;
     this.depthWrite = false;
-    this.transparent =  true;
+    this.transparent = true;
     this.side = THREE.DoubleSide;
 
     this.setValues(parameters);
@@ -58,13 +58,13 @@ THREE.ResultTextObject3d = function (camera, domElement, params) {
 
 
     this.show = function () {
-       this.visible = true;
-       this.update();
+        this.visible = true;
+        this.update();
     };
 
 
     this.hide = function () {
-       this.visible = false;
+        this.visible = false;
     };
 
 
@@ -85,10 +85,10 @@ THREE.ResultTextObject3d = function (camera, domElement, params) {
             color: 0xffffff
         });
 
-         plane.applyMatrix(new THREE.Matrix4().makeTranslation(-plane.attributes.position.array[0] + 0.1, 0, 0));
+        plane.applyMatrix(new THREE.Matrix4().makeTranslation(-plane.attributes.position.array[0] + 0.1, 0, 0));
 
-         THREE.Mesh.call(this, plane, planeMat);
-         this.quaternion.copy(camera.quaternion);
+        THREE.Mesh.call(this, plane, planeMat);
+        this.quaternion.copy(camera.quaternion);
 
 
         var tempMatrix = new THREE.Matrix4();
@@ -101,7 +101,7 @@ THREE.ResultTextObject3d = function (camera, domElement, params) {
 
         distance = worldPosition.distanceTo(camPosition);
 
-        var boundingBox = new THREE.Box3().setFromObject( this );
+        var boundingBox = new THREE.Box3().setFromObject(this);
         var subVector = new THREE.Vector3(0, 0, 0);
         subVector.subVectors(boundingBox.min, boundingBox.max);
 
@@ -109,19 +109,19 @@ THREE.ResultTextObject3d = function (camera, domElement, params) {
         radius = height / 2;
     };
 
-    this.leftCorner = function(){
-       return this.children[0].geometry.vertices[0].x * this.scale.y;
+    this.leftCorner = function () {
+        return this.children[0].geometry.vertices[0].x * this.scale.y;
     };
 
-     this.update = function (resultPointObject) {
-       var vFOV = camera.fov * Math.PI / 180;
-       var height = 2 * Math.tan( vFOV / 2 ) * distance;
-       var fraction = 0.5 / height;
-       var heightInPixels = domElement.offsetHeight * fraction;
-       var scaleFactorH = 598/heightInPixels;
-       this.scale.x =  scaleFactorH * 0.05;
-       this.scale.y = scaleFactorH* 0.05;
-       this.quaternion.copy(camera.quaternion);
+    this.update = function (resultPointObject) {
+        var vFOV = camera.fov * Math.PI / 180;
+        var height = 2 * Math.tan(vFOV / 2) * distance;
+        var fraction = 0.5 / height;
+        var heightInPixels = domElement.offsetHeight * fraction;
+        var scaleFactorH = 598 / heightInPixels;
+        this.scale.x = scaleFactorH * 0.05;
+        this.scale.y = scaleFactorH * 0.05;
+        this.quaternion.copy(camera.quaternion);
     };
 
     this.init();

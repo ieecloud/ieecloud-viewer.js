@@ -36,37 +36,37 @@ function Viewer(target, options) {
 
     var signalsListen = function ($this) {
         $this.threeEditor.signals.selectTree.add(function (object, value) {
-          if($this.options.onSelectObject){
-              $this.options.onSelectObject(object, value);
-          }
+            if ($this.options.onSelectObject) {
+                $this.options.onSelectObject(object, value);
+            }
 
         });
 
 
         $this.threeEditor.signals.select3dPoint.add(function (point) {
-          if($this.options.onSelect3dPoint){
-              $this.options.onSelect3dPoint(point);
-          }
+            if ($this.options.onSelect3dPoint) {
+                $this.options.onSelect3dPoint(point);
+            }
         });
 
         $this.threeEditor.signals.startRender.add(function () {
-         if($this.options.onStartRender){
-             $this.options.onStartRender();
-         }
+            if ($this.options.onStartRender) {
+                $this.options.onStartRender();
+            }
 
         });
 
         $this.threeEditor.signals.endRender.add(function () {
-          if($this.options.onEndRender){
-            $this.options.onEndRender();
-          }
+            if ($this.options.onEndRender) {
+                $this.options.onEndRender();
+            }
         });
 
 
         $this.threeEditor.signals.treeLoad.add(function (tree) {
-          if($this.options.onTreeLoad){
-             $this.options.onTreeLoad(tree);
-          }
+            if ($this.options.onTreeLoad) {
+                $this.options.onTreeLoad(tree);
+            }
         });
 
     };
@@ -86,7 +86,7 @@ function Viewer(target, options) {
     };
 
     Viewer.prototype.resize = function () {
-       scope.threeEditor.signals.windowResize.dispatch();
+        scope.threeEditor.signals.windowResize.dispatch();
     };
 
     Viewer.prototype.reloadModel = function (modelJsn) {
@@ -184,8 +184,8 @@ function Viewer(target, options) {
         resultDigits: 2,
         drawResults: true,
         gridVisible: true,
-        resultTextColor:"white",
-        backgroundColor:"#aaa",
+        resultTextColor: "white",
+        backgroundColor: "#aaa",
         nearestPointColor: "red",
         resultPointColor: "white",
         resultPointSize: 0.005

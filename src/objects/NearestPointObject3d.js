@@ -25,13 +25,13 @@ THREE.NearestPointObject3d = function (camera, domElement, params) {
 
 
     this.show = function () {
-       this.visible = true;
-       this.update();
+        this.visible = true;
+        this.update();
     }
 
 
     this.hide = function () {
-       this.visible = false;
+        this.visible = false;
     }
 
 
@@ -58,7 +58,7 @@ THREE.NearestPointObject3d = function (camera, domElement, params) {
 
         distance = worldPosition.distanceTo(camPosition);
 
-        var boundingBox = new THREE.Box3().setFromObject( this );
+        var boundingBox = new THREE.Box3().setFromObject(this);
         var subVector = new THREE.Vector3(0, 0, 0);
         subVector.subVectors(boundingBox.min, boundingBox.max);
 
@@ -67,13 +67,13 @@ THREE.NearestPointObject3d = function (camera, domElement, params) {
     }
 
 
-     this.update = function () {
+    this.update = function () {
         var vFOV = camera.fov * Math.PI / 180;
-        var height = 2 * Math.tan( vFOV / 2 ) * distance;
+        var height = 2 * Math.tan(vFOV / 2) * distance;
         var fraction = radius / height;
         var heightInPixels = domElement.offsetHeight * fraction;
-        var scaleFactorH = 598/heightInPixels;
-        this.scale.x = scaleFactorH *  radius
+        var scaleFactorH = 598 / heightInPixels;
+        this.scale.x = scaleFactorH * radius
         this.scale.y = scaleFactorH * radius
         this.scale.z = scaleFactorH * radius
     }

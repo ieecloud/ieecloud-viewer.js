@@ -2,7 +2,7 @@ var Editor = function (options) {
     var SIGNALS = signals;
 
     this.signals = {
-          // notifications
+        // notifications
         sceneGraphChanged: new SIGNALS.Signal(),
         rendererChanged: new SIGNALS.Signal(),
         objectSelected: new SIGNALS.Signal(),
@@ -85,8 +85,8 @@ Editor.prototype = {
         this.signals.select3dPoint.dispatch(point);
     },
 
-    saveModelPosition : function(){
-       this.signals.saveModelPosition.dispatch();
+    saveModelPosition: function () {
+        this.signals.saveModelPosition.dispatch();
     },
 
 
@@ -108,7 +108,7 @@ Editor.prototype = {
         this.lastAdded = object;
     },
 
-    addModelGroup : function (object) {
+    addModelGroup: function (object) {
         var scope = this;
         this.scene.add(object);
 
@@ -156,16 +156,15 @@ Editor.prototype = {
         this.loader.createJsonModelWithRotation(modelRotation);
     },
 
-     printScreen: function (url) {
-       this.signals.printScreen.dispatch(url);
+    printScreen: function (url) {
+        this.signals.printScreen.dispatch(url);
     },
-
 
 
     removeObject: function (object) {
 
         if (object.parent === undefined) {
-             return;
+            return;
         }
 
         var scope = this;
@@ -179,24 +178,24 @@ Editor.prototype = {
 
     removeAllObjects: function () {
 
-         var objsToRemove = [];
-         for ( i = this.scene.children.length - 1; i >= 0 ; i -- ) {
-              obj = this.scene.children[ i ];
-              if (obj.parent !== undefined && !(obj instanceof THREE.Light) && !(obj instanceof THREE.PerspectiveCamera )) {
-                  objsToRemove.push(obj);
-                  obj.parent.remove(obj);
-               }
-         }
+        var objsToRemove = [];
+        for (i = this.scene.children.length - 1; i >= 0; i--) {
+            obj = this.scene.children[i];
+            if (obj.parent !== undefined && !(obj instanceof THREE.Light) && !(obj instanceof THREE.PerspectiveCamera )) {
+                objsToRemove.push(obj);
+                obj.parent.remove(obj);
+            }
+        }
         this.lastModel = null;
         this.signals.objectsRemoved.dispatch(objsToRemove);
         this.signals.sceneGraphChanged.dispatch();
 
-     },
+    },
 
 
     addTexture: function (texture) {
 
-        this.textures[ texture.uuid ] = texture;
+        this.textures[texture.uuid] = texture;
 
     },
 
