@@ -1151,7 +1151,6 @@ var Viewport = function (editor) {
         var radius = height / 2;
         var dist = Math.abs(camera.position.y - editor.lastModel.position.y - radius / 2);
 
-
         camera.fov = 2 * Math.atan(height / ( 2 * dist )) * ( 180 / Math.PI );
         var newCameraFar = getFar(boundingBox);
         if (camera.far < newCameraFar) {

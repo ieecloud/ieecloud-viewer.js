@@ -88,6 +88,7 @@ var Loader = function (editor, textureUrl) {
 
     this.computeBoundingBox = function (modelRotation) {
         var commonBoundingBox = new THREE.Box3().setFromObject(editor.lastModel);
+        console.log("computeBoundingBox", commonBoundingBox);
         if (commonBoundingBox.max.length() < Infinity && commonBoundingBox.min.length() < Infinity) {
             editor.calculateSpaceScale(commonBoundingBox, modelRotation);
         }
@@ -471,6 +472,9 @@ var Loader = function (editor, textureUrl) {
             faceGeometry.computeBoundingBox();
             lineGeometry.computeBoundingBox();
 
+            //console.log(faceGeometry.boun);
+            console.log(faceGeometry.boundingBox);
+
             faceGeometry.computeFaceNormals();
             faceGeometry.computeVertexNormals();
             pictureGeometryElement.objectGeometry = faceGeometry;
@@ -560,7 +564,7 @@ var Loader = function (editor, textureUrl) {
             vertex.x = coords[offset++] * scale;
             vertex.y = coords[offset++] * scale;
             vertex.z = coords[offset++] * scale;
-            vertices.push(vertex);
+            vertices.push(vertex.divideScalar (_.max(coords) ));
         }
 
         var objectSettings = geometryObject.objectSettings;

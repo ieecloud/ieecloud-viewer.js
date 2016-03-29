@@ -51,6 +51,7 @@ module.exports = {
     js: [
       'bower_components/jquery/dist/jquery.min.js',
       'bower_components/signals/dist/signals.min.js',
+      'bower_components/lodash/dist/lodash.min.js',
       'vendor/three.min.js',
       'vendor/ui.js',
       'vendor/system.min.js',
