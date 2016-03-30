@@ -5,6 +5,7 @@ var Loader = function (editor, textureUrl) {
     var DRAW_RESULTS = true;
     this.textureUrl = textureUrl;
     this.objectsTree = null;
+    this.coordFactor = null;
     this.modelRotation = null;
 
     this.getObjectsTreeModel = function () {
@@ -558,13 +559,14 @@ var Loader = function (editor, textureUrl) {
 
         var drawResults = (DRAW_RESULTS && results && (results.length != 0));
 
+        this.coordFactor = _.max(coords);
         var offset = 0;
         while (offset < coords.length) { //reading vertices
             var vertex = new THREE.Vector3();
             vertex.x = coords[offset++] * scale;
             vertex.y = coords[offset++] * scale;
             vertex.z = coords[offset++] * scale;
-            vertices.push(vertex.divideScalar (_.max(coords) ));
+            vertices.push(vertex.divideScalar (this.coordFactor ));
         }
 
         var objectSettings = geometryObject.objectSettings;

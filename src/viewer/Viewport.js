@@ -29,7 +29,7 @@ var Viewport = function (editor) {
 
     var rulerInfo = new UI.Text();
     rulerInfo.setPosition('absolute');
-    rulerInfo.setRight('245px');
+    rulerInfo.setLeft('5px');
     rulerInfo.setBottom('5px');
     rulerInfo.setFontSize('12px');
     rulerInfo.setColor('#ffffff');
@@ -50,8 +50,8 @@ var Viewport = function (editor) {
 
     var SELECT_COLOR = 300;
     var SELECT_OPACITY = 0.4;
-    var DEFAULT_STEP_ZOOM = 0.03;
-    var FIRST_LIMIT_FOV = 0.01;
+    var DEFAULT_STEP_ZOOM = 0.0006;
+    var FIRST_LIMIT_FOV = 0.0006;
     var SECOND_LIMIT_FOV = 0.000000001;
     var ROTATE = false;
 
@@ -841,7 +841,8 @@ var Viewport = function (editor) {
 
                 }
                 resultVal = resultVal.round(editor.resultDigits);
-                info.setValue('x = ' + list[0].x + ' , y = ' + list[0].y + ' , z =  ' + list[0].z + ', result =  ' + resultVal);
+                var point  = list[0].clone().multiplyScalar(editor.loader.coordFactor);
+                info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal);
                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
                 nearestPoint.position.copy(position);
                 nearestPoint.userData.result = resultVal;
