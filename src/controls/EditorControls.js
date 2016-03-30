@@ -207,11 +207,11 @@ THREE.EditorControls = function (editorId, object, domElement) {
 
         if (event.wheelDelta) {
 
-            delta = event.wheelDelta/40;
+            delta = event.wheelDelta/4;
 
         } else if (event.detail) {
 
-            delta = -event.detail /3;
+            delta = -event.detail /30;
 
         }
 

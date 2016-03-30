@@ -80,7 +80,7 @@ var Viewport = function (editor) {
     renderer2.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
     container2.dom.appendChild(renderer2.domElement);
 
-    var camera = new THREE.PerspectiveCamera(10, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000);
+    var camera = new THREE.PerspectiveCamera(10, container.dom.offsetWidth / container.dom.offsetHeight, 1, 15000);
     camera.position.z = 63;
     camera.position.y = -149;
     camera.position.x = 36;
@@ -90,7 +90,7 @@ var Viewport = function (editor) {
     camera.lookAt(scene.position);
 
     // camera2
-    var camera2 = new THREE.PerspectiveCamera(50, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 1000);
+    var camera2 = new THREE.PerspectiveCamera(50, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 2000);
     camera2.up = camera.up; // important!
 
     var selectedResultPoints = {};
