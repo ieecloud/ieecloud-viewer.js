@@ -1022,8 +1022,8 @@ var Viewport = function (editor) {
         // temp solution
         // TODO: add logic with auto calculate step zoom
         if (event.distance > 0) {
-            DEFAULT_STEP_ZOOM = 0.01;
-            FIRST_LIMIT_FOV = 0.01;
+            DEFAULT_STEP_ZOOM = 0.0006;
+            FIRST_LIMIT_FOV = 0.0006;
         }
         var oldCameraFov = camera.fov;
         var newCameraFov = oldCameraFov + event.distance * DEFAULT_STEP_ZOOM;

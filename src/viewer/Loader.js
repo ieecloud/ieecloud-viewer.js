@@ -474,7 +474,7 @@ var Loader = function (editor, textureUrl) {
             lineGeometry.computeBoundingBox();
 
             //console.log(faceGeometry.boun);
-            console.log(faceGeometry.boundingBox);
+            //console.log(faceGeometry.boundingBox);
 
             faceGeometry.computeFaceNormals();
             faceGeometry.computeVertexNormals();
@@ -559,7 +559,9 @@ var Loader = function (editor, textureUrl) {
 
         var drawResults = (DRAW_RESULTS && results && (results.length != 0));
 
-        this.coordFactor = _.max(coords);
+        //this.coordFactor = _.max(coords);
+        //this.coordFactor = 1;
+        //console.debug('this.coordFactor' + this.coordFactor);
         var offset = 0;
         while (offset < coords.length) { //reading vertices
             var vertex = new THREE.Vector3();
@@ -651,6 +653,14 @@ var Loader = function (editor, textureUrl) {
             colorMapTexture.minFilter = THREE.LinearMipMapLinearFilter;
         }
 
+        // calculate scaleFactor
+        for (var i = 0; i < pictureData.length; i++) {
+            var coords = pictureData[i].coords;
+            var maxCoordinate = _.max(coords);
+            if(this.coordFactor < maxCoordinate) {
+                this.coordFactor = maxCoordinate;
+            }
+        }
 
         for (var i = 0; i < pictureData.length; i++) {
 
