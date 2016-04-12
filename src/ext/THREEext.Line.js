@@ -1,8 +1,18 @@
 var THREEext	= THREEext 		|| {};
+
+
+
+
+
+
+
+
+
+
 THREEext.Line = function ( geometry, material, mode ) {
 
 
-    THREE.Line.call( this );
+	THREE.Line.call( this );
 
 	this.type = 'Line';
 
@@ -89,7 +99,11 @@ THREEext.Line.prototype.raycast = ( function () {
 
 						if ( distSq > precisionSq ) continue;
 
-						var distance = ray.origin.distanceTo( interRay );
+						//var distance = ray.origin.distanceTo( interRay );
+
+						interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+
+						var distance = raycaster.ray.origin.distanceTo( interRay );
 
 						if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
@@ -97,6 +111,7 @@ THREEext.Line.prototype.raycast = ( function () {
 
 							distance: distance,
 							point: raycaster.ray.at( distance ),
+							//point: interSegment.clone().applyMatrix4( this.matrixWorld ),
 							face: null,
 							faceIndex: null,
 							object: this
@@ -120,7 +135,13 @@ THREEext.Line.prototype.raycast = ( function () {
 
 					if ( distSq > precisionSq ) continue;
 
-					var distance = ray.origin.distanceTo( interRay );
+
+
+					//var distance = ray.origin.distanceTo( interRay );
+
+					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+
+					var distance = raycaster.ray.origin.distanceTo( interRay );
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
@@ -128,7 +149,9 @@ THREEext.Line.prototype.raycast = ( function () {
 
 						distance: distance,
 						// What do we want? intersection point on the ray or on the segment??
+
 						point: raycaster.ray.at( distance ),
+						//point: interSegment.clone().applyMatrix4( this.matrixWorld ),
 						face: null,
 						faceIndex: null,
 						object: this
@@ -150,7 +173,13 @@ THREEext.Line.prototype.raycast = ( function () {
 
 				if ( distSq > precisionSq ) continue;
 
-				var distance = ray.origin.distanceTo( interRay );
+				//var distance = ray.origin.distanceTo( interRay );
+
+
+				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+
+				var distance = raycaster.ray.origin.distanceTo( interRay );
+
 
 				if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
@@ -158,6 +187,7 @@ THREEext.Line.prototype.raycast = ( function () {
 
 					distance: distance,
 					point: raycaster.ray.at( distance ),
+					//point: interSegment.clone().applyMatrix4( this.matrixWorld ),
 					face: null,
 					faceIndex: null,
 					object: this

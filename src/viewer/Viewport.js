@@ -428,6 +428,12 @@ var Viewport = function (editor) {
         mouse.set(( point.x * 2 ) - 1, -( point.y * 2 ) + 1);
 
         raycaster.setFromCamera(mouse, camera);
+        var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject( camera ).sub( camera.position ).normalize();
+
+        raycaster.set(camera.position, direction);
+
+        //this.ray.origin.copy( camera.position );
+        //this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
 
         if (object instanceof Array) {
 
@@ -817,15 +823,19 @@ var Viewport = function (editor) {
     };
 
     var runNearestAlgorithm = function (intersects) {
-        var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
-        var intersectLine = searchNearestIntersect(intersects, THREEext.Line);
-        var intersect = getNearestIntersect(intersectLine, intersectMesh);
+        //var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
+        //var intersectLine = searchNearestIntersect(intersects, THREEext.Line);
+        //var intersect = getNearestIntersect(intersectLine, intersectMesh);
+        var intersect = intersects[0];
         if (intersect) {
             var vertices = intersect.object.userData.totalObjVertices;
             var results = intersect.object.userData.totalObjResults;
             var pointsTable = intersect.object.userData.pointsTable;
 
-            var distance = intersect.distance;
+            console.log(vertices);
+
+            //var distance = intersect.distance;
+            var distance = intersect.distance * editor.loader.coordFactor;
             var c = intersect.point;
             if (!pointsTable || !vertices) {
                 return;

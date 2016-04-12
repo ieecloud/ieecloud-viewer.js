@@ -52,7 +52,7 @@ module.exports = {
       'bower_components/jquery/dist/jquery.min.js',
       'bower_components/signals/dist/signals.min.js',
       'bower_components/lodash/dist/lodash.min.js',
-      'vendor/three.min.js',
+      'bower_components/three.js/three.js',
       'vendor/ui.js',
       'vendor/system.min.js',
       'vendor/CanvasRenderer.js' ,
