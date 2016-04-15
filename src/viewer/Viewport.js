@@ -832,8 +832,6 @@ var Viewport = function (editor) {
             var results = intersect.object.userData.totalObjResults;
             var pointsTable = intersect.object.userData.pointsTable;
 
-            console.log(vertices);
-
             //var distance = intersect.distance;
             var distance = intersect.distance * editor.loader.coordFactor;
             var c = intersect.point;
@@ -1160,9 +1158,13 @@ var Viewport = function (editor) {
 
         var height = subVector.length();
         var radius = height / 2;
-        var dist = Math.abs(camera.position.y - editor.lastModel.position.y - radius / 2);
 
-        camera.fov = 2 * Math.atan(height / ( 2 * dist )) * ( 180 / Math.PI );
+
+        var heightModel =  Math.abs(boundingBox.min.z - boundingBox.max.z);
+        var widthModel =  Math.abs(boundingBox.min.x - boundingBox.max.x);
+        var paramToFit = Math.max(widthModel, heightModel);
+        var dist = Math.abs(camera.position.y - editor.lastModel.position.y - radius);
+        camera.fov = 2 * Math.atan(paramToFit / ( 2 * dist )) * ( 180 / Math.PI );
         var newCameraFar = getFar(boundingBox);
         if (camera.far < newCameraFar) {
             camera.far = newCameraFar;
