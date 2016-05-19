@@ -133,7 +133,7 @@ var Viewport = function (editor) {
     sceneHelpers.add(plane);
 
 
-    var ruler = new THREE.ToolsGizmo(camera, container.dom, plane, nearestPoint, highlighter, sceneHelpers);
+    var ruler = new THREE.ToolsGizmo(camera, container.dom, plane, nearestPoint, highlighter);
     rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' + ruler.userData.rotateVAngle);
 
     ruler.addEventListener("disableMainControl", function (event) {
@@ -143,7 +143,7 @@ var Viewport = function (editor) {
 
 
     ruler.addEventListener("select3dPoint", function (event) {
-        editor.select3dPoint(event.point);
+        editor.select3dPoint(event.point.clone().multiplyScalar(editor.loader.coordFactor));
     });
 
     ruler.addEventListener("enableMainControl", function (event) {
@@ -535,39 +535,6 @@ var Viewport = function (editor) {
         return list;
     };
 
-    function getFactorPos(val, factor, step) {
-        return step / factor * val;
-    }
-
-
-    function addNewParticle(pos, scale) {
-
-        if (!scale) {
-            scale = 16;
-        }
-
-        var particle = new THREE.Sprite(particleMaterialBlack);
-        particle.position.copy(pos);
-        particle.scale.x = particle.scale.y = scale;
-        scene.add(particle);
-    };
-
-
-    var drawParticleLine = function (pointA, pointB) {
-
-        var scale = 1;
-        var color = new THREE.Color("red");
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push(new THREE.Vector3(pointA.x, pointA.y, pointA.z));
-        geometry.vertices.push(new THREE.Vector3(pointB.x, pointB.y, pointB.z));
-        geometry.colors.push(color, color);
-        var material = new THREE.LineBasicMaterial({vertexColors: THREE.VertexColors});
-        var line = new THREEext.Line(geometry, material, THREE.LinePieces);
-        line.scale.x = line.scale.y = scale;
-        scene.add(line);
-    };
-
-
     var onMouseDownPosition = new THREE.Vector2();
     var onMouseUpPosition = new THREE.Vector2();
 
@@ -795,7 +762,7 @@ var Viewport = function (editor) {
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0 && nearestPoint.visible) {
-            editor.select3dPoint(nearestPoint.position);
+            editor.select3dPoint(nearestPoint.position.clone().multiplyScalar(editor.loader.coordFactor));
         }
         document.removeEventListener('mouseup', onMouseUp);
     };
@@ -1163,7 +1130,7 @@ var Viewport = function (editor) {
         var heightModel =  Math.abs(boundingBox.min.z - boundingBox.max.z);
         var widthModel =  Math.abs(boundingBox.min.x - boundingBox.max.x);
         var paramToFit = Math.max(widthModel, heightModel);
-        var dist = Math.abs(camera.position.y - editor.lastModel.position.y - radius);
+        var dist = camera.position.distanceTo( editor.lastModel.position ) - radius;
         camera.fov = 2 * Math.atan(paramToFit / ( 2 * dist )) * ( 180 / Math.PI );
         var newCameraFar = getFar(boundingBox);
         if (camera.far < newCameraFar) {
@@ -1214,7 +1181,7 @@ var Viewport = function (editor) {
 
         camera.lookAt(center);
         camera.updateProjectionMatrix();
-
+        ruler.setCoordFactor(editor.loader.coordFactor);
         ruler.update();
         protractorV.update();
         protractorH.update();

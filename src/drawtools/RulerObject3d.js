@@ -47,7 +47,7 @@ THREE.ToolsGizmoDivisionMaterial = function (parameters) {
 
 THREE.ToolsGizmoDivisionMaterial.prototype = Object.create(THREE.MeshBasicMaterial.prototype);
 
-THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighter, scene) {
+THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighter) {
     var worldPosition = new THREE.Vector3();
     var camPosition = new THREE.Vector3();
     var worldRotation = new THREE.Euler(0, 0, 1);
@@ -56,6 +56,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
     var radius;
     var me = this;
     me.INTERSECTED = {};
+    me.coordFactor = 1;
     var SELECTED;
     var onMouseDownPosition = new THREE.Vector2();
     var onMouseUpPosition = new THREE.Vector2();
@@ -131,7 +132,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         }
         return mesh;
 
-    }
+    };
 
     var createAndAddRulerDelimiter = function (numberText, yPos, container, sign, additional) {
         var material = new THREE.LineBasicMaterial({
@@ -192,12 +193,11 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         container.add(textResultMesh);
     };
 
-    this.createRulerSide = function (container, maxSizeDelimiters, step, digits, scaleFactorW, revertOrder) {
-
+    this.createRulerSide = function (container, maxSizeDelimiters, step, digits, scaleFactorW, revertOrder, displayFactor) {
         var number = -1;
         for (var i = 0; i <= maxSizeDelimiters; i += step) {
             number++;
-            createAndAddRulerDelimiter(i.round(digits), (i / scaleFactorW), container, revertOrder ? -1 : 1);
+            createAndAddRulerDelimiter((i * me.coordFactor).round(digits), (i / scaleFactorW ), container, revertOrder ? -1 : 1);
             if (!revertOrder) {
                 this.userData.pointsTable.table.push([number]);
                 this.userData.valueTable.push((step * number).round(digits));
@@ -208,6 +208,29 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         if (!revertOrder) {
             this.userData.pointsTable.tableSize = this.userData.pointsTable.table.length;
         }
+    };
+
+
+    function gcd(a, b)
+    {
+        return !b ? a : gcd(b, a % b);
+    }
+
+    function lcm(a, b)
+    {
+        return a * (b / gcd(a,b));
+    }
+
+    var  round = function(value, ndec){
+        var n = 10;
+        for(var i = 1; i < ndec; i++){
+            n *=10;
+        }
+
+        if(!ndec || ndec <= 0)
+            return Math.round(value);
+        else
+            return Math.round(value * n) / n;
     };
 
     var rotObjectMatrix;
@@ -276,10 +299,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         this.userData.rotateHAngle = 0;
         this.userData.rotateVAngle = 0;
         this.keys = {LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40};
-
-
-//         window.addEventListener( "keydown", onKeyPress, false );
-    }
+    };
 
     this.getLeftCornerVerticalPosition = function () {
         var geometry = this.rulerMeshFront.geometry;
@@ -287,23 +307,23 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         leftCornerPosition.applyMatrix4(this.matrixWorld);
         return leftCornerPosition;
 
-    }
+    };
 
     this.setRotateVSign = function (value) {
         this.userData.rotateVSign = value;
-    }
+    };
 
     this.setRotateSinSign = function (value) {
         this.userData.rotateSinSign = value;
-    }
+    };
 
     this.setRotateHAngle = function (value) {
         this.userData.rotateHAngle = value;
-    }
+    };
 
     this.setRotateVAngle = function (value) {
         this.userData.rotateVAngle = value;
-    }
+    };
 
     this.hide = function () {
         me.dispatchEvent(enableMainMove);
@@ -312,7 +332,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         domElement.removeEventListener('mouseup', onMouseUp);
         document.removeEventListener('keydown', onKeyPress);
         me.visible = false;
-    }
+    };
 
     this.show = function () {
         me.dispatchEvent(disableMainMove);
@@ -324,7 +344,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         document.addEventListener("keydown", onKeyPress, false);
 
         this.update();
-    }
+    };
 
     var onKeyPress = function (event) {
         switch (event.keyCode) {
@@ -354,7 +374,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
                 break;
 
         }
-    }
+    };
 
 
     var onMouseMove = function (event) {
@@ -397,7 +417,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
             me.dispatchEvent(changeEvent);
 
         }
-    }
+    };
 
     this.getPointDirectionVector = function () {
         var pointA = new THREE.Vector3(nearestPoint.position.x, nearestPoint.position.y, nearestPoint.position.z);
@@ -407,12 +427,12 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         me.getWorldQuaternion(quaternion);
 
         result.set(1, 0, 0).applyQuaternion(quaternion);
-        var directionNorm = result.normalize().multiplyScalar(1)
+        var directionNorm = result.normalize().multiplyScalar(1);
         var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y, directionNorm.z);
 
         var result = pointA.clone().add(pointB);
         return result;
-    }
+    };
 
     this.getDirectionNorm = function () {
         var result = new THREE.Vector3();
@@ -423,7 +443,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         result.set(1, 0, 0).applyQuaternion(quaternion);
         var directionNorm = result.normalize().multiplyScalar(1)
         return directionNorm;
-    }
+    };
 
     var onMouseDown = function (event) {
         if (!me.visible) {
@@ -451,7 +471,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         }
 
-    }
+    };
 
 
     var onMouseUp = function (event) {
@@ -500,7 +520,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         domElement.style.cursor = 'auto';
         me.dispatchEvent(enableMainControl);
 
-    }
+    };
 
 
     var getIntersects = function (event, object) {
@@ -541,7 +561,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         }
         this.delimiters = null;
         this.textResults = null;
-    }
+    };
 
     this.updateDelimiters = function (scaleFactorW) {
         var width = scaleFactorW * this.RULER_SIZE;
@@ -559,6 +579,12 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         this.textResults = {};
         var step = 1;
         var digits = 1;
+
+
+        if (maxSizeDelimiters > 10) {
+            step = 3;
+        }
+
         if (maxSizeDelimiters > 25) {
             step = 5;
         }
@@ -591,13 +617,13 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         if (width < 0.3) {
             step = 0.01;
             digits = 2;
-            maxSizeDelimiters = width;
+            maxSizeDelimiters = width ;
         }
 
         if (width < 0.013) {
             step = 0.001;
             digits = 3;
-            maxSizeDelimiters = width;
+            maxSizeDelimiters = width ;
         }
 
         if (width < 0.001) {
@@ -606,9 +632,17 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
             maxSizeDelimiters = width;
         }
 
-        this.createRulerSide(this.frontSide, maxSizeDelimiters, step, digits, scaleFactorW, false);
-        this.createRulerSide(this.backSide, maxSizeDelimiters, step, digits, scaleFactorW, true);
-    }
+        this.createRulerSide(this.frontSide, maxSizeDelimiters, step, digits, scaleFactorW, false, me.coordFactor);
+        this.createRulerSide(this.backSide, maxSizeDelimiters, step, digits, scaleFactorW, true, me.coordFactor);
+    };
+
+    this.setCoordFactor = function (coordFactor) {
+        var oldCoordFactor = this.coordFactor;
+        var oldPosition = this.position.clone();
+        var realModelPosition = oldPosition.multiplyScalar(oldCoordFactor);
+        this.coordFactor = coordFactor;
+        this.position.copy(realModelPosition.divideScalar (this.coordFactor ));
+    };
 
 
     this.update = function () {
@@ -622,11 +656,10 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         this.scale.z = scaleFactor * pixW;
         this.updateDelimiters(scaleFactor * pixW);
 
-
-    }
+    };
 
     this.init();
 
-}
+};
 
 THREE.ToolsGizmo.prototype = Object.create(THREE.Object3D.prototype);

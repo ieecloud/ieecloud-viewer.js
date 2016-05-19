@@ -263,7 +263,7 @@ var Loader = function (editor, textureUrl) {
                     }
                 }
             }
-        }
+        };
 
         traverse(data.tree);
         scope.objectsTree = data.tree;
@@ -272,7 +272,7 @@ var Loader = function (editor, textureUrl) {
 
         scope.computeBoundingBox(pictureInfo.modelRotation);
         editor.onRenderDone();
-    }
+    };
 
     this.parseSimpleShapes = function (simpleShapes, groupIndex, pictureGeometryElement, vertices) {
         var simpleShapes = simpleShapes[groupIndex];
@@ -306,7 +306,7 @@ var Loader = function (editor, textureUrl) {
             }
         }
 
-    }
+    };
 
     this.createTexture = function (settings, pictureGeometryElement) {
         var imageName = scope.textureUrl ? scope.textureUrl + settings.texture.name + '.gif' : 'css/images/' + settings.texture.name + '.gif';
@@ -649,7 +649,7 @@ var Loader = function (editor, textureUrl) {
 
             editor.addTexture(colorMapTexture);
             colorMapTexture.magFilter = THREE.NearestFilter;
-            colorMapTexture.minFilter = THREE.LinearMipMapLinearFilter;
+            colorMapTexture.minFilter = THREE.LinearFilter;
         }
 
         // calculate scaleFactor
@@ -668,4 +668,4 @@ var Loader = function (editor, textureUrl) {
         }
         return pictureInfo;
     }
-}
+};
