@@ -799,7 +799,6 @@ var Viewport = function (editor) {
             var results = intersect.object.userData.totalObjResults;
             var pointsTable = intersect.object.userData.pointsTable;
 
-            //var distance = intersect.distance;
             var distance = intersect.distance * editor.loader.coordFactor;
             var c = intersect.point;
             if (!pointsTable || !vertices) {
@@ -1092,6 +1091,8 @@ var Viewport = function (editor) {
 
     signals.setMode.add(function () {
         nearestPoint.hide();
+        highlighter.hide();
+        highlighterProtractor.hide();
         infoMode.setValue('mode=' + editor.mode);
         render();
     });
@@ -1231,6 +1232,11 @@ var Viewport = function (editor) {
 
         });
 
+        nearestPoint.hide();
+        highlighter.hide();
+        highlighterProtractor.hide();
+        ruler.hide();
+        editor.setMode(editor.MODE_3D_GEOMETRY);
         if (materialsNeedUpdate === true) {
             updateMaterials();
         }

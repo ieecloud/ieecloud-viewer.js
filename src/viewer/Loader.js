@@ -5,7 +5,7 @@ var Loader = function (editor, textureUrl) {
     var DRAW_RESULTS = true;
     this.textureUrl = textureUrl;
     this.objectsTree = null;
-    this.coordFactor = null;
+    this.coordFactor = 1;
     this.modelRotation = null;
 
     this.getObjectsTreeModel = function () {
@@ -85,14 +85,14 @@ var Loader = function (editor, textureUrl) {
 
         return canvas;
 
-    }
+    };
 
     this.computeBoundingBox = function (modelRotation) {
         var commonBoundingBox = new THREE.Box3().setFromObject(editor.lastModel);
         if (commonBoundingBox.max.length() < Infinity && commonBoundingBox.min.length() < Infinity) {
             editor.calculateSpaceScale(commonBoundingBox, modelRotation);
         }
-    }
+    };
 
 
     this.loadMeshes = function (pictureInfo) {
@@ -214,16 +214,16 @@ var Loader = function (editor, textureUrl) {
 
         return mesh;
 
-    }
+    };
 
     this.removeModel = function () {
         editor.removeAllObjects();
-    }
+    };
 
     this.reloadModel = function (data) {
         editor.removeAllObjects();
         scope.handleJSONData(data);
-    }
+    };
 
 
     this.handleJSONData = function (data) {

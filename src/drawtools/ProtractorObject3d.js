@@ -10,7 +10,7 @@ THREE.ProtractorMaterial = function (parameters) {
 
     this.setValues(parameters);
 
-}
+};
 
 THREE.ProtractorMaterial.prototype = Object.create(THREE.MeshBasicMaterial.prototype);
 
@@ -103,7 +103,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
 
         return canvas;
 
-    }
+    };
 
 
 
@@ -129,14 +129,14 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
 
         return mesh;
 
-    }
+    };
 
 
     this.buildProtractorDivisions = function(container, sign){
         for (var angle = 0; angle < 2*Math.PI - me.DIVISION_STEP; angle= angle + me.DIVISION_STEP) {
               this.buildProtractorDivision(container, angle, sign);
         }
-    }
+    };
 
     this.buildProtractorDivision = function(container, angle, sign){
         var radius = 2.9;
@@ -173,7 +173,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
         var position = new THREE.Vector3(radius*Math.cos(sign*angle) , radius*Math.sin(sign*angle), 0);
         textResultMesh.position.copy(position);
         container.add(textResultMesh);
-    }
+    };
 
     var boundingBox = function(obj) {
         var me = this;
@@ -193,7 +193,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
             }
             return bb;
         }
-    }
+    };
 
     var rotObjectMatrix;
     var rotateAroundObjectAxis = function(object, axis, radians) {
@@ -201,7 +201,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
         rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
         object.matrix.multiply(rotObjectMatrix);
         object.rotation.setFromRotationMatrix(object.matrix);
-    }
+    };
 
     var boundingBox = function(obj) {
         var me = this;
@@ -221,7 +221,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
             }
             return bb;
         }
-    }
+    };
 
 
 
@@ -292,7 +292,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
           document.removeEventListener('mousedown', onMouseDown);
           me.dispatchEvent(enableMainMove);
           me.visible = false;
-        }
+        };
 
         this.show = function () {
            domElement.addEventListener( "mousemove", onMouseMove, false );
@@ -300,7 +300,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
            me.dispatchEvent(disableMainMove);
            me.visible = true;
            this.update();
-        }
+        };
 
 
 
@@ -323,7 +323,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
                  me.dispatchEvent(mouseDownEvent);
              }
           }
-        }
+        };
 
         var onMouseMove = function( event ) {
           if(!me.visible){
@@ -341,7 +341,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
               highlightEvent.intersects = null;
               me.dispatchEvent(highlightEvent);
           }
-        }
+        };
 
          var getIntersects = function ( event, object ) {
             var point  = new THREE.Vector2();
@@ -370,12 +370,12 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
 
         };
 
-    }
+    };
 
 
      this.setMode = function (mode) {
         this.mode = mode;
-     }
+     };
 
 
      this.getDirectionNorm = function(  ) {
@@ -387,7 +387,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
          result.set( 1, 0, 0).applyQuaternion( quaternion );
          var directionNorm = result.normalize().multiplyScalar(1)
         return   directionNorm;
-      }
+      };
 
 
 
@@ -404,10 +404,10 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
        this.scale.z = scaleFactor * pixW;
 
 
-    }
+    };
 
     this.init();
 
-}
+};
 
 THREE.Protractor.prototype = Object.create(THREE.Object3D.prototype);
