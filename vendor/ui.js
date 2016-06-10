@@ -1,11 +1,71 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var UI = {};
 
-UI.Element = function () {
+UI.Element = function ( dom ) {
+
+    this.dom = dom;
+
 };
 
 UI.Element.prototype = {
 
-    setId: function (id) {
+    add: function () {
+
+        for ( var i = 0; i < arguments.length; i ++ ) {
+
+            var argument = arguments[ i ];
+
+            if ( argument instanceof UI.Element ) {
+                this.dom.appendChild( argument.dom );
+
+            } else {
+
+                console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
+
+            }
+
+        }
+
+        return this;
+
+    },
+
+    remove: function () {
+
+        for ( var i = 0; i < arguments.length; i ++ ) {
+
+            var argument = arguments[ i ];
+
+            if ( argument instanceof UI.Element ) {
+
+                this.dom.removeChild( argument.dom );
+
+            } else {
+
+                console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
+
+            }
+
+        }
+
+        return this;
+
+    },
+
+    clear: function () {
+
+        while ( this.dom.children.length ) {
+
+            this.dom.removeChild( this.dom.lastChild );
+
+        }
+
+    },
+
+    setId: function ( id ) {
 
         this.dom.id = id;
 
@@ -13,7 +73,7 @@ UI.Element.prototype = {
 
     },
 
-    setClass: function (name) {
+    setClass: function ( name ) {
 
         this.dom.className = name;
 
@@ -21,17 +81,19 @@ UI.Element.prototype = {
 
     },
 
-    setStyle: function (style, array) {
+    setStyle: function ( style, array ) {
 
-        for (var i = 0; i < array.length; i++) {
+        for ( var i = 0; i < array.length; i ++ ) {
 
             this.dom.style[ style ] = array[ i ];
 
         }
 
+        return this;
+
     },
 
-    setDisabled: function (value) {
+    setDisabled: function ( value ) {
 
         this.dom.disabled = value;
 
@@ -39,7 +101,7 @@ UI.Element.prototype = {
 
     },
 
-    setTextContent: function (value) {
+    setTextContent: function ( value ) {
 
         this.dom.textContent = value;
 
@@ -47,142 +109,268 @@ UI.Element.prototype = {
 
     }
 
-}
+};
 
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
     'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-    'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
+    'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
-properties.forEach(function (property) {
+properties.forEach( function ( property ) {
 
-    var method = 'set' + property.substr(0, 1).toUpperCase() + property.substr(1, property.length);
+    var method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
 
     UI.Element.prototype[ method ] = function () {
 
-        this.setStyle(property, arguments);
+        this.setStyle( property, arguments );
+
         return this;
 
     };
 
-});
+} );
 
 // events
 
-var events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'Change' ];
+var events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change' ];
 
-events.forEach(function (event) {
+events.forEach( function ( event ) {
 
     var method = 'on' + event;
 
-    UI.Element.prototype[ method ] = function (callback) {
+    UI.Element.prototype[ method ] = function ( callback ) {
 
-        this.dom.addEventListener(event.toLowerCase(), callback, false);
+        this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
+
         return this;
 
     };
 
-});
+} );
 
+// Span
+
+UI.Span = function () {
+
+    UI.Element.call( this );
+
+    this.dom = document.createElement( 'span' );
+
+    return this;
+
+};
+
+UI.Span.prototype = Object.create( UI.Element.prototype );
+UI.Span.prototype.constructor = UI.Span;
+
+// Div
+
+UI.Div = function () {
+
+    UI.Element.call( this );
+
+    this.dom = document.createElement( 'div' );
+
+    return this;
+
+};
+
+UI.Div.prototype = Object.create( UI.Element.prototype );
+UI.Div.prototype.constructor = UI.Div;
+
+// Row
+
+UI.Row = function () {
+
+    UI.Element.call( this );
+
+    var dom = document.createElement( 'div' );
+    dom.className = 'Row';
+
+    this.dom = dom;
+
+    return this;
+
+};
+
+UI.Row.prototype = Object.create( UI.Element.prototype );
+UI.Row.prototype.constructor = UI.Row;
 
 // Panel
 
 UI.Panel = function () {
 
-    UI.Element.call(this);
+    UI.Element.call( this );
 
-    var dom = document.createElement('div');
+    var dom = document.createElement( 'div' );
     dom.className = 'Panel';
-    dom.style.userSelect = 'none';
-    dom.style.WebkitUserSelect = 'none';
-    dom.style.MozUserSelect = 'none';
 
     this.dom = dom;
 
     return this;
+
 };
 
-UI.Panel.prototype = Object.create(UI.Element.prototype);
+UI.Panel.prototype = Object.create( UI.Element.prototype );
+UI.Panel.prototype.constructor = UI.Panel;
 
-UI.Panel.prototype.add = function () {
 
-    for (var i = 0; i < arguments.length; i++) {
+// Collapsible Panel
 
-        this.dom.appendChild(arguments[ i ].dom);
+UI.CollapsiblePanel = function () {
+
+    UI.Panel.call( this );
+
+    this.setClass( 'Panel Collapsible' );
+
+    var scope = this;
+
+    this.static = new UI.Panel();
+    this.static.setClass( 'Static' );
+    this.static.onClick( function () {
+
+        scope.toggle();
+
+    } );
+    this.dom.appendChild( this.static.dom );
+
+    this.contents = new UI.Panel();
+    this.contents.setClass( 'Content' );
+    this.dom.appendChild( this.contents.dom );
+
+    var button = new UI.Panel();
+    button.setClass( 'Button' );
+    this.static.add( button );
+
+    this.isCollapsed = false;
+
+    return this;
+
+};
+
+UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
+UI.CollapsiblePanel.prototype.constructor = UI.CollapsiblePanel;
+
+UI.CollapsiblePanel.prototype.addStatic = function () {
+
+    this.static.add.apply( this.static, arguments );
+    return this;
+
+};
+
+UI.CollapsiblePanel.prototype.removeStatic = function () {
+
+    this.static.remove.apply( this.static, arguments );
+    return this;
+
+};
+
+UI.CollapsiblePanel.prototype.clearStatic = function () {
+
+    this.static.clear();
+    return this;
+
+};
+
+UI.CollapsiblePanel.prototype.add = function () {
+
+    this.contents.add.apply( this.contents, arguments );
+    return this;
+
+};
+
+UI.CollapsiblePanel.prototype.remove = function () {
+
+    this.contents.remove.apply( this.contents, arguments );
+    return this;
+
+};
+
+UI.CollapsiblePanel.prototype.clear = function () {
+
+    this.contents.clear();
+    return this;
+
+};
+
+UI.CollapsiblePanel.prototype.toggle = function() {
+
+    this.setCollapsed( ! this.isCollapsed );
+
+};
+
+UI.CollapsiblePanel.prototype.collapse = function() {
+
+    this.setCollapsed( true );
+
+};
+
+UI.CollapsiblePanel.prototype.expand = function() {
+
+    this.setCollapsed( false );
+
+};
+
+UI.CollapsiblePanel.prototype.setCollapsed = function( boolean ) {
+
+    if ( boolean ) {
+
+        this.dom.classList.add( 'collapsed' );
+
+    } else {
+
+        this.dom.classList.remove( 'collapsed' );
 
     }
 
-    return this;
+    this.isCollapsed = boolean;
 
-};
+    if ( this.onCollapsedChangeCallback !== undefined ) {
 
-
-UI.Panel.prototype.remove = function () {
-
-    for (var i = 0; i < arguments.length; i++) {
-
-        this.dom.removeChild(arguments[ i ].dom);
+        this.onCollapsedChangeCallback( boolean );
 
     }
 
-    return this;
-
 };
 
-//Image
+UI.CollapsiblePanel.prototype.onCollapsedChange = function ( callback ) {
 
-UI.Image = function (path) {
-
-    UI.Element.call(this);
-
-    var dom = document.createElement('img');
-    dom.style.styleFloat = "left";
-    dom.style.cssFloat = "left";
-
-    this.dom = dom;
-    dom.src = path;
-
-    return this;
-
-};
-
-UI.Image.prototype = Object.create(UI.Element.prototype);
-
-UI.Image.prototype.setValue = function (value) {
-
-    if (value !== undefined) {
-
-    }
-
-    return this;
+    this.onCollapsedChangeCallback = callback;
 
 };
 
 // Text
 
-UI.Text = function (text) {
+UI.Text = function ( text ) {
 
-    UI.Element.call(this);
+    UI.Element.call( this );
 
-    var dom = document.createElement('span');
+    var dom = document.createElement( 'span' );
     dom.className = 'Text';
     dom.style.cursor = 'default';
     dom.style.display = 'inline-block';
     dom.style.verticalAlign = 'middle';
 
     this.dom = dom;
-    this.setValue(text);
+    this.setValue( text );
 
     return this;
 
 };
 
-UI.Text.prototype = Object.create(UI.Element.prototype);
+UI.Text.prototype = Object.create( UI.Element.prototype );
+UI.Text.prototype.constructor = UI.Text;
 
-UI.Text.prototype.setValue = function (value) {
+UI.Text.prototype.getValue = function () {
 
-    if (value !== undefined) {
+    return this.dom.textContent;
+
+};
+
+UI.Text.prototype.setValue = function ( value ) {
+
+    if ( value !== undefined ) {
 
         this.dom.textContent = value;
 
@@ -195,30 +383,36 @@ UI.Text.prototype.setValue = function (value) {
 
 // Input
 
-UI.Input = function () {
+UI.Input = function ( text ) {
 
-    UI.Element.call(this);
+    UI.Element.call( this );
 
     var scope = this;
 
-    var dom = document.createElement('input');
+    var dom = document.createElement( 'input' );
     dom.className = 'Input';
-    dom.style.padding = '2px';
     dom.style.border = '1px solid #ccc';
+    dom.style.height = '25px';
+    dom.style.width = '100%';
+    dom.style.backgroundImage = 'none';
+    dom.style.boxShadow = 'inset 0 1px 1px rgba(0,0,0,.075)';
+    dom.style.transition = 'border-color ease-in-out .15s,box-shadow ease-in-out .15s';
 
-    dom.addEventListener('keydown', function (event) {
+    dom.addEventListener( 'keydown', function ( event ) {
 
         event.stopPropagation();
 
-    }, false);
+    }, false );
 
     this.dom = dom;
+    this.setValue( text );
 
     return this;
 
 };
 
-UI.Input.prototype = Object.create(UI.Element.prototype);
+UI.Input.prototype = Object.create( UI.Element.prototype );
+UI.Input.prototype.constructor = UI.Input;
 
 UI.Input.prototype.getValue = function () {
 
@@ -226,7 +420,7 @@ UI.Input.prototype.getValue = function () {
 
 };
 
-UI.Input.prototype.setValue = function (value) {
+UI.Input.prototype.setValue = function ( value ) {
 
     this.dom.value = value;
 
@@ -239,20 +433,32 @@ UI.Input.prototype.setValue = function (value) {
 
 UI.TextArea = function () {
 
-    UI.Element.call(this);
+    UI.Element.call( this );
 
     var scope = this;
 
-    var dom = document.createElement('textarea');
+    var dom = document.createElement( 'textarea' );
     dom.className = 'TextArea';
     dom.style.padding = '2px';
-    dom.style.border = '1px solid #ccc';
+    dom.spellcheck = false;
 
-    dom.addEventListener('keydown', function (event) {
+    dom.addEventListener( 'keydown', function ( event ) {
 
         event.stopPropagation();
 
-    }, false);
+        if ( event.keyCode === 9 ) {
+
+            event.preventDefault();
+
+            var cursor = dom.selectionStart;
+
+            dom.value = dom.value.substring( 0, cursor ) + '\t' + dom.value.substring( cursor );
+            dom.selectionStart = cursor + 1;
+            dom.selectionEnd = dom.selectionStart;
+
+        }
+
+    }, false );
 
     this.dom = dom;
 
@@ -260,7 +466,8 @@ UI.TextArea = function () {
 
 };
 
-UI.TextArea.prototype = Object.create(UI.Element.prototype);
+UI.TextArea.prototype = Object.create( UI.Element.prototype );
+UI.TextArea.prototype.constructor = UI.TextArea;
 
 UI.TextArea.prototype.getValue = function () {
 
@@ -268,7 +475,7 @@ UI.TextArea.prototype.getValue = function () {
 
 };
 
-UI.TextArea.prototype.setValue = function (value) {
+UI.TextArea.prototype.setValue = function ( value ) {
 
     this.dom.value = value;
 
@@ -281,16 +488,13 @@ UI.TextArea.prototype.setValue = function (value) {
 
 UI.Select = function () {
 
-    UI.Element.call(this);
+    UI.Element.call( this );
 
     var scope = this;
 
-    var dom = document.createElement('select');
+    var dom = document.createElement( 'select' );
     dom.className = 'Select';
-    dom.style.width = '64px';
-    dom.style.height = '16px';
-    dom.style.border = '0px';
-    dom.style.padding = '0px';
+    dom.style.padding = '2px';
 
     this.dom = dom;
 
@@ -298,32 +502,33 @@ UI.Select = function () {
 
 };
 
-UI.Select.prototype = Object.create(UI.Element.prototype);
+UI.Select.prototype = Object.create( UI.Element.prototype );
+UI.Select.prototype.constructor = UI.Select;
 
-UI.Select.prototype.setMultiple = function (value) {
+UI.Select.prototype.setMultiple = function ( boolean ) {
 
-    this.dom.multiple = value;
+    this.dom.multiple = boolean;
 
     return this;
 
 };
 
-UI.Select.prototype.setOptions = function (options) {
+UI.Select.prototype.setOptions = function ( options ) {
 
     var selected = this.dom.value;
 
-    while (this.dom.children.length > 0) {
+    while ( this.dom.children.length > 0 ) {
 
-        this.dom.removeChild(this.dom.firstChild);
+        this.dom.removeChild( this.dom.firstChild );
 
     }
 
-    for (var key in options) {
+    for ( var key in options ) {
 
-        var option = document.createElement('option');
+        var option = document.createElement( 'option' );
         option.value = key;
         option.innerHTML = options[ key ];
-        this.dom.appendChild(option);
+        this.dom.appendChild( option );
 
     }
 
@@ -339,119 +544,15 @@ UI.Select.prototype.getValue = function () {
 
 };
 
-UI.Select.prototype.setValue = function (value) {
+UI.Select.prototype.setValue = function ( value ) {
 
-    this.dom.value = value;
+    value = String( value );
 
-    return this;
+    if ( this.dom.value !== value ) {
 
-};
-
-// FancySelect
-
-UI.FancySelect = function () {
-
-    UI.Element.call(this);
-
-    var scope = this;
-
-    var dom = document.createElement('div');
-    dom.className = 'FancySelect';
-    dom.style.background = '#fff';
-    dom.style.border = '1px solid #ccc';
-    dom.style.padding = '0';
-    dom.style.cursor = 'default';
-    dom.style.overflow = 'auto';
-
-    this.dom = dom;
-
-    this.options = [];
-    this.selectedValue = null;
-
-    return this;
-
-};
-
-UI.FancySelect.prototype = Object.create(UI.Element.prototype);
-
-UI.FancySelect.prototype.setOptions = function (options) {
-
-    var scope = this;
-
-    var changeEvent = document.createEvent('HTMLEvents');
-    changeEvent.initEvent('change', true, true);
-
-    while (scope.dom.children.length > 0) {
-
-        scope.dom.removeChild(scope.dom.firstChild);
+        this.dom.value = value;
 
     }
-
-    scope.options = [];
-
-    for (var key in options) {
-
-        var option = document.createElement('div');
-        option.style.padding = '4px';
-        option.style.whiteSpace = 'nowrap';
-        option.innerHTML = options[ key ];
-        option.value = key;
-        scope.dom.appendChild(option);
-
-        scope.options.push(option);
-
-        option.addEventListener('click', function (event) {
-
-            scope.setValue(this.value);
-            scope.dom.dispatchEvent(changeEvent);
-
-        }, false);
-
-    }
-
-    return scope;
-
-};
-
-UI.FancySelect.prototype.getValue = function () {
-
-    return this.selectedValue;
-
-};
-
-UI.FancySelect.prototype.setValue = function (value) {
-
-    if (typeof value === 'number') value = value.toString();
-
-    for (var i = 0; i < this.options.length; i++) {
-
-        var element = this.options[ i ];
-
-        if (element.value === value) {
-
-            element.style.backgroundColor = '#f0f0f0';
-
-            // scroll into view
-
-            var y = i * element.clientHeight;
-            var scrollTop = this.dom.scrollTop;
-            var domHeight = this.dom.clientHeight;
-
-            if (y < scrollTop || y > scrollTop + domHeight) {
-
-                this.dom.scrollTop = y;
-
-            }
-
-        } else {
-
-            element.style.backgroundColor = '';
-
-        }
-
-    }
-
-    this.selectedValue = value;
 
     return this;
 
@@ -459,24 +560,25 @@ UI.FancySelect.prototype.setValue = function (value) {
 
 // Checkbox
 
-UI.Checkbox = function (boolean) {
+UI.Checkbox = function ( boolean ) {
 
-    UI.Element.call(this);
+    UI.Element.call( this );
 
     var scope = this;
 
-    var dom = document.createElement('input');
+    var dom = document.createElement( 'input' );
     dom.className = 'Checkbox';
     dom.type = 'checkbox';
 
     this.dom = dom;
-    this.setValue(boolean);
+    this.setValue( boolean );
 
     return this;
 
 };
 
-UI.Checkbox.prototype = Object.create(UI.Element.prototype);
+UI.Checkbox.prototype = Object.create( UI.Element.prototype );
+UI.Checkbox.prototype.constructor = UI.Checkbox;
 
 UI.Checkbox.prototype.getValue = function () {
 
@@ -484,9 +586,9 @@ UI.Checkbox.prototype.getValue = function () {
 
 };
 
-UI.Checkbox.prototype.setValue = function (value) {
+UI.Checkbox.prototype.setValue = function ( value ) {
 
-    if (value !== undefined) {
+    if ( value !== undefined ) {
 
         this.dom.checked = value;
 
@@ -501,22 +603,24 @@ UI.Checkbox.prototype.setValue = function (value) {
 
 UI.Color = function () {
 
-    UI.Element.call(this);
+    UI.Element.call( this );
 
     var scope = this;
 
-    var dom = document.createElement('input');
+    var dom = document.createElement( 'input' );
     dom.className = 'Color';
     dom.style.width = '64px';
-    dom.style.height = '16px';
+    dom.style.height = '17px';
     dom.style.border = '0px';
-    dom.style.padding = '0px';
+    dom.style.padding = '2px';
     dom.style.backgroundColor = 'transparent';
 
     try {
+
         dom.type = 'color';
-    } catch (exception) {
-    }
+        dom.value = '#ffffff';
+
+    } catch ( exception ) {}
 
     this.dom = dom;
 
@@ -524,7 +628,8 @@ UI.Color = function () {
 
 };
 
-UI.Color.prototype = Object.create(UI.Element.prototype);
+UI.Color.prototype = Object.create( UI.Element.prototype );
+UI.Color.prototype.constructor = UI.Color;
 
 UI.Color.prototype.getValue = function () {
 
@@ -534,11 +639,11 @@ UI.Color.prototype.getValue = function () {
 
 UI.Color.prototype.getHexValue = function () {
 
-    return parseInt(this.dom.value.substr(1), 16);
+    return parseInt( this.dom.value.substr( 1 ), 16 );
 
 };
 
-UI.Color.prototype.setValue = function (value) {
+UI.Color.prototype.setValue = function ( value ) {
 
     this.dom.value = value;
 
@@ -546,9 +651,9 @@ UI.Color.prototype.setValue = function (value) {
 
 };
 
-UI.Color.prototype.setHexValue = function (hex) {
+UI.Color.prototype.setHexValue = function ( hex ) {
 
-    this.dom.value = "#" + ( '000000' + hex.toString(16) ).slice(-6);
+    this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( - 6 );
 
     return this;
 
@@ -557,139 +662,171 @@ UI.Color.prototype.setHexValue = function (hex) {
 
 // Number
 
-UI.Number = function (number) {
+UI.Number = function ( number ) {
 
-    UI.Element.call(this);
+    UI.Element.call( this );
 
     var scope = this;
 
-    var dom = document.createElement('input');
+    var dom = document.createElement( 'input' );
     dom.className = 'Number';
-    dom.style.color = '#0080f0';
-    dom.style.fontSize = '12px';
-    dom.style.backgroundColor = 'transparent';
-    dom.style.border = '1px solid transparent';
-    dom.style.padding = '2px';
-    dom.style.cursor = 'col-resize';
     dom.value = '0.00';
+    dom.style.padding = '4px';
+    dom.style.border = '1px solid #ccc';
+    dom.style.height = '20px';
+    dom.style.width = '100%';
+    dom.style.backgroundImage = 'none';
+    dom.style.boxShadow = 'inset 0 1px 1px rgba(0,0,0,.075)';
+    dom.style.transition = 'border-color ease-in-out .15s,box-shadow ease-in-out .15s';
 
-    dom.addEventListener('keydown', function (event) {
+    dom.addEventListener( 'keydown', function ( event ) {
 
-        event.stopPropagation();
+        //event.stopPropagation();
 
-        if (event.keyCode === 13) dom.blur();
+        if ( event.keyCode === 13 ) dom.blur();
 
-    }, false);
+    }, false );
 
-    this.min = -Infinity;
+    this.value = 0;
+
+    this.min = - Infinity;
     this.max = Infinity;
 
     this.precision = 2;
     this.step = 1;
 
     this.dom = dom;
-    this.setValue(number);
 
-    var changeEvent = document.createEvent('HTMLEvents');
-    changeEvent.initEvent('change', true, true);
+    this.setValue( number );
+
+    var changeEvent = document.createEvent( 'HTMLEvents' );
+    changeEvent.initEvent( 'change', true, true );
 
     var distance = 0;
     var onMouseDownValue = 0;
 
-    var onMouseDown = function (event) {
+    var pointer = [ 0, 0 ];
+    var prevPointer = [ 0, 0 ];
+
+    function onMouseDown( event ) {
 
         event.preventDefault();
 
         distance = 0;
 
-        onMouseDownValue = parseFloat(dom.value);
+        onMouseDownValue = scope.value;
 
-        document.addEventListener('mousemove', onMouseMove, false);
-        document.addEventListener('mouseup', onMouseUp, false);
+        prevPointer = [ event.clientX, event.clientY ];
 
-    };
+        document.addEventListener( 'mousemove', onMouseMove, false );
+        document.addEventListener( 'mouseup', onMouseUp, false );
 
-    var onMouseMove = function (event) {
+    }
 
-        var currentValue = dom.value;
+    function onMouseMove( event ) {
 
-        var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-        var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+        var currentValue = scope.value;
 
-        distance += movementX - movementY;
+        pointer = [ event.clientX, event.clientY ];
 
-        var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+        distance += ( pointer[ 0 ] - prevPointer[ 0 ] ) - ( pointer[ 1 ] - prevPointer[ 1 ] );
 
-        dom.value = Math.min(scope.max, Math.max(scope.min, number)).toFixed(scope.precision);
+        var value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+        value = Math.min( scope.max, Math.max( scope.min, value ) );
 
-        if (currentValue !== dom.value) dom.dispatchEvent(changeEvent);
+        if ( currentValue !== value ) {
 
-    };
+            scope.setValue( value );
+            dom.dispatchEvent( changeEvent );
 
-    var onMouseUp = function (event) {
+        }
 
-        document.removeEventListener('mousemove', onMouseMove, false);
-        document.removeEventListener('mouseup', onMouseUp, false);
+        prevPointer = [ event.clientX, event.clientY ];
 
-        if (Math.abs(distance) < 2) {
+    }
+
+    function onMouseUp( event ) {
+
+        document.removeEventListener( 'mousemove', onMouseMove, false );
+        document.removeEventListener( 'mouseup', onMouseUp, false );
+
+        if ( Math.abs( distance ) < 2 ) {
 
             dom.focus();
             dom.select();
 
         }
 
-    };
+    }
 
-    var onChange = function (event) {
+    function onChange( event ) {
 
-        var number = parseFloat(dom.value);
+        var value = 0;
 
-        if (isNaN(number) === false) {
+        try {
 
-            dom.value = number;
+            value = eval( dom.value );
+
+        } catch ( error ) {
+
+            console.error( error.message );
 
         }
 
-    };
+        scope.setValue( value );
 
-    var onFocus = function (event) {
+    }
+
+    function onFocus( event ) {
 
         dom.style.backgroundColor = '';
-        dom.style.borderColor = '#ccc';
         dom.style.cursor = '';
 
-    };
+    }
 
-    var onBlur = function (event) {
+    function onBlur( event ) {
 
         dom.style.backgroundColor = 'transparent';
-        dom.style.borderColor = 'transparent';
         dom.style.cursor = 'col-resize';
 
-    };
+    }
 
-    dom.addEventListener('mousedown', onMouseDown, false);
-    dom.addEventListener('change', onChange, false);
-    dom.addEventListener('focus', onFocus, false);
-    dom.addEventListener('blur', onBlur, false);
+    onBlur();
+
+
+
+
+    this.initListeners = function () {
+        dom.addEventListener( 'mousedown', onMouseDown, false );
+        dom.addEventListener( 'change', onChange, false );
+        dom.addEventListener( 'focus', onFocus, false );
+        dom.addEventListener( 'blur', onBlur, false );
+    };
 
     return this;
 
 };
 
-UI.Number.prototype = Object.create(UI.Element.prototype);
+UI.Number.prototype = Object.create( UI.Element.prototype );
+UI.Number.prototype.constructor = UI.Number;
 
 UI.Number.prototype.getValue = function () {
 
-    return parseFloat(this.dom.value);
+    return this.value;
 
 };
 
-UI.Number.prototype.setValue = function (value) {
+UI.Number.prototype.setValue = function ( value ) {
 
-    if (value !== undefined) {
+    if ( value !== undefined ) {
 
-        this.dom.value = value.toFixed(this.precision);
+        value = parseFloat( value );
+
+        if ( value < this.min ) value = this.min;
+        if ( value > this.max ) value = this.max;
+
+        this.value = value;
+        this.dom.value = value.toFixed( this.precision );
 
     }
 
@@ -697,7 +834,7 @@ UI.Number.prototype.setValue = function (value) {
 
 };
 
-UI.Number.prototype.setRange = function (min, max) {
+UI.Number.prototype.setRange = function ( min, max ) {
 
     this.min = min;
     this.max = max;
@@ -706,7 +843,7 @@ UI.Number.prototype.setRange = function (min, max) {
 
 };
 
-UI.Number.prototype.setPrecision = function (precision) {
+UI.Number.prototype.setPrecision = function ( precision ) {
 
     this.precision = precision;
 
@@ -714,193 +851,6 @@ UI.Number.prototype.setPrecision = function (precision) {
 
 };
 
-
-// Integer
-
-UI.Integer = function (number) {
-
-    UI.Element.call(this);
-
-    var scope = this;
-
-    var dom = document.createElement('input');
-    dom.className = 'Number';
-    dom.style.color = '#0080f0';
-    dom.style.fontSize = '12px';
-    dom.style.backgroundColor = 'transparent';
-    dom.style.border = '1px solid transparent';
-    dom.style.padding = '2px';
-    dom.style.cursor = 'col-resize';
-    dom.value = '0.00';
-
-    dom.addEventListener('keydown', function (event) {
-
-        event.stopPropagation();
-
-    }, false);
-
-    this.min = -Infinity;
-    this.max = Infinity;
-
-    this.step = 1;
-
-    this.dom = dom;
-    this.setValue(number);
-
-    var changeEvent = document.createEvent('HTMLEvents');
-    changeEvent.initEvent('change', true, true);
-
-    var distance = 0;
-    var onMouseDownValue = 0;
-
-    var onMouseDown = function (event) {
-
-        event.preventDefault();
-
-        distance = 0;
-
-        onMouseDownValue = parseFloat(dom.value);
-
-        document.addEventListener('mousemove', onMouseMove, false);
-        document.addEventListener('mouseup', onMouseUp, false);
-
-    };
-
-    var onMouseMove = function (event) {
-
-        var currentValue = dom.value;
-
-        var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-        var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
-
-        distance += movementX - movementY;
-
-        var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
-
-        dom.value = Math.min(scope.max, Math.max(scope.min, number)) | 0;
-
-        if (currentValue !== dom.value) dom.dispatchEvent(changeEvent);
-
-    };
-
-    var onMouseUp = function (event) {
-
-        document.removeEventListener('mousemove', onMouseMove, false);
-        document.removeEventListener('mouseup', onMouseUp, false);
-
-        if (Math.abs(distance) < 2) {
-
-            dom.focus();
-            dom.select();
-
-        }
-
-    };
-
-    var onChange = function (event) {
-
-        var number = parseInt(dom.value);
-
-        if (isNaN(number) === false) {
-
-            dom.value = number;
-
-        }
-
-    };
-
-    var onFocus = function (event) {
-
-        dom.style.backgroundColor = '';
-        dom.style.borderColor = '#ccc';
-        dom.style.cursor = '';
-
-    };
-
-    var onBlur = function (event) {
-
-        dom.style.backgroundColor = 'transparent';
-        dom.style.borderColor = 'transparent';
-        dom.style.cursor = 'col-resize';
-
-    };
-
-    dom.addEventListener('mousedown', onMouseDown, false);
-    dom.addEventListener('change', onChange, false);
-    dom.addEventListener('focus', onFocus, false);
-    dom.addEventListener('blur', onBlur, false);
-
-    return this;
-
-};
-
-UI.Integer.prototype = Object.create(UI.Element.prototype);
-
-UI.Integer.prototype.getValue = function () {
-
-    return parseInt(this.dom.value);
-
-};
-
-UI.Integer.prototype.setValue = function (value) {
-
-    if (value !== undefined) {
-
-        this.dom.value = value | 0;
-
-    }
-
-    return this;
-
-};
-
-UI.Integer.prototype.setRange = function (min, max) {
-
-    this.min = min;
-    this.max = max;
-
-    return this;
-
-};
-
-
-// Break
-
-UI.Break = function () {
-
-    UI.Element.call(this);
-
-    var dom = document.createElement('br');
-    dom.className = 'Break';
-
-    this.dom = dom;
-
-    return this;
-
-};
-
-UI.Break.prototype = Object.create(UI.Element.prototype);
-
-
-// HorizontalRule
-
-UI.HorizontalRule = function () {
-
-    UI.Element.call(this);
-
-    var dom = document.createElement('hr');
-    dom.className = 'HorizontalRule';
-
-    this.dom = dom;
-
-    return this;
-
-};
-
-UI.HorizontalRule.prototype = Object.create(UI.Element.prototype);
-
-
-// Button
 
 UI.Button = function (value) {
 
@@ -927,3 +877,98 @@ UI.Button.prototype.setLabel = function (value) {
     return this;
 
 };
+
+
+UI.Modal = function ( value ) {
+
+    var scope = this;
+
+    UI.Element.call( this );
+
+    var dom = document.createElement( 'div' );
+
+    dom.id = "panel";
+
+    dom.style.position = 'absolute';
+    dom.style.width = '100%';
+    dom.style.height = '100%';
+    dom.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    dom.style.display = 'none';
+    dom.style.alignItems = 'center';
+    dom.style.justifyContent = 'center';
+
+
+
+    this.dom = dom;
+
+    this.container = new UI.Panel();
+    this.container.dom.id = 'modal-panel';
+    this.container.dom.style.width = '200px';
+    this.container.dom.style.padding = '20px';
+    this.container.dom.style.backgroundColor = '#ffffff';
+    this.container.dom.style.boxShadow = '0px 5px 10px rgba(0,0,0,0.5)';
+
+    this.add( this.container);
+
+    return this;
+
+};
+
+UI.Modal.prototype = Object.create( UI.Element.prototype );
+UI.Modal.prototype.constructor = UI.Modal;
+
+
+
+UI.Modal.prototype.show = function ( header, content, okCallback ) {
+    var scope = this;
+    this.container.clear();
+    this.okCallback = okCallback;
+    this.content = content;
+    this.container.add( header );
+    content.initListeners();
+    this.container.dom.appendChild( content.dom );
+    //this.okBtn = new UI.Button('OK');
+    //this.container.add(this.okBtn);
+
+    //this.okBtn.onClick( function () {
+    //    scope.hide();
+    //    okCallback(content.getValue());
+    //});
+
+    var clickListener = function(event){
+        event.stopPropagation();
+        if (scope.container.dom.id !== event.target.id && !scope.container.dom.contains(event.target)) {
+            scope.hide();
+        }
+    };
+
+    var keyListener = function(event){
+        if ( event.keyCode === 13 ){
+            event.stopPropagation();
+            scope.hide();
+            scope.okCallback(scope.content.getValue())
+        }
+    };
+
+
+
+    this.hide = function(){
+        scope.dom.removeEventListener("click", clickListener, false);
+        scope.dom.removeEventListener("keydown",keyListener, false);
+        this.container.clear();
+        this.dom.style.display = 'none';
+    };
+
+    scope.dom.addEventListener('click', clickListener);
+    scope.dom.addEventListener( 'keydown', keyListener);
+
+
+    scope.dom.style.display = 'flex';
+
+    scope.content.dom.focus();
+    scope.content.dom.select();
+
+    return this;
+
+};
+

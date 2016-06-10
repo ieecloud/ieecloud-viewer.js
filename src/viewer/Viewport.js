@@ -75,6 +75,10 @@ var Viewport = function (editor) {
     container2.setPosition('absolute');
 
 
+    var modal = new UI.Modal();
+    container.add(modal);
+
+
     // renderer
     var renderer2 = new THREE.CanvasRenderer({alpha: true});
     renderer2.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -144,6 +148,8 @@ var Viewport = function (editor) {
 
     ruler.addEventListener("select3dPoint", function (event) {
         editor.select3dPoint(event.point.clone().multiplyScalar(editor.loader.coordFactor));
+        ruler.hide();
+        render();
     });
 
     ruler.addEventListener("enableMainControl", function (event) {
@@ -377,7 +383,7 @@ var Viewport = function (editor) {
         rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
         object.matrix.multiply(rotObjectMatrix);
         object.rotation.setFromRotationMatrix(object.matrix);
-    };
+    }
 
     function calculateCrossVector() {
         var normal = new THREE.Vector3(0, 0, 1);
@@ -386,7 +392,7 @@ var Viewport = function (editor) {
 
         var vectorToCross = directionNorm.projectOnPlane(normal);
         crossVector.crossVectors(normal, vectorToCross);
-    };
+    }
 
 
     function findVerticalAngle() {
@@ -405,7 +411,7 @@ var Viewport = function (editor) {
         return result
 
 
-    };
+    }
 
 
     function rotateAroundWorldAxis(object, axis, radians) {
@@ -415,7 +421,7 @@ var Viewport = function (editor) {
         object.matrix = rotWorldMatrix;
         object.rotation.setFromRotationMatrix(object.matrix.extractRotation(rotWorldMatrix));
 
-    };
+    }
 
     // events
 
@@ -734,6 +740,9 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseUp3dGeometryHandler = function (event) {
+        if(event.button !== 0){
+            return;
+        }
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
@@ -759,10 +768,16 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseUp3dPointHandler = function (event) {
+        if(event.button !== 0){
+            return;
+        }
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0 && nearestPoint.visible) {
+            ruler.position.copy(nearestPoint.position);
             editor.select3dPoint(nearestPoint.position.clone().multiplyScalar(editor.loader.coordFactor));
+            ruler.hide();
+            render();
         }
         document.removeEventListener('mouseup', onMouseUp);
     };
@@ -790,10 +805,10 @@ var Viewport = function (editor) {
     };
 
     var runNearestAlgorithm = function (intersects) {
-        //var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
-        //var intersectLine = searchNearestIntersect(intersects, THREEext.Line);
-        //var intersect = getNearestIntersect(intersectLine, intersectMesh);
-        var intersect = intersects[0];
+        var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
+        var intersectLine = searchNearestIntersect(intersects, THREEext.Line);
+        var intersect = getNearestIntersect(intersectLine, intersectMesh);
+        //var intersect = intersects[0];
         if (intersect) {
             var vertices = intersect.object.userData.totalObjVertices;
             var results = intersect.object.userData.totalObjResults;
@@ -866,6 +881,14 @@ var Viewport = function (editor) {
     // controls need to be added *after* main logic,
     // otherwise controls.enabled doesn't work.
 
+    ruler.addEventListener('digitsEvent', function (event) {
+        var modalHeader  = new UI.Text();
+        modalHeader.setValue('Set Delimiter');
+        var numberControl  = new UI.Number(event.digit);
+        modal.show(modalHeader, numberControl, function(result){
+            ruler.getDelimiterAndDispatch(result);
+        });
+    });
 
     ruler.addEventListener('rotateEvent', function (event) {
 
@@ -1120,7 +1143,6 @@ var Viewport = function (editor) {
 
 
     signals.scaleChanged.add(function (boundingBox, modelRotation) {
-
         var subVector = new THREE.Vector3(0, 0, 0);
         subVector.subVectors(boundingBox.min, boundingBox.max);
 

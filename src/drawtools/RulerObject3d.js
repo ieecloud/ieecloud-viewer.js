@@ -72,6 +72,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
     var enableMainMove = {type: "enableMainMove"};
     var changeEvent = {type: "change"};
     var rotateEvent = {type: "rotateEvent"};
+    var digitsEvent = {type: "digitsEvent"};
     var offset = new THREE.Vector3();
     me.RULER_SIZE = 15;
     me.RULER_INNER_LIMIT = 2.1;
@@ -210,29 +211,6 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         }
     };
 
-
-    function gcd(a, b)
-    {
-        return !b ? a : gcd(b, a % b);
-    }
-
-    function lcm(a, b)
-    {
-        return a * (b / gcd(a,b));
-    }
-
-    var  round = function(value, ndec){
-        var n = 10;
-        for(var i = 1; i < ndec; i++){
-            n *=10;
-        }
-
-        if(!ndec || ndec <= 0)
-            return Math.round(value);
-        else
-            return Math.round(value * n) / n;
-    };
-
     var rotObjectMatrix;
     var rotateAroundObjectAxis = function (object, axis, radians) {
         rotObjectMatrix = new THREE.Matrix4();
@@ -309,6 +287,12 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
     };
 
+    this.getDelimiterAndDispatch = function (inputValue) {
+        var number = inputValue / me.coordFactor;
+        select3dPoint.point = calculateRulerPointInWorld(number);
+        me.dispatchEvent(select3dPoint);
+    };
+
     this.setRotateVSign = function (value) {
         this.userData.rotateVSign = value;
     };
@@ -346,9 +330,29 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         this.update();
     };
 
-    var onKeyPress = function (event) {
-        switch (event.keyCode) {
 
+    function validateNumber(event) {
+        var key = window.event ? event.keyCode : event.which;
+
+        if (event.keyCode === 8 || event.keyCode === 46
+            || event.keyCode === 37 || event.keyCode === 39) {
+            return true;
+        }
+        else if ( key < 48 || key > 57 ) {
+            return false;
+        }
+        else return true;
+    }
+
+    var onKeyPress = function (event) {
+        var charCode = (event.which) ? event.which : event.keyCode;
+        if(validateNumber(event)){
+            document.removeEventListener('keydown', onKeyPress);
+            digitsEvent.digit =  event.key;
+            me.dispatchEvent(digitsEvent);
+        }
+
+        switch (charCode) {
             case me.keys.UP:
                 rotateEvent.angle = -90;
                 rotateEvent.direction = "vertical";
@@ -372,7 +376,6 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
                 rotateEvent.direction = "horizontal";
                 me.dispatchEvent(rotateEvent);
                 break;
-
         }
     };
 
@@ -445,6 +448,20 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         return directionNorm;
     };
 
+    var calculateRulerPointInWorld = function(number){
+        var pointA = new THREE.Vector3(me.position.x, me.position.y, me.position.z);
+        var result = new THREE.Vector3();
+        var quaternion = new THREE.Quaternion();
+
+        me.getWorldQuaternion(quaternion);
+
+        result.set(1, 0, 0).applyQuaternion(quaternion);
+        var directionNorm = result.normalize().multiplyScalar(number);
+        var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y, directionNorm.z);
+
+        return pointA.clone().add(pointB);
+    };
+
     var onMouseDown = function (event) {
         if (!me.visible) {
             return;
@@ -493,18 +510,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
             var array = getMousePosition(domElement, event.clientX, event.clientY);
             onMouseUpPosition.fromArray(array);
             if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
-                var pointA = new THREE.Vector3(me.position.x, me.position.y, me.position.z);
-                var result = new THREE.Vector3();
-                var quaternion = new THREE.Quaternion();
-
-                me.getWorldQuaternion(quaternion);
-
-                result.set(1, 0, 0).applyQuaternion(quaternion);
-                var directionNorm = result.normalize().multiplyScalar(highlighter.userData.value)
-                var pointB = new THREE.Vector3(directionNorm.x, directionNorm.y, directionNorm.z);
-
-                var result = pointA.clone().add(pointB);
-                select3dPoint.point = result;
+                select3dPoint.point = calculateRulerPointInWorld(highlighter.userData.value);
                 me.dispatchEvent(select3dPoint);
             }
         }
