@@ -933,9 +933,7 @@ var Viewport = function (editor) {
         render();
     });
 
-
-    protractorV.addEventListener('mouseDown', function (event) {
-        var degree = event.angle;
+    var onChooseProtractorVAngle = function(degree){
         var currentAngle = findVerticalAngle();
         if (ruler.userData.rotateSinSign < 0) { // sin <0
             currentAngle = 360 - currentAngle;
@@ -963,10 +961,25 @@ var Viewport = function (editor) {
         protractorV.hide();
         ruler.show();
         render();
+    };
+
+
+    protractorV.addEventListener('mouseDown', function (event) {
+        var degree = event.angle;
+        onChooseProtractorVAngle(degree);
     });
 
-    protractorH.addEventListener('mouseDown', function (event) {
-        var degree = event.angle;
+    protractorV.addEventListener('digitsEvent', function (event) {
+        var modalHeader  = new UI.Text();
+        modalHeader.setValue('Set Vertical Angle');
+        var numberControl  = new UI.Number(event.digit);
+        modal.show(modalHeader, numberControl, function(degree){
+            onChooseProtractorVAngle(degree);
+        });
+    });
+
+
+    var onChooseProtractorHAngle = function(degree){
         var normal = new THREE.Vector3(0, 0, 1);
         var directionNorm = ruler.getDirectionNorm();
 
@@ -1000,6 +1013,21 @@ var Viewport = function (editor) {
         protractorH.hide();
         ruler.show();
         render();
+    };
+
+    protractorH.addEventListener('mouseDown', function (event) {
+        var degree = event.angle;
+        onChooseProtractorHAngle(degree);
+    });
+
+
+    protractorH.addEventListener('digitsEvent', function (event) {
+        var modalHeader  = new UI.Text();
+        modalHeader.setValue('Set Horizontal Angle');
+        var numberControl  = new UI.Number(event.digit);
+        modal.show(modalHeader, numberControl, function(degree){
+            onChooseProtractorHAngle(degree);
+        });
     });
 
 

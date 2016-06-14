@@ -25,15 +25,15 @@ THREE.ProtractorDivisionMaterial = function (parameters) {
     this.oldColor = this.color.clone();
     this.oldOpacity = this.opacity;
 
-    this.highlight = function( highlighted ) {
+    this.highlight = function (highlighted) {
 
-        if ( highlighted ) {
+        if (highlighted) {
 
-            this.color.setRGB( 139,0,0 );
+            this.color.setRGB(139, 0, 0);
             this.opacity = 1;
 
         } else {
-            this.color.setRGB( this.oldColor );
+            this.color.setRGB(this.oldColor);
             this.opacity = this.oldOpacity;
 
         }
@@ -46,7 +46,7 @@ THREE.ProtractorDivisionMaterial = function (parameters) {
 
 THREE.ProtractorDivisionMaterial.prototype = Object.create(THREE.MeshBasicMaterial.prototype);
 
-THREE.ProtractorModes = {VERTICAL:"protractorV", HORIZONTAL:"protractorH"};
+THREE.ProtractorModes = {VERTICAL: "protractorV", HORIZONTAL: "protractorH"};
 
 THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
     var worldPosition = new THREE.Vector3();
@@ -56,18 +56,17 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
     var distance;
     var radius;
     var me = this;
-    me.DIVISION_STEP = Math.PI/12;
+    me.DIVISION_STEP = Math.PI / 12;
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
     var delimiters = [];
     var INTERSECTED = {};
-    var reRenderProtractor = { type: "reRenderProtractor" };
-    var mouseDownEvent = { type: "mouseDown" };
-    var disableMainMove = { type: "disableMainMove" };
-    var enableMainMove = { type: "enableMainMove" };
-    var highlightEvent = { type: "highlightEvent" };
-
-
+    var reRenderProtractor = {type: "reRenderProtractor"};
+    var mouseDownEvent = {type: "mouseDown"};
+    var disableMainMove = {type: "disableMainMove"};
+    var enableMainMove = {type: "enableMainMove"};
+    var highlightEvent = {type: "highlightEvent"};
+    var digitsEvent = {type: "digitsEvent"};
 
 
     this.mode = mode;
@@ -106,12 +105,11 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
     };
 
 
-
     var createText2D = function (text, color, font, size, camera) {
 
         var canvas = createTextCanvas(text, color, font, 256);
 
-        var plane = new THREE.PlaneBufferGeometry (canvas.width / canvas.height * size, size);
+        var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
         var tex = new THREE.Texture(canvas);
 
         tex.needsUpdate = true;
@@ -132,97 +130,56 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
     };
 
 
-    this.buildProtractorDivisions = function(container, sign){
-        for (var angle = 0; angle < 2*Math.PI - me.DIVISION_STEP; angle= angle + me.DIVISION_STEP) {
-              this.buildProtractorDivision(container, angle, sign);
+    this.buildProtractorDivisions = function (container, sign) {
+        for (var angle = 0; angle < 2 * Math.PI - me.DIVISION_STEP; angle = angle + me.DIVISION_STEP) {
+            this.buildProtractorDivision(container, angle, sign);
         }
     };
 
-    this.buildProtractorDivision = function(container, angle, sign){
+    this.buildProtractorDivision = function (container, angle, sign) {
         var radius = 2.9;
-        var position = new THREE.Vector3(radius*Math.cos(angle) , radius*Math.sin(angle), 0);
+        var position = new THREE.Vector3(radius * Math.cos(angle), radius * Math.sin(angle), 0);
 
         var degree = Math.round(THREE.Math.radToDeg(angle));
 
         var material = new THREE.LineBasicMaterial({
-           color: 0x000000, depthTest:false, linewidth: 50
+            color: 0x000000, depthTest: false, linewidth: 50
         });
 
         var geometry = new THREE.Geometry();
         geometry.vertices.push(
-           new THREE.Vector3(3*Math.cos(angle) , 3*Math.sin(angle), 0 ),
-           new THREE.Vector3(2.7*Math.cos(angle) , 2.7*Math.sin(angle), 0 )
+            new THREE.Vector3(3 * Math.cos(angle), 3 * Math.sin(angle), 0),
+            new THREE.Vector3(2.7 * Math.cos(angle), 2.7 * Math.sin(angle), 0)
         );
 
-        var delimiter = new THREE.Line( geometry, material );
+        var delimiter = new THREE.Line(geometry, material);
 
-        me.userData.totalObjVertices.push(new THREE.Vector3(3*Math.cos(angle), 0, 3*Math.sin(angle) ));
+        me.userData.totalObjVertices.push(new THREE.Vector3(3 * Math.cos(angle), 0, 3 * Math.sin(angle)));
 
-       container.add(delimiter)
+        container.add(delimiter)
 
-         var textResultMesh = createText2D(degree, "black", null, 0.3);
-         var zAxis = new THREE.Vector3(0, 0, 1);
-         if(sign > 0){
-              rotateAroundObjectAxis(textResultMesh, zAxis,  angle - Math.PI / 2);
-         }else{
-              rotateAroundObjectAxis(textResultMesh, zAxis, -angle + Math.PI / 2+ Math.PI / 2+ Math.PI / 2);
-         }
+        var textResultMesh = createText2D(degree, "black", null, 0.3);
+        var zAxis = new THREE.Vector3(0, 0, 1);
+        if (sign > 0) {
+            rotateAroundObjectAxis(textResultMesh, zAxis, angle - Math.PI / 2);
+        } else {
+            rotateAroundObjectAxis(textResultMesh, zAxis, -angle + Math.PI / 2 + Math.PI / 2 + Math.PI / 2);
+        }
 
 
         var radius = 2.5;
-        var position = new THREE.Vector3(radius*Math.cos(sign*angle) , radius*Math.sin(sign*angle), 0);
+        var position = new THREE.Vector3(radius * Math.cos(sign * angle), radius * Math.sin(sign * angle), 0);
         textResultMesh.position.copy(position);
         container.add(textResultMesh);
     };
 
-    var boundingBox = function(obj) {
-        var me = this;
-        if (obj instanceof THREE.Mesh) {
-
-            var geometry = obj.geometry;
-            geometry.computeBoundingBox();
-            return  geometry.boundingBox;
-
-        }
-
-        if (obj instanceof THREE.Object3D) {
-
-            var bb = new THREE.Box3();
-            for (var i=0;i < obj.children.length;i++) {
-                bb.union(me.boundingBox(obj.children[i]));
-            }
-            return bb;
-        }
-    };
-
     var rotObjectMatrix;
-    var rotateAroundObjectAxis = function(object, axis, radians) {
+    var rotateAroundObjectAxis = function (object, axis, radians) {
         rotObjectMatrix = new THREE.Matrix4();
         rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
         object.matrix.multiply(rotObjectMatrix);
         object.rotation.setFromRotationMatrix(object.matrix);
     };
-
-    var boundingBox = function(obj) {
-        var me = this;
-        if (obj instanceof THREE.Mesh) {
-
-            var geometry = obj.geometry;
-            geometry.computeBoundingBox();
-            return  geometry.boundingBox;
-
-        }
-
-        if (obj instanceof THREE.Object3D) {
-
-            var bb = new THREE.Box3();
-            for (var i=0;i < obj.children.length;i++) {
-                bb.union(me.boundingBox(obj.children[i]));
-            }
-            return bb;
-        }
-    };
-
 
 
     this.init = function () {
@@ -232,43 +189,43 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
         this.userData.totalObjVertices = [];
         this.frontSide = new THREE.Object3D();
 
-        var geometry = new THREE.RingGeometry( 1.8, 3, 100, 100, 0, Math.PI * 2 );
-        var material = new THREE.ProtractorMaterial( {color: 0xffff00,  transparent: true,  opacity: 0.5} );
-        this.protractorMeshFront = new THREE.Mesh( geometry, material );
+        var geometry = new THREE.RingGeometry(1.8, 3, 100, 100, 0, Math.PI * 2);
+        var material = new THREE.ProtractorMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
+        this.protractorMeshFront = new THREE.Mesh(geometry, material);
 
 
-
-
-        this.frontSide.add( this.protractorMeshFront );
-        this.buildProtractorDivisions(this.frontSide, 1)
-
-
-
+        this.frontSide.add(this.protractorMeshFront);
+        this.buildProtractorDivisions(this.frontSide, 1);
 
 
         var xAxis = new THREE.Vector3(1, 0, 0);
-        rotateAroundObjectAxis(this.frontSide, xAxis, Math.PI/2 );
+        rotateAroundObjectAxis(this.frontSide, xAxis, Math.PI / 2);
 
 
         this.backSide = new THREE.Object3D();
 
-        var geometry = new THREE.RingGeometry( 1.8, 3, 100, 100, 0, Math.PI * 2 );
-        var material = new THREE.ProtractorMaterial( {color: 0xffff00,  transparent: true,  opacity: 0.5} );
-        this.protractorMeshBack = new THREE.Mesh( geometry, material );
-        this.backSide.add( this.protractorMeshBack );
+        var geometry = new THREE.RingGeometry(1.8, 3, 100, 100, 0, Math.PI * 2);
+        var material = new THREE.ProtractorMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
+        this.protractorMeshBack = new THREE.Mesh(geometry, material);
+        this.backSide.add(this.protractorMeshBack);
         this.buildProtractorDivisions(this.backSide, -1)
 
         var xAxis = new THREE.Vector3(1, 0, 0);
-        rotateAroundObjectAxis(this.backSide, xAxis, -Math.PI/2 );
+        rotateAroundObjectAxis(this.backSide, xAxis, -Math.PI / 2);
 
         this.add(this.frontSide);
         this.add(this.backSide);
-        if(me.mode === THREE.ProtractorModes.HORIZONTAL){
-            rotateAroundObjectAxis(me, xAxis, -Math.PI/2 );
+        if (me.mode === THREE.ProtractorModes.HORIZONTAL) {
+            rotateAroundObjectAxis(me, xAxis, -Math.PI / 2);
         }
 
-        this.userData.pointsTable =  {"maxR" : 0.0,"minR" : 0.0,"tableSize" : 25,"table" : [[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15], [16],  [17], [18], [19],
-        [20], [21], [22], [23], [0]]};
+        this.userData.pointsTable = {
+            "maxR": 0.0,
+            "minR": 0.0,
+            "tableSize": 25,
+            "table": [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10], [11], [12], [13], [14], [15], [16], [17], [18], [19],
+                [20], [21], [22], [23], [0]]
+        };
 
         var tempMatrix = new THREE.Matrix4();
         worldPosition.setFromMatrixPosition(this.matrixWorld);
@@ -280,7 +237,7 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
 
         distance = worldPosition.distanceTo(camPosition);
 
-        var boundingBox = new THREE.Box3().setFromObject( this );
+        var boundingBox = new THREE.Box3().setFromObject(this);
         var subVector = new THREE.Vector3(0, 0, 0);
         subVector.subVectors(boundingBox.min, boundingBox.max);
 
@@ -288,120 +245,144 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
         radius = height / 2;
 
         this.hide = function () {
-          document.removeEventListener('mousemove', onMouseMove);
-          document.removeEventListener('mousedown', onMouseDown);
-          me.dispatchEvent(enableMainMove);
-          me.visible = false;
+            domElement.removeEventListener('mousemove', onMouseMove);
+            domElement.removeEventListener('mousedown', onMouseDown);
+            document.removeEventListener('keydown', onKeyPress);
+            me.dispatchEvent(enableMainMove);
+            me.visible = false;
         };
 
         this.show = function () {
-           domElement.addEventListener( "mousemove", onMouseMove, false );
-           domElement.addEventListener( "mousedown", onMouseDown, false );
-           me.dispatchEvent(disableMainMove);
-           me.visible = true;
-           this.update();
+            domElement.addEventListener("mousemove", onMouseMove, false);
+            domElement.addEventListener("mousedown", onMouseDown, false);
+            document.addEventListener("keydown", onKeyPress, false);
+            me.dispatchEvent(disableMainMove);
+            me.visible = true;
+            this.update();
         };
 
 
+        var onMouseDown = function (event) {
+            if (!me.visible) {
+                return;
+            }
+            event.preventDefault();
 
-        var onMouseDown = function( event ) {
-          if(!me.visible){
-              return;
-          }
-          event.preventDefault();
+            var pointer = event.changedTouches ? event.changedTouches[0] : event;
+            if (!highlighterProtractor.visible) {
+                return;
+            }
 
-          var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
-          if(!highlighterProtractor.visible){
-             return;
-          }
+            var intersects = getIntersects(pointer, me);
 
-          var intersects = getIntersects(pointer, me);
-
-          if ( intersects.length > 0 ) {
-             if(highlighterProtractor.visible){
-                 var mouseDownEvent = { type: "mouseDown" , angle: highlighterProtractor.userData.angle};
-                 me.dispatchEvent(mouseDownEvent);
-             }
-          }
+            if (intersects.length > 0) {
+                if (highlighterProtractor.visible) {
+                    var mouseDownEvent = {type: "mouseDown", angle: highlighterProtractor.userData.angle};
+                    me.dispatchEvent(mouseDownEvent);
+                }
+            }
         };
 
-        var onMouseMove = function( event ) {
-          if(!me.visible){
-              return;
-          }
-          event.preventDefault();
+        var onMouseMove = function (event) {
+            if (!me.visible) {
+                return;
+            }
+            event.preventDefault();
 
-          var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+            var pointer = event.changedTouches ? event.changedTouches[0] : event;
 
-          var intersects = getIntersects( pointer, me);
-          if(intersects.length > 0){
-              highlightEvent.intersects = intersects;
-              me.dispatchEvent(highlightEvent);
-          }else {
-              highlightEvent.intersects = null;
-              me.dispatchEvent(highlightEvent);
-          }
+            var intersects = getIntersects(pointer, me);
+            if (intersects.length > 0) {
+                highlightEvent.intersects = intersects;
+                me.dispatchEvent(highlightEvent);
+            } else {
+                highlightEvent.intersects = null;
+                me.dispatchEvent(highlightEvent);
+            }
         };
 
-         var getIntersects = function ( event, object ) {
-            var point  = new THREE.Vector2();
+        function validateNumber(event) {
+            var key = window.event ? event.keyCode : event.which;
+
+            if (event.keyCode === 8 || event.keyCode === 46
+                || event.keyCode === 37 || event.keyCode === 39) {
+                return true;
+            }
+            else if ( key < 48 || key > 57 ) {
+                return false;
+            }
+            else return true;
+        }
+
+
+
+        var onKeyPress = function (event) {
+            if(validateNumber(event)){
+                document.removeEventListener('keydown', onKeyPress);
+                digitsEvent.digit =  event.key;
+                me.dispatchEvent(digitsEvent);
+            }
+        };
+
+
+        var getIntersects = function (event, object) {
+            var point = new THREE.Vector2();
             var array = getMousePosition(domElement, event.clientX, event.clientY);
 
-            point.fromArray( array );
+            point.fromArray(array);
 
-            mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+            mouse.set(( point.x * 2 ) - 1, -( point.y * 2 ) + 1);
 
-            raycaster.setFromCamera( mouse, camera );
+            raycaster.setFromCamera(mouse, camera);
 
-            if ( object instanceof Array ) {
+            if (object instanceof Array) {
 
-                return raycaster.intersectObjects( object , true);
+                return raycaster.intersectObjects(object, true);
 
             }
 
-            return raycaster.intersectObject( object , true);
+            return raycaster.intersectObject(object, true);
 
         };
 
-        var getMousePosition = function ( dom, x, y ) {
+        var getMousePosition = function (dom, x, y) {
 
             var rect = dom.getBoundingClientRect();
-            return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+            return [( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height];
 
         };
 
     };
 
 
-     this.setMode = function (mode) {
+    this.setMode = function (mode) {
         this.mode = mode;
-     };
+    };
 
 
-     this.getDirectionNorm = function(  ) {
-         var result = new THREE.Vector3();
-         var quaternion = new THREE.Quaternion();
+    this.getDirectionNorm = function () {
+        var result = new THREE.Vector3();
+        var quaternion = new THREE.Quaternion();
 
-         me.getWorldQuaternion( quaternion );
+        me.getWorldQuaternion(quaternion);
 
-         result.set( 1, 0, 0).applyQuaternion( quaternion );
-         var directionNorm = result.normalize().multiplyScalar(1)
-        return   directionNorm;
-      };
+        result.set(1, 0, 0).applyQuaternion(quaternion);
+        var directionNorm = result.normalize().multiplyScalar(1)
+        return directionNorm;
+    };
 
 
+    this.update = function () {
+        var pixW = 1200 + 500;
+        var pixH = domElement.offsetHeight;
 
-     this.update = function () {
-       var pixW = 1200 + 500;
-       var pixH = domElement.offsetHeight;
+        var vFOV = camera.fov * Math.PI / 180;
+        var focalLength = 2 * Math.tan(vFOV / 2);
+        var scaleFactor = focalLength / (focalLength + distance);
 
-       var vFOV = camera.fov * Math.PI / 180;
-       var focalLength = 2 * Math.tan( vFOV / 2 );
-       var scaleFactor = focalLength / (focalLength + distance);
-
-       this.scale.x = scaleFactor * pixW;
-       this.scale.y = scaleFactor * pixW;
-       this.scale.z = scaleFactor * pixW;
+        this.scale.x = scaleFactor * pixW;
+        this.scale.y = scaleFactor * pixW;
+        this.scale.z = scaleFactor * pixW;
 
 
     };
