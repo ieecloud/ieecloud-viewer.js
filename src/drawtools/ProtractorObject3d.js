@@ -302,16 +302,16 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
         };
 
         function validateNumber(event) {
-            var key = window.event ? event.keyCode : event.which;
+            var theEvent = event || window.event;
+            var key = theEvent.keyCode || theEvent.which;
+            key = String.fromCharCode(key);
+            console.log(key);
 
-            if (event.keyCode === 8 || event.keyCode === 46
-                || event.keyCode === 37 || event.keyCode === 39) {
+            var regex = /[0-9]|\./;
+            if (regex.test(key)) {
                 return true;
             }
-            else if ( key < 48 || key > 57 ) {
-                return false;
-            }
-            else return true;
+            return false;
         }
 
 
