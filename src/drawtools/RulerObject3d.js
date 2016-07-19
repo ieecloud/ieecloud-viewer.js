@@ -311,19 +311,21 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
     this.hide = function () {
         me.dispatchEvent(enableMainMove);
-        domElement.removeEventListener('mousemove', onMouseMove);
+        document.body.removeEventListener('mousemove', onMouseMove);
         domElement.removeEventListener('mousedown', onMouseDown);
-        domElement.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('mouseup', onMouseUp);
         document.removeEventListener('keydown', onKeyPress);
         me.visible = false;
+        me.dispatchEvent(enableMainControl);
     };
 
     this.show = function () {
         me.dispatchEvent(disableMainMove);
         me.visible = true;
-        domElement.addEventListener("mousemove", onMouseMove, false);
+
+        document.body.addEventListener("mousemove", onMouseMove, false);
         domElement.addEventListener("mousedown", onMouseDown, false);
-        domElement.addEventListener("mouseup", onMouseUp, false);
+        document.addEventListener("mouseup", onMouseUp, false);
 
         document.addEventListener("keydown", onKeyPress, false);
 
@@ -384,6 +386,14 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         }
         event.preventDefault();
         event.stopPropagation();
+        var vector = new THREE.Vector2();
+
+        var array = getMousePosition(document.body, event.clientX, event.clientY);
+        vector.fromArray(array);
+
+        if (onMouseDownPosition.distanceTo(vector) < 0.01) {
+            return false;
+        }
 
         var pointer = event.changedTouches ? event.changedTouches[0] : event;
 
@@ -393,30 +403,25 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
             SELECTED.position.copy(intersects[0].point.sub(offset));
             changeEvent.moved = true;
             me.dispatchEvent(changeEvent);
-            return;
+            me.dispatchEvent(disableMainControl);
+        }else{
+            var intersects = getIntersects(pointer, me);
 
-        }
+            if (intersects.length > 0) {
+                if (!intersects[0].object.visible) {
+                    return;
+                }
 
-        var intersects = getIntersects(pointer, me);
-
-        if (intersects.length > 0) {
-            if (!intersects[0].object.visible) {
-                return;
+                INTERSECTED = me;
+                plane.position.copy(INTERSECTED.position);
+                document.body.style.cursor = 'pointer';
+                changeEvent.intersects = intersects;
+                me.dispatchEvent(changeEvent);
+            } else {
+                INTERSECTED = null;
+                document.body.style.cursor = 'auto';
+                me.dispatchEvent(changeEvent);
             }
-
-            INTERSECTED = me;
-            plane.position.copy(INTERSECTED.position);
-            domElement.style.cursor = 'pointer';
-            changeEvent.intersects = intersects;
-            me.dispatchEvent(changeEvent);
-
-        } else {
-
-            INTERSECTED = null;
-
-            domElement.style.cursor = 'auto';
-            me.dispatchEvent(changeEvent);
-
         }
     };
 
@@ -467,7 +472,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         event.preventDefault();
         event.stopPropagation();
 
-        var array = getMousePosition(domElement, event.clientX, event.clientY);
+        var array = getMousePosition(document.body, event.clientX, event.clientY);
         onMouseDownPosition.fromArray(array);
 
         var pointer = event.changedTouches ? event.changedTouches[0] : event;
@@ -481,11 +486,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
             var intersects = raycaster.intersectObject(plane);
             offset.copy(intersects[0].point).sub(plane.position);
-
-            domElement.style.cursor = 'move';
-
         }
-
     };
 
 
@@ -495,19 +496,19 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         }
         event.preventDefault();
 //       event.stopPropagation();
-
         var pointer = event.changedTouches ? event.changedTouches[0] : event;
         if (SELECTED) {
             if (changeEvent.moved) {
                 SELECTED.position.copy(nearestPoint.position);
+                document.body.style.cursor = 'auto';
+                me.dispatchEvent(enableMainControl);
             }
             nearestPoint.hide();
             changeEvent.moved = false;
             me.dispatchEvent(changeEvent);
-            var rect = domElement.getBoundingClientRect();
-            var array = getMousePosition(domElement, event.clientX, event.clientY);
+            var array = getMousePosition(document.body, event.clientX, event.clientY);
             onMouseUpPosition.fromArray(array);
-            if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
+            if (onMouseDownPosition.distanceTo(onMouseUpPosition) <= 0.005) {
                 select3dPoint.point = calculateRulerPointInWorld(highlighter.userData.value);
                 me.dispatchEvent(select3dPoint);
             }
@@ -515,15 +516,11 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         if (INTERSECTED) {
 
             plane.position.copy(me.position);
-
             SELECTED = null;
 
         }
 
         SELECTED = null;
-        domElement.style.cursor = 'auto';
-        me.dispatchEvent(enableMainControl);
-
     };
 
 

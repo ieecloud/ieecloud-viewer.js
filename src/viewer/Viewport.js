@@ -126,7 +126,7 @@ var Viewport = function (editor) {
 
     plane.material.side = THREE.DoubleSide;
 
-    plane.userData.name = "PLANE"
+    plane.userData.name = "PLANE";
 
     var xAxis = new THREE.Vector3(1, 0, 0);
     rotateAroundObjectAxis(plane, xAxis, Math.PI / 2);
@@ -141,7 +141,9 @@ var Viewport = function (editor) {
     rulerInfo.setValue('angleH = ' + ruler.userData.rotateHAngle + ' , angleV = ' + ruler.userData.rotateVAngle);
 
     ruler.addEventListener("disableMainControl", function (event) {
-        controls.enabled = false;
+        if (controls) {
+            controls.setDisabled();
+        }
         highlighter.hide();
     });
 
@@ -153,7 +155,10 @@ var Viewport = function (editor) {
     });
 
     ruler.addEventListener("enableMainControl", function (event) {
-        controls.enabled = true;
+        if (controls) {
+            controls.setEnabled();
+        }
+
     });
 
     ruler.addEventListener("change", function (event) {
@@ -434,7 +439,7 @@ var Viewport = function (editor) {
         mouse.set(( point.x * 2 ) - 1, -( point.y * 2 ) + 1);
 
         raycaster.setFromCamera(mouse, camera);
-        var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject( camera ).sub( camera.position ).normalize();
+        var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
 
         raycaster.set(camera.position, direction);
 
@@ -740,7 +745,7 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseUp3dGeometryHandler = function (event) {
-        if(event.button !== 0){
+        if (event.button !== 0) {
             return;
         }
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
@@ -768,12 +773,12 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseUp3dPointHandler = function (event) {
-        if(event.button !== 0){
+        if (event.button !== 0) {
             return;
         }
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
-        if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0 && nearestPoint.visible) {
+        if (onMouseDownPosition.distanceTo(onMouseUpPosition) <= 0.005 && nearestPoint.visible) {
             ruler.position.copy(nearestPoint.position);
             editor.select3dPoint(nearestPoint.position.clone().multiplyScalar(editor.loader.coordFactor));
             ruler.hide();
@@ -830,7 +835,7 @@ var Viewport = function (editor) {
 
                 }
                 resultVal = resultVal.round(editor.resultDigits);
-                var point  = list[0].clone().multiplyScalar(editor.loader.coordFactor);
+                var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
                 info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal);
                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
                 nearestPoint.position.copy(position);
@@ -882,10 +887,10 @@ var Viewport = function (editor) {
     // otherwise controls.enabled doesn't work.
 
     ruler.addEventListener('digitsEvent', function (event) {
-        var modalHeader  = new UI.Text();
+        var modalHeader = new UI.Text();
         modalHeader.setValue('Set Delimiter');
-        var numberControl  = new UI.Number(event.digit);
-        modal.show(modalHeader, numberControl, function(result){
+        var numberControl = new UI.Number(event.digit);
+        modal.show(modalHeader, numberControl, function (result) {
             ruler.getDelimiterAndDispatch(result);
         });
     });
@@ -933,7 +938,7 @@ var Viewport = function (editor) {
         render();
     });
 
-    var onChooseProtractorVAngle = function(degree){
+    var onChooseProtractorVAngle = function (degree) {
         var currentAngle = findVerticalAngle();
         if (ruler.userData.rotateSinSign < 0) { // sin <0
             currentAngle = 360 - currentAngle;
@@ -970,16 +975,16 @@ var Viewport = function (editor) {
     });
 
     protractorV.addEventListener('digitsEvent', function (event) {
-        var modalHeader  = new UI.Text();
+        var modalHeader = new UI.Text();
         modalHeader.setValue('Set Vertical Angle');
-        var numberControl  = new UI.Number(event.digit);
-        modal.show(modalHeader, numberControl, function(degree){
+        var numberControl = new UI.Number(event.digit);
+        modal.show(modalHeader, numberControl, function (degree) {
             onChooseProtractorVAngle(degree);
         });
     });
 
 
-    var onChooseProtractorHAngle = function(degree){
+    var onChooseProtractorHAngle = function (degree) {
         var normal = new THREE.Vector3(0, 0, 1);
         var directionNorm = ruler.getDirectionNorm();
 
@@ -1022,10 +1027,10 @@ var Viewport = function (editor) {
 
 
     protractorH.addEventListener('digitsEvent', function (event) {
-        var modalHeader  = new UI.Text();
+        var modalHeader = new UI.Text();
         modalHeader.setValue('Set Horizontal Angle');
-        var numberControl  = new UI.Number(event.digit);
-        modal.show(modalHeader, numberControl, function(degree){
+        var numberControl = new UI.Number(event.digit);
+        modal.show(modalHeader, numberControl, function (degree) {
             onChooseProtractorHAngle(degree);
         });
     });
@@ -1178,10 +1183,10 @@ var Viewport = function (editor) {
         var radius = height / 2;
 
 
-        var heightModel =  Math.abs(boundingBox.min.z - boundingBox.max.z);
-        var widthModel =  Math.abs(boundingBox.min.x - boundingBox.max.x);
+        var heightModel = Math.abs(boundingBox.min.z - boundingBox.max.z);
+        var widthModel = Math.abs(boundingBox.min.x - boundingBox.max.x);
         var paramToFit = Math.max(widthModel, heightModel);
-        var dist = camera.position.distanceTo( editor.lastModel.position ) - radius;
+        var dist = camera.position.distanceTo(editor.lastModel.position) - radius;
         camera.fov = 2 * Math.atan(paramToFit / ( 2 * dist )) * ( 180 / Math.PI );
         var newCameraFar = getFar(boundingBox);
         if (camera.far < newCameraFar) {
