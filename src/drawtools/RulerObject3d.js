@@ -117,6 +117,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
 
         var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
         var tex = new THREE.Texture(canvas);
+        tex.minFilter = THREE.LinearFilter;
 
         tex.needsUpdate = true;
 
@@ -132,7 +133,6 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
             mesh.quaternion = camera.quaternion;
         }
         return mesh;
-
     };
 
     var createAndAddRulerDelimiter = function (numberText, yPos, container, sign, additional) {
@@ -148,7 +148,7 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         }
 
 
-        var delimiter = new THREE.Line(geometry, material);
+        var delimiter = new THREE.LineSegments(geometry, material);
 
 
         var pos = new THREE.Vector3(yPos, 0, 0);
@@ -268,9 +268,6 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         var subVector = new THREE.Vector3(0, 0, 0);
         subVector.subVectors(this.boundingBox.min, this.boundingBox.max);
 
-        var height = subVector.length();
-        radius = 7.76;
-
         this.userData.rotateVSign = -1;
         this.userData.rotateSinSign = 1;
 
@@ -316,12 +313,14 @@ THREE.ToolsGizmo = function (camera, domElement, plane, nearestPoint, highlighte
         document.removeEventListener('mouseup', onMouseUp);
         document.removeEventListener('keydown', onKeyPress);
         me.visible = false;
+        plane.visible = false;
         me.dispatchEvent(enableMainControl);
     };
 
     this.show = function () {
         me.dispatchEvent(disableMainMove);
         me.visible = true;
+        plane.visible = true;
 
         document.body.addEventListener("mousemove", onMouseMove, false);
         domElement.addEventListener("mousedown", onMouseDown, false);

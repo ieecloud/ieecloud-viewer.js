@@ -152,11 +152,11 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
             new THREE.Vector3(2.7 * Math.cos(angle), 2.7 * Math.sin(angle), 0)
         );
 
-        var delimiter = new THREE.Line(geometry, material);
+        var delimiter = new THREE.LineSegments(geometry, material);
 
         me.userData.totalObjVertices.push(new THREE.Vector3(3 * Math.cos(angle), 0, 3 * Math.sin(angle)));
 
-        container.add(delimiter)
+        container.add(delimiter);
 
         var textResultMesh = createText2D(degree, "black", null, 0.3);
         var zAxis = new THREE.Vector3(0, 0, 1);

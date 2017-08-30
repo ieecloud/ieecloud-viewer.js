@@ -52,12 +52,13 @@ module.exports = {
       'bower_components/jquery/dist/jquery.min.js',
       'bower_components/signals/dist/signals.min.js',
       'bower_components/lodash/dist/lodash.min.js',
-      'bower_components/three.js/three.js',
+      'vendor/three.min.js',
+      'vendor/THREE.MeshLine.js',
       'vendor/ui.js',
       'vendor/system.min.js',
       'vendor/CanvasRenderer.js' ,
-      'vendor/Projector.js',
-      'vendor/helvetiker_regular.typeface.js'
+      'vendor/Projector.js'/*,
+      'vendor/helvetiker_regular.typeface.js'*/
     ]
   }
 };

@@ -16,7 +16,6 @@
     "README.md"
   ],
   "dependencies": {
-    "three.js" : "0.71.0",
     "signals": "~1.0.0",
     "jquery": "2.1.4",
     "lodash": "~4.0.0"

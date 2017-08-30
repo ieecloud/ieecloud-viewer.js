@@ -718,7 +718,7 @@ var Viewport = function (editor) {
             if (intersects.length > 0) {
 
                 if (event && (event.altKey || event.metaKey)) {
-                    var obj = searchNearestObject(intersects, THREEext.Line);
+                    var obj = searchNearestObject(intersects, THREE.LineSegments);
                     if (obj.selectedFlag) {
                         editor.unSelectObject(obj);
                         editor.unSelectTree(obj);
@@ -811,7 +811,7 @@ var Viewport = function (editor) {
 
     var runNearestAlgorithm = function (intersects) {
         var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
-        var intersectLine = searchNearestIntersect(intersects, THREEext.Line);
+        var intersectLine = searchNearestIntersect(intersects, THREE.LineSegments);
         var intersect = getNearestIntersect(intersectLine, intersectMesh);
         //var intersect = intersects[0];
         if (intersect) {

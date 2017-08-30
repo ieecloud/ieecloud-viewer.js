@@ -15,29 +15,18 @@ THREEext.GridHelper = function ( size, step ) {
 			new THREE.Vector3(i, -size, 0), new THREE.Vector3(i, size, 0)
 		);
 
+
 		var color = i === 0 ? this.color1 : this.color2;
 
 		geometry.colors.push( color, color, color, color );
 
 	}
 
-	THREE.Line.call( this, geometry, material, THREE.LinePieces );
+	THREE.LineSegments.call( this, geometry, material);
 
 };
 
 
-THREEext.GridHelper.prototype = Object.create( THREE.Line.prototype );
+
+THREEext.GridHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREEext.GridHelper.prototype.constructor = THREEext.GridHelper;
-
-THREEext.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
-
-	this.color1.set( colorCenterLine );
-	this.color2.set( colorGrid );
-
-	this.geometry.colorsNeedUpdate = true;
-
-}
-
-THREEext.GridHelper.prototype.hide = function() {
-	this.visible = false;
-}

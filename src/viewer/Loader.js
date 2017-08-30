@@ -272,6 +272,7 @@ var Loader = function (editor, textureUrl) {
 
         scope.computeBoundingBox(pictureInfo.modelRotation);
         editor.onRenderDone();
+        data = null;
     };
 
     this.parseSimpleShapes = function (simpleShapes, groupIndex, pictureGeometryElement, vertices) {
@@ -359,7 +360,7 @@ var Loader = function (editor, textureUrl) {
             pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                 map: texture,
                 side: THREE.FrontSide,
-                shading: THREE.FlatShading,
+                flatShading: true,
                 transparent: settings.transparancy > 0 ? true : false,
                 opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
             });
@@ -424,7 +425,7 @@ var Loader = function (editor, textureUrl) {
             offset = offset + 3;
 
         }
-    }
+    };
 
     this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray) {
         var groups = geometryObject.groups; // group names
@@ -477,6 +478,8 @@ var Loader = function (editor, textureUrl) {
 
             faceGeometry.computeFaceNormals();
             faceGeometry.computeVertexNormals();
+            faceGeometry.computeFlatVertexNormals();
+            lineGeometry.computeFlatVertexNormals();
             pictureGeometryElement.objectGeometry = faceGeometry;
             pictureGeometryElement.edgesGeometry = lineGeometry;
             pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
@@ -485,7 +488,7 @@ var Loader = function (editor, textureUrl) {
             if (drawResults) { // Draw face with spectral texture according to results
                 pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                     map: colorMapTexture,
-                    shading: THREE.FlatShading,
+                    flatShading: true,
                     side: THREE.FrontSide
 
                 });
@@ -504,7 +507,7 @@ var Loader = function (editor, textureUrl) {
 
                         pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                             map: texture,
-                            shading: THREE.FlatShading,
+                            flatShading: true,
                             side: THREE.FrontSide,
                             transparent: settings.transparancy > 0 ? true : false,
                             opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
@@ -513,7 +516,7 @@ var Loader = function (editor, textureUrl) {
                     else { // face without texture & 3dText
                         pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                             color: settings.faceColor,
-                            shading: THREE.FlatShading,
+                            flatShading: true,
                             side: THREE.FrontSide,
                             transparent: settings.transparancy > 0 ? true : false,
                             opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
@@ -542,7 +545,7 @@ var Loader = function (editor, textureUrl) {
 
         }
 
-    }
+    };
 
 
     this.parseModelPart = function (geometryObject, names, pictureInfo, colorMapTexture, index, maxResult, minResult) {
