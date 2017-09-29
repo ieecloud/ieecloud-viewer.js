@@ -14,16 +14,16 @@
     "url": ""
   },
   "devDependencies": {
+    "bower": "^1.3.1",
     "grunt": "~0.4.1",
     "grunt-bump": "0.0.6",
     "grunt-contrib-clean": "^0.4.1",
     "grunt-contrib-concat": "^0.3.0",
     "grunt-contrib-copy": "^0.4.1",
     "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-uglify": "^0.2.7",
+    "grunt-contrib-uglify": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
     "grunt-contrib-watch": "^0.4.4",
     "grunt-conventional-changelog": "^0.1.2",
-    "bower": "^1.3.1",
     "http-server": "^0.6.1",
     "jasmine-core": "^2.3.4",
     "karma": "~0.12",
@@ -39,8 +39,5 @@
     "start": "http-server -a localhost -p 8000 -c-1",
     "preupdate-webdriver": "npm install",
     "update-webdriver": "webdriver-manager update"
-  },
-  "dependencies": {
-    "three.meshline": "^1.0.1"
   }
 }

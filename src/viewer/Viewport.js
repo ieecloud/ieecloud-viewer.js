@@ -38,6 +38,7 @@ var Viewport = function (editor) {
     var scene = editor.scene;
     var sceneAxis = editor.sceneAxis;
     var sceneHelpers = editor.sceneHelpers;
+    var scenePicker = editor.pickingScene;
     var CANVAS_WIDTH = 200;
     var CANVAS_HEIGHT = 200;
     var CAM_DISTANCE = 300;
@@ -375,8 +376,9 @@ var Viewport = function (editor) {
 
 
     var raycaster = new THREE.Raycaster();
-    raycaster.linePrecision = 0.1;
+    // raycaster.linePrecision = 0.1;
     var mouse = new THREE.Vector2();
+    var mouse2 = new THREE.Vector2();
 
     // object picking
 
@@ -445,7 +447,6 @@ var Viewport = function (editor) {
 
         //this.ray.origin.copy( camera.position );
         //this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
-
         if (object instanceof Array) {
 
             return raycaster.intersectObjects(object, true);
@@ -813,8 +814,9 @@ var Viewport = function (editor) {
         var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
         var intersectLine = searchNearestIntersect(intersects, THREE.LineSegments);
         var intersect = getNearestIntersect(intersectLine, intersectMesh);
-        //var intersect = intersects[0];
+        // var intersect = intersects[0];
         if (intersect) {
+
             var vertices = intersect.object.userData.totalObjVertices;
             var results = intersect.object.userData.totalObjResults;
             var pointsTable = intersect.object.userData.pointsTable;
@@ -1095,6 +1097,7 @@ var Viewport = function (editor) {
         renderer.autoClear = false;
         renderer.autoUpdateScene = false;
         renderer.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
+        pickingRenderTarget.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
 
         container.dom.appendChild(renderer.domElement);
 
@@ -1291,7 +1294,7 @@ var Viewport = function (editor) {
         highlighter.hide();
         highlighterProtractor.hide();
         ruler.hide();
-        editor.setMode(editor.MODE_3D_GEOMETRY);
+        // editor.setMode(editor.MODE_3D_GEOMETRY);
         if (materialsNeedUpdate === true) {
             updateMaterials();
         }
@@ -1453,6 +1456,8 @@ var Viewport = function (editor) {
         camera.updateProjectionMatrix();
 
         renderer.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
+        pickingRenderTarget.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
+
 
         ruler.update();
         protractorV.update();
@@ -1467,10 +1472,15 @@ var Viewport = function (editor) {
     });
 
     var renderer;
+    var pickingRenderTarget;
 
     if (System.support.webgl === true) {
 
         renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: true});
+        pickingRenderTarget = new THREE.WebGLRenderTarget();
+        pickingRenderTarget.texture.generateMipmaps = false;
+        pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
+
 
     } else {
 
@@ -1563,12 +1573,13 @@ var Viewport = function (editor) {
         }
     }
 
+
     function render() {
 
         sceneHelpers.updateMatrixWorld();
         scene.updateMatrixWorld();
         sceneAxis.updateMatrixWorld();
-
+        renderer.clearDepth();
         renderer.clear();
         renderer.render(scene, camera);
         renderer.render(sceneHelpers, camera);

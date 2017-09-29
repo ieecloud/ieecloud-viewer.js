@@ -46,6 +46,7 @@ var Editor = function (options) {
     this.scene = new THREE.Scene();
     this.sceneAxis = new THREE.Scene();
     this.sceneHelpers = new THREE.Scene();
+    this.pickingScene = new THREE.Scene();
 
     this.object = {};
     this.geometries = {};
@@ -109,13 +110,22 @@ Editor.prototype = {
     },
 
     addModelGroup: function (object) {
-        var scope = this;
         this.scene.add(object);
 
         this.signals.objectAdded.dispatch(object);
         this.signals.sceneGraphChanged.dispatch();
         this.lastModel = object;
     },
+
+    addPickingGroup: function (object) {
+        var scope = this;
+        this.pickingScene.add(object);
+
+        // this.signals.objectAdded.dispatch(object);
+        // this.signals.sceneGraphChanged.dispatch();
+        // this.lastModel = object;
+    },
+
 
     calculateSpaceScale: function (commonBoundingBox, calculateSpaceScale) {
         this.signals.scaleChanged.dispatch(commonBoundingBox, calculateSpaceScale);

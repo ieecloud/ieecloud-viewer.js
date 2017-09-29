@@ -15,6 +15,7 @@ THREEext.Line = function ( geometry, material, mode ) {
 	THREE.Line.call( this );
 
 	this.type = 'Line';
+    this.isLineSegments =  true;
 
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: 'black' } );

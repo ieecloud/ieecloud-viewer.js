@@ -48,17 +48,20 @@ module.exports = {
    */
 
   vendor_files: {
-    js: [
-      'bower_components/jquery/dist/jquery.min.js',
-      'bower_components/signals/dist/signals.min.js',
-      'bower_components/lodash/dist/lodash.min.js',
-      'vendor/three.min.js',
-      'vendor/THREE.MeshLine.js',
-      'vendor/ui.js',
-      'vendor/system.min.js',
-      'vendor/CanvasRenderer.js' ,
-      'vendor/Projector.js'/*,
-      'vendor/helvetiker_regular.typeface.js'*/
-    ]
+      js: [
+          'bower_components/jquery/dist/jquery.min.js',
+          'bower_components/signals/dist/signals.min.js',
+          'bower_components/lodash/dist/lodash.min.js',
+          'vendor/three.min.js',
+          'vendor/ui.js',
+          'vendor/fatlines/LineSegmentsGeometry.js',
+          'vendor/fatlines/LineGeometry.js',
+          'vendor/fatlines/LineMaterial.js',
+          'vendor/fatlines/LineSegments2.js',
+          'vendor/fatlines/Line2.js',
+          'vendor/system.min.js',
+          'vendor/CanvasRenderer.js',
+          'vendor/Projector.js'
+      ]
   }
 };

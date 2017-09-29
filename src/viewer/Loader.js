@@ -92,6 +92,53 @@ var Loader = function (editor, textureUrl) {
         if (commonBoundingBox.max.length() < Infinity && commonBoundingBox.min.length() < Infinity) {
             editor.calculateSpaceScale(commonBoundingBox, modelRotation);
         }
+//         if (editor.lastModel instanceof THREE.Object3D)
+//         {
+//
+//             var minX = 0
+//             var minY = 0
+//             var minZ = 0
+//             var maxX = 0
+//             var maxY = 0
+//             var  maxZ = 0
+//             editor.lastModel.traverse (function (mesh)
+//             {
+//                 if (mesh instanceof THREE.Line2)
+//                 {
+//
+// //                     var helper = new THREE.BoxHelper (mesh, 0xff0000);
+// //                     helper.update();
+// // // If you want a visible bounding box
+// //                     editor.scene.add(helper);
+//
+//                     mesh.geometry.computeBoundingBox ();
+//                     var bBox = mesh.geometry.boundingBox;
+//
+//                     // compute overall bbox
+//                     minX = Math.min (minX, bBox.min.x);
+//                     minY = Math.min (minY, bBox.min.y);
+//                     minZ = Math.min (minZ, bBox.min.z);
+//                     maxX = Math.max (maxX, bBox.max.x);
+//                     maxY = Math.max (maxY, bBox.max.y);
+//                     maxZ = Math.max (maxZ, bBox.max.z);
+//                 }
+//             });
+//
+//             var bBox_min = new THREE.Vector3 (minX, minY, minZ);
+//             var bBox_max = new THREE.Vector3 (maxX, maxY, maxZ);
+//             var bBox_new = new THREE.Box3 (bBox_min, bBox_max);
+//
+//             console.log(bBox_new);
+//
+//             if (bBox_new.max.length() < Infinity && bBox_new.min.length() < Infinity) {
+//                     editor.calculateSpaceScale(bBox_new, modelRotation);
+//                 }
+//         }
+//
+//         // var helper = new THREE.BoxHelper (editor.lastModel, 0xff0000);
+//         // helper.update();
+// // If you want a visible bounding box
+//         // editor.scene.add(helper);
     };
 
 
@@ -101,7 +148,8 @@ var Loader = function (editor, textureUrl) {
         var scaleFactor = pictureInfo.scaleFactor;
         var meshesData = {};
         var modelGroup = new THREE.Object3D();
-
+        var modelPickingGroup = new THREE.Object3D();
+//
         for (var key in result) {
             meshesData[key] = new Array();
             var totalObjectDataElement = result[key];
@@ -109,13 +157,15 @@ var Loader = function (editor, textureUrl) {
             var pointsTable = totalObjectDataElement.pointsTable;
             var vertices = totalObjectDataElement.totalObjVertices;
             var results = totalObjectDataElement.totalObjResults;
-            var commonEdgesGeometry = new THREE.Geometry();
             var edgesMaterial = objectElement[0].edgesMaterial;
             for (var j = 0; j < objectElement.length; j++) {
                 var objectGeometry = objectElement[j].objectGeometry;
                 var facesMaterial = objectElement[j].facesMaterial;
                 var edgesGeometry = objectElement[j].edgesGeometry;
                 var edgesMaterial = objectElement[j].edgesMaterial;
+                var pickingEdgesGeometry = objectElement[j].pickingAgesGeometry;
+                var pickingEdgesMaterial = objectElement[j].pickingEdgesMaterial;
+
 
                 var mesh = new THREE.Mesh(objectGeometry, facesMaterial);
                 mesh.userData.pointsTable = pointsTable;
@@ -123,12 +173,18 @@ var Loader = function (editor, textureUrl) {
                 mesh.userData.totalObjVertices = vertices;
                 mesh.userData.totalObjResults = results;
 //            http://stackoverflow.com/questions/17146650/combining-multiple-line-geometries-into-a-single-geometry
-                var lines = new THREEext.Line(edgesGeometry, edgesMaterial, THREE.LinePieces);
+                var lines = new THREE.Line2(edgesGeometry, edgesMaterial);
+                var linespicking = new THREE.LineSegments(pickingEdgesGeometry, pickingEdgesMaterial);
+
+
                 lines.userData.pointsTable = pointsTable;
                 lines.userData.name = objectElement[j].name;
                 lines.userData.totalObjVertices = vertices;
                 lines.userData.totalObjResults = results;
+
+
                 modelGroup.add(lines);
+
                 modelGroup.add(mesh);
 
                 lines.name = objectElement[j].name;
@@ -141,16 +197,17 @@ var Loader = function (editor, textureUrl) {
                 mesh.parentName = objectElement[j].parentName;
                 mesh.defaultColor = facesMaterial.color.clone();
 
-                if ((objectGeometry.faces.length > 0 && edgesGeometry.vertices.length > 0)) {
-                    lines.name = objectElement[j].name + ".EDGE";
-                    mesh.name = objectElement[j].name + ".FACE";
-                    meshesData[key].push(lines);
-                    meshesData[key].push(mesh);
-                } else if (objectGeometry.faces.length === 0 && edgesGeometry.vertices.length > 0) {
-                    meshesData[key].push(lines);
-                } else if (objectGeometry.faces.length > 0 && edgesGeometry.vertices.length === 0) {
-                    meshesData[key].push(mesh);
-                }
+                // TODO: needed for tree
+                // if ((objectGeometry.faces.length > 0 && edgesGeometry.vertices.length > 0)) {
+                //     lines.name = objectElement[j].name + ".EDGE";
+                //     mesh.name = objectElement[j].name + ".FACE";
+                //     meshesData[key].push(lines);
+                //     meshesData[key].push(mesh);
+                // } else if (objectGeometry.faces.length === 0 && edgesGeometry.vertices.length > 0) {
+                //     meshesData[key].push(lines);
+                // } else if (objectGeometry.faces.length > 0 && edgesGeometry.vertices.length === 0) {
+                //     meshesData[key].push(mesh);
+                // }
 
                 var simpleShapes = objectElement[j].simpleShapes;
                 var v = 0;
@@ -173,10 +230,8 @@ var Loader = function (editor, textureUrl) {
 
                 var shapes = new THREE.Mesh(simpleShapesGeometry, facesMaterial);
                 modelGroup.add(shapes);
-
             }
         }
-
         var textData = pictureInfo.textData;
         for (var key in textData) {
             var textElement = textData[key];
@@ -190,7 +245,6 @@ var Loader = function (editor, textureUrl) {
         }
 
         editor.addModelGroup(modelGroup);
-//        data = null;
         return meshesData;
     };
 
@@ -452,14 +506,30 @@ var Loader = function (editor, textureUrl) {
             var pictureGeometryElement = {};
             //Creating THREE.geometry for faces and lines in group
             var faceGeometry = new THREE.Geometry();
-            var lineGeometry = new THREE.Geometry();
+            var linePickingGeometry = new THREE.Geometry();
+            var lineGeometry = new THREE.LineGeometry();
             var edges = edgeGroups[j];
             var offset = 0;
+            var positions = [];
             while (offset < edges.length) {
-                lineGeometry.vertices.push(vertices[edges[offset]])
-                lineGeometry.vertices.push(vertices[edges[offset + 1]])
+                linePickingGeometry.vertices.push(vertices[edges[offset]])
+                linePickingGeometry.vertices.push(vertices[edges[offset + 1]])
+                vertices[edges[offset]].toArray();
+                var array1 = vertices[edges[offset]].toArray();
+                positions.push(array1[0])
+                positions.push(array1[1])
+                positions.push(array1[2])
+                var array2 = vertices[edges[offset + 1]].toArray();
+
+                positions.push(array2[0])
+                positions.push(array2[1])
+                positions.push(array2[2])
+
                 offset += 2;
             }
+
+            lineGeometry.setPositions(positions);
+
 
             var faces = faceGroups[j];
             var uv = uvGroups[j];
@@ -471,17 +541,16 @@ var Loader = function (editor, textureUrl) {
 
 
             faceGeometry.computeBoundingBox();
-            lineGeometry.computeBoundingBox();
-
-            //console.log(faceGeometry.boun);
-            //console.log(faceGeometry.boundingBox);
+            // lineGeometry.computeBoundingBox();
+            // lineGeometry.computeBoundingSphere()
 
             faceGeometry.computeFaceNormals();
             faceGeometry.computeVertexNormals();
             faceGeometry.computeFlatVertexNormals();
-            lineGeometry.computeFlatVertexNormals();
+            // lineGeometry.computeFlatVertexNormals();
             pictureGeometryElement.objectGeometry = faceGeometry;
             pictureGeometryElement.edgesGeometry = lineGeometry;
+            pictureGeometryElement.pickingAgesGeometry = linePickingGeometry;
             pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
             pictureGeometryElement.name = groups[j];
             pictureGeometryElement.parentName = complexObjectName;
@@ -529,11 +598,23 @@ var Loader = function (editor, textureUrl) {
 
             }
 
-            pictureGeometryElement.edgesMaterial = new THREE.LineBasicMaterial({
-                color: settings.lineColor,
-                opacity: 1,
-                linewidth: settings.lineWidth
-            });
+
+            // pictureGeometryElement.pickingEdgesMaterial = new THREE.LineBasicMaterial({
+            //     color: settings.lineColor,
+            //     opacity: 1,
+            //     linewidth: settings.lineWidth
+            // });
+
+
+            pictureGeometryElement.edgesMaterial  = new THREE.LineMaterial( {
+
+                    color: settings.lineColor,
+                    // linewidth: settings.lineWidth, // in pixels
+                    linewidth: settings.lineWidth/1000, // in pixels
+                    vertexColors: THREE.VertexColors,
+                    //resolution:  // to be set by renderer, eventually
+
+                } );
 
             pictureGeometryElement.simpleShapes = [];  //Simple shapes
 
