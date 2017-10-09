@@ -1097,7 +1097,7 @@ var Viewport = function (editor) {
         renderer.autoClear = false;
         renderer.autoUpdateScene = false;
         renderer.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
-        pickingRenderTarget.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
+        // pickingRenderTarget.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
 
         container.dom.appendChild(renderer.domElement);
 
@@ -1108,7 +1108,7 @@ var Viewport = function (editor) {
     signals.sceneGraphChanged.add(function () {
 
         render();
-        updateInfo();
+        // updateInfo();
 
 
     });
@@ -1311,7 +1311,7 @@ var Viewport = function (editor) {
 
             }
 
-            updateInfo();
+            // updateInfo();
 
         }
 
@@ -1456,7 +1456,7 @@ var Viewport = function (editor) {
         camera.updateProjectionMatrix();
 
         renderer.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
-        pickingRenderTarget.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
+        // pickingRenderTarget.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
 
 
         ruler.update();
@@ -1472,14 +1472,14 @@ var Viewport = function (editor) {
     });
 
     var renderer;
-    var pickingRenderTarget;
+    // var pickingRenderTarget;
 
     if (System.support.webgl === true) {
 
         renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: true});
-        pickingRenderTarget = new THREE.WebGLRenderTarget();
-        pickingRenderTarget.texture.generateMipmaps = false;
-        pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
+        // pickingRenderTarget = new THREE.WebGLRenderTarget();
+        // pickingRenderTarget.texture.generateMipmaps = false;
+        // pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
 
 
     } else {
@@ -1579,7 +1579,7 @@ var Viewport = function (editor) {
         sceneHelpers.updateMatrixWorld();
         scene.updateMatrixWorld();
         sceneAxis.updateMatrixWorld();
-        renderer.clearDepth();
+        // renderer.clearDepth();
         renderer.clear();
         renderer.render(scene, camera);
         renderer.render(sceneHelpers, camera);
