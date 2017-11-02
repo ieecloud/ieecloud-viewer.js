@@ -189,14 +189,15 @@ Editor.prototype = {
     removeAllObjects: function () {
 
         var objsToRemove = [];
-        for (i = this.scene.children.length - 1; i >= 0; i--) {
-            obj = this.scene.children[i];
+        for (var i = this.scene.children.length - 1; i >= 0; i--) {
+            var obj = this.scene.children[i];
             if (obj.parent !== undefined && !(obj instanceof THREE.Light) && !(obj instanceof THREE.PerspectiveCamera )) {
                 objsToRemove.push(obj);
                 obj.parent.remove(obj);
             }
         }
         this.lastModel = null;
+        delete this.lastModel;
         this.signals.objectsRemoved.dispatch(objsToRemove);
         this.signals.sceneGraphChanged.dispatch();
 

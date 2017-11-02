@@ -849,13 +849,13 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseMoveViewerHandler = function (event) {
-        if (!mainMouseMove) {
-            return;
-        }
-        var intersects = getIntersects(event, objects);
-        if (intersects.length > 0) {
-            runNearestAlgorithm(intersects);
-        }
+        // if (!mainMouseMove) {
+        //     return;
+        // }
+        // var intersects = getIntersects(event, objects);
+        // if (intersects.length > 0) {
+        //     runNearestAlgorithm(intersects);
+        // }
     };
 
     scope.onMouseMoveEditorHandler = function (event) {
@@ -1342,17 +1342,64 @@ var Viewport = function (editor) {
 
     signals.objectsRemoved.add(function (objsToRemove) {
         var materialsNeedUpdate = false;
-        for (i = objsToRemove.length - 1; i >= 0; i--) {
-            obj = objsToRemove[i];
+        for (var i = objsToRemove.length - 1; i >= 0; i--) {
+            var obj = objsToRemove[i];
             obj.traverse(function (child) {
                 if (child instanceof THREE.Light) {
                     materialsNeedUpdate = true;
                 }
                 objects.splice(objects.indexOf(child), 1);
+
+                if (child instanceof THREE.Mesh) {
+                    if (child.geometry) {
+                        child.geometry.dispose();
+                    }
+                    if (child.material) {
+                        if (child.material instanceof THREE.MeshFaceMaterial || child.material instanceof THREE.MultiMaterial) {
+                            child.material.materials.forEach(function (mtrl, idx) {
+                                if (mtrl.map) mtrl.map.dispose();
+                                if (mtrl.lightMap) mtrl.lightMap.dispose();
+                                if (mtrl.bumpMap) mtrl.bumpMap.dispose();
+                                if (mtrl.normalMap) mtrl.normalMap.dispose();
+                                if (mtrl.specularMap) mtrl.specularMap.dispose();
+                                if (mtrl.envMap) mtrl.envMap.dispose();
+                                mtrl.dispose();    // disposes any programs associated with the material
+                            });
+                        } else {
+                            if (child.material.map) child.material.map.dispose();
+                            if (child.material.lightMap) child.material.lightMap.dispose();
+                            if (child.material.bumpMap) child.material.bumpMap.dispose();
+                            if (child.material.normalMap) child.material.normalMap.dispose();
+                            if (child.material.specularMap) child.material.specularMap.dispose();
+                            if (child.material.envMap) child.material.envMap.dispose();
+                            // child.material.dispose(); !!! cause problem with rendering
+                        }
+
+
+                    }
+                    scene.remove(child);
+                }
+
+                if (child instanceof THREE.LineSegments) {
+                    if (child.geometry) {
+                        child.geometry.dispose();
+                    }
+
+                    if (child.material) {
+                        child.material.dispose();
+                    }
+                    scene.remove(child);
+                }
+
             });
+
+            scene.remove(obj);
         }
         if (materialsNeedUpdate === true) {
             updateMaterials();
+        }
+        if (renderer && (renderer.info.memory.geometries || renderer.info.memory.programs || renderer.info.memory.textures)) {
+            // console.log("geometries=" + renderer.info.memory.geometries + " programs=" + renderer.info.memory.programs + " textures=" +renderer.info.memory.textures);
         }
     });
 
@@ -1579,7 +1626,7 @@ var Viewport = function (editor) {
         sceneHelpers.updateMatrixWorld();
         scene.updateMatrixWorld();
         sceneAxis.updateMatrixWorld();
-        // renderer.clearDepth();
+        renderer.clearDepth();
         renderer.clear();
         renderer.render(scene, camera);
         renderer.render(sceneHelpers, camera);

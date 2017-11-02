@@ -272,24 +272,18 @@ var Loader = function (editor, textureUrl) {
     this.reloadModel = function (data) {
         editor.removeAllObjects();
         scope.handleJSONData(data);
+        data = null;
+        delete data;
     };
 
 
     this.handleJSONData = function (data) {
         editor.onRenderStart();
 
-        var firstDate = new Date();
 
 
-        console.log("parseModel started")
         var pictureInfo = this.parseModel(data);
-        var secondDate = new Date();
-        console.log("parseModel ended", secondDate.getTime() - firstDate.getTime() )
-        console.log("handleJSONData load meshes started")
-        var firstDate2 = new Date();
-        var result = scope.loadMeshes(pictureInfo);
-        var secondDate2 = new Date();
-        console.log("handleJSONData load meshes ended", secondDate2.getTime() - firstDate2.getTime())
+        scope.loadMeshes(pictureInfo);
 
         // var traverse = function (obj) {
         //     if (obj instanceof Array) {
@@ -332,6 +326,9 @@ var Loader = function (editor, textureUrl) {
         scope.computeBoundingBox(pictureInfo.modelRotation);
         editor.onRenderDone();
         data = null;
+        pictureInfo = null;
+        delete data;
+        delete pictureInfo;
     };
 
     this.parseSimpleShapes = function (simpleShapes, groupIndex, pictureGeometryElement, vertices) {
@@ -389,7 +386,7 @@ var Loader = function (editor, textureUrl) {
             var texture2 = new THREE.Texture(scope.createTextCanvas(settings.text3d, settings.textColor, null, 256));
             texture2.flipY = true;
             texture2.needsUpdate = true;
-
+            var transparencyValue = (settings.transparancy > 0 ? (1 - settings.transparancy) : 1.0);
             // uniforms
             var uniforms = {
                 texture: {type: "t", value: texture},
@@ -397,7 +394,7 @@ var Loader = function (editor, textureUrl) {
                 offsetRepeat: {
                     type: "v4", value: new THREE.Vector4(settings.texture.offsetX, settings.texture.offsetY,
                         settings.texture.repeatX, settings.texture.repeatY),
-                    transparency: {type: "f", value: (settings.transparancy > 0 ? (1 - settings.transparancy) : 1.0)}
+                    transparency: {type: "f", value: transparencyValue}
                 }
             };
 
@@ -416,12 +413,14 @@ var Loader = function (editor, textureUrl) {
 
         }
         else {  // only texture without 3dText
+            var transparencyValue =  settings.transparancy > 0 ? true : false;
+            var opacityValue = settings.transparancy > 0 ? transparencyValue : 1;
             pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                 map: texture,
                 side: THREE.FrontSide,
                 flatShading: true,
-                transparent: settings.transparancy > 0 ? true : false,
-                opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
+                transparent: transparencyValue,
+                opacity: opacityValue
             });
         }
 
@@ -511,29 +510,30 @@ var Loader = function (editor, textureUrl) {
             var pictureGeometryElement = {};
             //Creating THREE.geometry for faces and lines in group
             var faceGeometry = new THREE.Geometry();
-            var lineGeometry = new THREE.Geometry();
+            var lineGeometry = new THREE.BufferGeometry();
             var edges = edgeGroups[j];
             var offset = 0;
-            // var positions = [];
+            var positions = [];
             while (offset < edges.length) {
-                // vertices[edges[offset]].toArray();
-                // var array1 = vertices[edges[offset]].toArray();
-                // positions.push(array1[0])
-                // positions.push(array1[1])
-                // positions.push(array1[2])
-                // var array2 = vertices[edges[offset + 1]].toArray();
-                //
-                // positions.push(array2[0])
-                // positions.push(array2[1])
-                // positions.push(array2[2])
+                vertices[edges[offset]].toArray();
+                var array1 = vertices[edges[offset]].toArray();
+                positions.push(array1[0]);
+                positions.push(array1[1]);
+                positions.push(array1[2]);
+                var array2 = vertices[edges[offset + 1]].toArray();
 
+                positions.push(array2[0]);
+                positions.push(array2[1]);
+                positions.push(array2[2]);
 
-                lineGeometry.vertices.push(vertices[edges[offset]]);
-                lineGeometry.vertices.push(vertices[edges[offset + 1]]);
+                // var vertice1 = vertices[edges[offset]];
+                // var vertice2 = vertices[edges[offset + 1]];
+                // lineGeometry.vertices.push(vertice1);
+                // lineGeometry.vertices.push(vertice2);
 
                 offset += 2;
             }
-
+            lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
             // lineGeometry.setPositions(positions);
 
 
@@ -550,9 +550,9 @@ var Loader = function (editor, textureUrl) {
             lineGeometry.computeBoundingBox();
 
             faceGeometry.computeFaceNormals();
-            faceGeometry.computeVertexNormals();
-            faceGeometry.computeFlatVertexNormals();
-            lineGeometry.computeFlatVertexNormals();
+            // faceGeometry.computeVertexNormals();
+            // faceGeometry.computeFlatVertexNormals();
+            // lineGeometry.computeFlatVertexNormals();
 
 
             var bObjGeometry = new THREE.BufferGeometry();
@@ -598,12 +598,14 @@ var Loader = function (editor, textureUrl) {
                         });
                     }
                     else { // face without texture & 3dText
+                        var transparencyValue = settings.transparancy > 0 ? true : false;
+                        var opacityValue = settings.transparancy > 0 ? (1 - settings.transparancy) : 1;
                         pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                             color: settings.faceColor,
                             flatShading: true,
                             side: THREE.FrontSide,
-                            transparent: settings.transparancy > 0 ? true : false,
-                            opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
+                            transparent: transparencyValue,
+                            opacity: opacityValue
 
                         });
 
@@ -672,7 +674,8 @@ var Loader = function (editor, textureUrl) {
             vertex.x = coords[offset++] * scale;
             vertex.y = coords[offset++] * scale;
             vertex.z = coords[offset++] * scale;
-            vertices.push(vertex.divideScalar (this.coordFactor ));
+            var dividedVertex = vertex.divideScalar (this.coordFactor );
+            vertices.push(dividedVertex);
         }
 
         var objectSettings = geometryObject.objectSettings;
@@ -719,7 +722,6 @@ var Loader = function (editor, textureUrl) {
         if (modelRotation.results) {
             for (var i = 0; i < modelRotation.results.length; i++) {
                 var result = modelRotation.results[i];
-                console.log(result)
                 message += "result = " + result.resultValue + "  position: x = " + result.position.x + " y =" + result.position.y + " z =" + result.position.z + "\n";
             }
         }
@@ -764,9 +766,6 @@ var Loader = function (editor, textureUrl) {
             if(this.coordFactor < maxCoordinate) {
                 this.coordFactor = maxCoordinate;
             }
-        }
-
-        for (var i = 0; i < pictureData.length; i++) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
