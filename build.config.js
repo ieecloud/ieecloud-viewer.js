@@ -61,7 +61,8 @@ module.exports = {
           'vendor/fatlines/Line2.js',
           'vendor/system.min.js',
           'vendor/CanvasRenderer.js',
-          'vendor/Projector.js'
+          'vendor/Projector.js',
+          'vendor/Octree.js'
       ]
   }
 };

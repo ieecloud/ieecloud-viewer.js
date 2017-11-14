@@ -28,6 +28,8 @@
         <button id="showRulerBtn" class="btn">Ruler</button>
         <button id="showProtractorVBtn" class="btn">Protractor V</button>
         <button id="showProtractorHBtn" class="btn">Protractor H</button>
+        <button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>
+        <button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>
         <input id="modeInput" />
         <button id="setModeBtn" class="btn">Set Mode</button>
         <div id="viewer" class = "viewer">
@@ -65,6 +67,14 @@
 
         $("#setModeBtn").click(function(){
              $("#viewer").ieecloudEditor('setMode', $("#modeInput").val());
+        });
+
+        $("#setSearchNearestModeOctreeBtn").click(function(){
+             $("#viewer").ieecloudEditor('toggleSearchNearestMode', true);
+        });
+
+        $("#setSearchNearestModeSimpleBtn").click(function(){
+             $("#viewer").ieecloudEditor('toggleSearchNearestMode', false);
         });
 
         $("#loadModel").click(function(){

@@ -55,6 +55,7 @@ var Viewport = function (editor) {
     var FIRST_LIMIT_FOV = 0.0006;
     var SECOND_LIMIT_FOV = 0.000000001;
     var ROTATE = false;
+    var USE_OCTREE = false;
 
 
     var mainMouseMove = true;
@@ -97,6 +98,26 @@ var Viewport = function (editor) {
     // camera2
     var camera2 = new THREE.PerspectiveCamera(50, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 2000);
     camera2.up = camera.up; // important!
+
+
+
+    var octree = new THREE.Octree( {
+        // uncomment below to see the octree (may kill the fps)
+        //scene: scene,
+        // when undeferred = true, objects are inserted immediately
+        // instead of being deferred until next octree.update() call
+        // this may decrease performance as it forces a matrix update
+        undeferred: false,
+        // set the max depth of tree
+        depthMax: Infinity,
+        // max number of objects before nodes split or merge
+        objectsThreshold: 8,
+        // percent between 0 and 1 that nodes will overlap each other
+        // helps insert objects that lie over more than one node
+        overlapPct: 0.15
+    } );
+
+
 
     var selectedResultPoints = {};
     var textResults = {};
@@ -430,7 +451,6 @@ var Viewport = function (editor) {
 
     }
 
-    // events
 
     var getIntersects = function (event, object) {
         var point = new THREE.Vector2();
@@ -441,20 +461,22 @@ var Viewport = function (editor) {
         mouse.set(( point.x * 2 ) - 1, -( point.y * 2 ) + 1);
 
         raycaster.setFromCamera(mouse, camera);
-        var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
+        if (USE_OCTREE) {
+            var octreeObjects = octree.search(raycaster.ray.origin, raycaster.ray.far, true, raycaster.ray.direction);
+            return raycaster.intersectOctreeObjects(octreeObjects);
+        } else {
+            var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
 
-        raycaster.set(camera.position, direction);
+            raycaster.set(camera.position, direction);
 
-        //this.ray.origin.copy( camera.position );
-        //this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
-        if (object instanceof Array) {
+            //this.ray.origin.copy( camera.position );
+            //this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
+            if (object instanceof Array) {
+                return raycaster.intersectObjects(object, true);
 
-            return raycaster.intersectObjects(object, true);
-
+            }
+            return raycaster.intersectObject(object, true);
         }
-
-        return raycaster.intersectObject(object, true);
-
     };
 
     var getMousePosition = function (dom, x, y) {
@@ -847,15 +869,23 @@ var Viewport = function (editor) {
             }
         }
     };
-
+    var lastMove = Date.now();
     scope.onMouseMoveViewerHandler = function (event) {
-        // if (!mainMouseMove) {
-        //     return;
-        // }
-        // var intersects = getIntersects(event, objects);
-        // if (intersects.length > 0) {
-        //     runNearestAlgorithm(intersects);
-        // }
+        if (!mainMouseMove) {
+            return;
+        }
+
+        if (Date.now() - lastMove < 31) { // 32 frames a second
+            return;
+        } else {
+            lastMove = Date.now();
+        }
+
+
+        var intersects = getIntersects(event, objects);
+        if (intersects.length > 0) {
+            runNearestAlgorithm(intersects);
+        }
     };
 
     scope.onMouseMoveEditorHandler = function (event) {
@@ -1286,6 +1316,11 @@ var Viewport = function (editor) {
             }
 
 
+
+            if (child instanceof THREE.Mesh || child instanceof THREE.LineSegments) {
+                octree.add( child);
+            }
+
             objects.push(child);
 
         });
@@ -1487,6 +1522,13 @@ var Viewport = function (editor) {
 
     });
 
+    signals.toggleSearchNearestMode.add(function (flag) {
+
+        USE_OCTREE = flag;
+
+
+    });
+
 
     signals.clearColorChanged.add(function (color) {
 
@@ -1631,6 +1673,7 @@ var Viewport = function (editor) {
         renderer.render(scene, camera);
         renderer.render(sceneHelpers, camera);
         renderer2.render(sceneAxis, camera2);
+        octree.update();
 
 
     }

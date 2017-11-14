@@ -25,6 +25,7 @@ var Editor = function (options) {
         showVProtractor: new SIGNALS.Signal(),
         showHProtractor: new SIGNALS.Signal(),
         toggleRotate: new SIGNALS.Signal(),
+        toggleSearchNearestMode: new SIGNALS.Signal(),
         saveModelPosition: new SIGNALS.Signal(),
         printScreen: new SIGNALS.Signal(),
         materialChanged: new SIGNALS.Signal(),
@@ -154,6 +155,10 @@ Editor.prototype = {
 
     toggleRotate: function (flag) {
         this.signals.toggleRotate.dispatch(flag);
+    },
+
+    toggleSearchNearestMode: function (flag) {
+        this.signals.toggleSearchNearestMode.dispatch(flag);
     },
 
     setMode: function (mode) {

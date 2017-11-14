@@ -129,6 +129,10 @@ function Viewer(target, options) {
         this.threeEditor.toggleRotate(value);
     };
 
+    Viewer.prototype.toggleSearchNearestMode = function (value) {
+        this.threeEditor.toggleSearchNearestMode(value);
+    };
+
 
     Viewer.prototype.changeAxisUpZ = function () {
         this.threeEditor.changeAxis("upZ");
