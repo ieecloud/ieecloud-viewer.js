@@ -14,7 +14,7 @@ THREE.EditorControls = function (editorId, object, domElement) {
     var vector = new THREE.Vector3();
 
     var STATE = {NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2};
-    var state = STATE.NONE;
+
 
     scope.center = new THREE.Vector3();
     var normalMatrix = new THREE.Matrix3();
@@ -28,6 +28,7 @@ THREE.EditorControls = function (editorId, object, domElement) {
     var changeEvent = {type: 'change', distance: 0};
     var zoomEvent = {type: 'zoom', distance: 0};
 
+    scope.state = STATE.NONE;
 
     this.updateEvent = function () {
 
@@ -38,7 +39,7 @@ THREE.EditorControls = function (editorId, object, domElement) {
     this.setDisabled = function () {
 
         scope.enabled = false;
-        state = STATE.NONE;
+        scope.state = STATE.NONE;
         domElement.removeEventListener('mousemove', onMouseMove, false);
         domElement.removeEventListener('mouseup', onMouseUp, false);
         domElement.removeEventListener('mouseout', onMouseUp, false);
@@ -146,20 +147,20 @@ THREE.EditorControls = function (editorId, object, domElement) {
 
         event.preventDefault();
         if (event.which == 2) {
-            state = STATE.NONE;
+            scope.state = STATE.NONE;
             return;
         }
         if (event.button === 0) {
 
-            state = STATE.ROTATE;
+            scope.state = STATE.ROTATE;
 
         } else if (event.button === 1) {
 
-            state = STATE.ZOOM;
+            scope.state = STATE.ZOOM;
 
         } else if (event.button === 2) {
 
-            state = STATE.PAN;
+            scope.state = STATE.PAN;
 
         }
 
@@ -180,7 +181,7 @@ THREE.EditorControls = function (editorId, object, domElement) {
     }
 
     function onMouseMove(event) {
-        if (scope.enabled === false || state.NONE) {
+        if (scope.enabled === false || scope.state.NONE) {
             return false;
         }
 
@@ -202,18 +203,18 @@ THREE.EditorControls = function (editorId, object, domElement) {
         var movementX = pointer.x - pointerOld.x;
         var movementY = pointer.y - pointerOld.y;
 
-        if (state === STATE.ROTATE) {
+        if (scope.state === STATE.ROTATE) {
             var rotationVector = new THREE.Vector3(movementX * 0.005, 0, -movementY * 0.005);
             if (scope.direction == "upY") {
                 rotationVector = new THREE.Vector3(-movementX * 0.005, -movementY * 0.005, 0);
             }
             scope.rotate(rotationVector);
 
-        } else if (state === STATE.ZOOM) {
+        } else if (scope.state === STATE.ZOOM) {
 
             scope.zoom(movementY);
 
-        } else if (state === STATE.PAN) {
+        } else if (scope.state === STATE.PAN) {
 
             scope.pan(new THREE.Vector3(-movementX, movementY, 0));
 
@@ -231,7 +232,7 @@ THREE.EditorControls = function (editorId, object, domElement) {
         domElement.removeEventListener('mouseup', onMouseUp, false);
         domElement.removeEventListener('mouseout', onMouseUp, false);
 
-        state = STATE.NONE;
+        scope.state = STATE.NONE;
     }
 
     function onMouseWheel(event) {

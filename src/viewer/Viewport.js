@@ -55,7 +55,7 @@ var Viewport = function (editor) {
     var FIRST_LIMIT_FOV = 0.0006;
     var SECOND_LIMIT_FOV = 0.000000001;
     var ROTATE = false;
-    var USE_OCTREE = false;
+    var USE_OCTREE = true;
 
 
     var mainMouseMove = true;
@@ -875,12 +875,19 @@ var Viewport = function (editor) {
             return;
         }
 
+        if (controls.state >= 0) {
+            return;
+        }
+
+        if (objects.length === 0) {
+            return;
+        }
+
         if (Date.now() - lastMove < 31) { // 32 frames a second
             return;
         } else {
             lastMove = Date.now();
         }
-
 
         var intersects = getIntersects(event, objects);
         if (intersects.length > 0) {
