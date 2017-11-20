@@ -773,20 +773,36 @@ var Viewport = function (editor) {
         }
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
+        var toggleSelect = function(aTree, fCompair){
+            var aInnerTree = [];
+            var oNode;
+            for(var keysTree in aTree) {
+                aInnerTree.push(aTree[keysTree]);
+            }
+            while(aInnerTree.length > 0) {
+                oNode = aInnerTree.pop();
+                if( fCompair(oNode) ){
+                    if (oNode.selectedFlag) {
+                        editor.unSelectObject(oNode);
+                    } else {
+                        editor.selectObject(oNode);
+                    }
+                } else { // if (node.children && node.children.length) {
+                    for(var keysNode in oNode){
+                        if(oNode[keysNode] instanceof Array){
+                            for (var i = 0; i < oNode[keysNode].length; i++) {
+                                aInnerTree.push(oNode[keysNode][i]);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
             var intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
-                editor.loader.traverseTree(editor.loader.objectsTree, function (child) {
-                    if (child.parentName === intersects[0].object.parentName) {
-                        if (child.selectedFlag) {
-                            editor.unSelectObject(child);
-                            editor.unSelectTree(child);
-                        } else {
-                            editor.selectObject(child);
-                            editor.selectTree(child);
-                        }
-                    }
-                });
+                toggleSelect(editor.loader.objectsTree, function(oNode){ if(oNode["parentName"] === intersects[0].object.parentName) return true; });
             } else {
                 editor.select(camera);
             }

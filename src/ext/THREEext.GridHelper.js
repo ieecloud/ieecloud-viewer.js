@@ -22,10 +22,7 @@ THREEext.GridHelper = function ( size, step ) {
 
 	}
 
-    var bObjGeometry = new THREE.BufferGeometry();
-    bObjGeometry.fromGeometry(geometry);
-
-	THREE.LineSegments.call( this, bObjGeometry, material);
+    THREE.LineSegments.call( this, geometry, material);
 
 };
 

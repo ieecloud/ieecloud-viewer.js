@@ -41,7 +41,7 @@
 
          $("#viewer").ieecloudEditor({
             textureUrl: "",
-            mode: "3d_point",
+            mode: "3d_geometry",
             resultDigits: 3,
             drawResults: false,
             gridVisible: true,
@@ -78,7 +78,7 @@
         });
 
         $("#loadModel").click(function(){
-             $.getJSON("../resources/core_part1.json", function(json) {
+             $.getJSON("../resources/view11.json", function(json) {
                  $("#viewer").ieecloudEditor('reloadModel', json);
              });
         });

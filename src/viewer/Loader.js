@@ -192,17 +192,16 @@ var Loader = function (editor, textureUrl) {
                 mesh.parentName = objectElement[j].parentName;
                 mesh.defaultColor = facesMaterial.color.clone();
 
-                // TODO: needed for tree
-                // if ((objectGeometry.faces.length > 0 && edgesGeometry.vertices.length > 0)) {
-                //     lines.name = objectElement[j].name + ".EDGE";
-                //     mesh.name = objectElement[j].name + ".FACE";
-                //     meshesData[key].push(lines);
-                //     meshesData[key].push(mesh);
-                // } else if (objectGeometry.faces.length === 0 && edgesGeometry.vertices.length > 0) {
-                //     meshesData[key].push(lines);
-                // } else if (objectGeometry.faces.length > 0 && edgesGeometry.vertices.length === 0) {
-                //     meshesData[key].push(mesh);
-                // }
+                if (objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count > 0) {
+                    lines.name = objectElement[j].name + ".EDGE";
+                    mesh.name = objectElement[j].name + ".FACE";
+                    meshesData[key].push(lines);
+                    meshesData[key].push(mesh);
+                } else if (objectGeometry.attributes.position.count === 0 && edgesGeometry.attributes.position.count > 0) {
+                    meshesData[key].push(lines);
+                } else if (objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count === 0) {
+                    meshesData[key].push(mesh);
+                }
 
                 var simpleShapes = objectElement[j].simpleShapes;
                 var v = 0;
@@ -283,45 +282,47 @@ var Loader = function (editor, textureUrl) {
 
 
         var pictureInfo = this.parseModel(data);
-        scope.loadMeshes(pictureInfo);
+        var result = scope.loadMeshes(pictureInfo);
 
-        // var traverse = function (obj) {
-        //     if (obj instanceof Array) {
-        //         for (var i = 0; i < obj.length; i++) {
-        //             if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREEext.Line)) {
-        //                 var node = obj[i];
-        //                 if (node.index != -1) {
-        //                     if (result[node.index]) {
-        //                         node.children = result[node.index];
-        //                         node.uniqueId = THREE.Math.generateUUID();
-        //                     }
-        //
-        //                 }
-        //                 traverse(obj[i]);
-        //             } else {
-        //             }
-        //         }
-        //     } else {
-        //         for (var prop in obj) {
-        //             if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREEext.Line)) {
-        //                 var node = obj[prop];
-        //                 if (node.index != -1) {
-        //                     if (result[node.index]) {
-        //                         node.children = result[node.index];
-        //                         node.uniqueId = THREE.Math.generateUUID();
-        //                     }
-        //                 }
-        //                 traverse(obj[prop]);
-        //             } else {
-        //             }
-        //         }
-        //     }
-        // };
-        //
-        // traverse(data.tree);
-        // scope.objectsTree = data.tree;
-        //
-        // editor.onTreeLoad(data.tree);
+        var traverse = function (obj) {
+            if (obj instanceof Array) {
+                for (var i = 0; i < obj.length; i++) {
+                    if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREE.LineSegments)) {
+                        var node = obj[i];
+                        if (node.index != -1) {
+                            if (result[node.index]) {
+                                node.children = result[node.index];
+                                node.uniqueId = THREE.Math.generateUUID();
+                            }
+
+                        }
+                        traverse(obj[i]);
+                    } else {
+                    }
+                }
+            } else {
+                for (var prop in obj) {
+                    if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREE.LineSegments)) {
+                        var node = obj[prop];
+                        if (node.index != -1) {
+                            if (result[node.index]) {
+                                node.children = result[node.index];
+                                node.uniqueId = THREE.Math.generateUUID();
+                            }
+                        }
+                        traverse(obj[prop]);
+                    } else {
+                    }
+                }
+            }
+        };
+
+        traverse(data.tree);
+
+        data.tree.uniqueId = THREE.Math.generateUUID();
+
+        scope.objectsTree = [data.tree];
+        editor.onTreeLoad(data.tree);
 
         scope.computeBoundingBox(pictureInfo.modelRotation);
         editor.onRenderDone();
