@@ -742,21 +742,22 @@ var Viewport = function (editor) {
 
                 if (event && (event.altKey || event.metaKey)) {
                     var obj = searchNearestObject(intersects, THREE.LineSegments);
+                    // TODO: in editor mode select tree node
                     if (obj.selectedFlag) {
-                        editor.unSelectObject(obj);
-                        editor.unSelectTree(obj);
+                        scope.unSelectObject(obj);
+                        // editor.unSelectTree(obj);
                     } else {
-                        editor.selectObject(obj);
-                        editor.selectTree(obj);
+                        scope.selectObject(obj);
+                        // editor.selectTree(obj);
                     }
                 } else if (event && (event.ctrlKey || event.metaKey)) {
                     obj = searchNearestObject(intersects, THREE.Mesh);
                     if (obj.selectedFlag) {
-                        editor.unSelectObject(obj);
-                        editor.unSelectTree(obj);
+                        scope.unSelectObject(obj);
+                        // editor.unSelectTree(obj);
                     } else {
-                        editor.selectObject(obj);
-                        editor.selectTree(obj);
+                        scope.selectObject(obj);
+                        // editor.selectTree(obj);
                     }
                 }
             } else {
@@ -782,10 +783,11 @@ var Viewport = function (editor) {
             while(aInnerTree.length > 0) {
                 oNode = aInnerTree.pop();
                 if( fCompair(oNode) ){
+                    // TODO: in editor mode select tree node
                     if (oNode.selectedFlag) {
-                        editor.unSelectObject(oNode);
+                        scope.unSelectObject(oNode)
                     } else {
-                        editor.selectObject(oNode);
+                        scope.selectObject(oNode)
                     }
                 } else { // if (node.children && node.children.length) {
                     for(var keysNode in oNode){
@@ -825,6 +827,35 @@ var Viewport = function (editor) {
         }
         document.removeEventListener('mouseup', onMouseUp);
     };
+
+
+    scope.selectObject = function (object) {
+        if (object !== null) {
+            if (object.material) {
+                object.material.color.setHex(0xff0000);
+                object.material.transparent = true;
+                object.material.depthTest = false;
+                object.material.opacity = SELECT_OPACITY;
+                object.selectedFlag = true;
+            }
+        }
+    };
+
+    scope.unSelectObject = function (object) {
+        if (object !== null) {
+            if (object.material) {
+                object.material.color.set(object.defaultColor);
+                object.material.transparent = false;
+                object.material.depthTest = true;
+                object.material.opacity = 1;
+                object.selectedFlag = false;
+            }
+        }
+    };
+
+
+
+
 
     var onMouseUp = function (event) {
         if (editor.mode === editor.MODE_FACES_EDGES) {
@@ -1167,34 +1198,13 @@ var Viewport = function (editor) {
     });
 
     signals.objectColorSelected.add(function (object) {
-        if (object !== null) {
-
-            if (object.material) {
-                object.material.color.setHex(0xff0000);
-                object.material.transparent = true;
-                object.material.depthTest = false;
-                object.material.opacity = SELECT_OPACITY;
-                object.selectedFlag = true;
-            }
-
-        }
-
+        scope.selectObject(object);
         render();
 
     });
 
     signals.objectColorUnSelected.add(function (object) {
-        if (object !== null) {
-
-            if (object.material) {
-                object.material.color.set(object.defaultColor);
-                object.material.transparent = false;
-                object.material.depthTest = true;
-                object.material.opacity = 1;
-                object.selectedFlag = false;
-            }
-
-        }
+        scope.unSelectObject(object);
 
         render();
 
