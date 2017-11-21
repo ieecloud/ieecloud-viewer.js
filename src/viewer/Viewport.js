@@ -397,7 +397,7 @@ var Viewport = function (editor) {
 
 
     var raycaster = new THREE.Raycaster();
-    // raycaster.linePrecision = 0.1;
+    raycaster.linePrecision = 0.01;
     var mouse = new THREE.Vector2();
     var mouse2 = new THREE.Vector2();
 
@@ -734,6 +734,15 @@ var Viewport = function (editor) {
     };
 
     scope.onMouseUpFacesEdgesHandler = function (event) {
+
+        if (controls.state >= 0) {
+            return;
+        }
+
+        if (objects.length === 0) {
+            return;
+        }
+
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
@@ -772,6 +781,15 @@ var Viewport = function (editor) {
         if (event.button !== 0) {
             return;
         }
+
+        if (controls.state >= 0) {
+            return;
+        }
+
+        if (objects.length === 0) {
+            return;
+        }
+
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
         var toggleSelect = function(aTree, fCompair){
