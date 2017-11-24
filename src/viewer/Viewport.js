@@ -731,7 +731,7 @@ var Viewport = function (editor) {
             if (intersects.length > 0) {
 
                 if (event && (event.altKey || event.metaKey)) {
-                    var obj = searchNearestObject(intersects, THREE.LineSegments);
+                    var obj = searchNearestObject(intersects, THREE.Line);
                     // TODO: in editor mode select tree node
                     if (obj.selectedFlag) {
                         scope.unSelectObject(obj);
@@ -880,7 +880,7 @@ var Viewport = function (editor) {
 
     var runNearestAlgorithm = function (intersects) {
         var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
-        var intersectLine = searchNearestIntersect(intersects, THREE.LineSegments);
+        var intersectLine = searchNearestIntersect(intersects, THREE.Line);
         var intersect = getNearestIntersect(intersectLine, intersectMesh);
         // var intersect = intersects[0];
         if (intersect) {
@@ -1439,7 +1439,7 @@ var Viewport = function (editor) {
                     scene.remove(child);
                 }
 
-                if (child instanceof THREE.LineSegments) {
+                if (child instanceof THREE.Line) {
                     if (child.geometry) {
                         child.geometry.dispose();
                     }
@@ -1589,7 +1589,7 @@ var Viewport = function (editor) {
 
     if (System.support.webgl === true) {
 
-        renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: true});
+        renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: false});
         // pickingRenderTarget = new THREE.WebGLRenderTarget();
         // pickingRenderTarget.texture.generateMipmaps = false;
         // pickingRenderTarget.texture.minFilter = THREE.NearestFilter;

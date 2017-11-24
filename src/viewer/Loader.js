@@ -170,7 +170,8 @@ var Loader = function (editor, textureUrl) {
                 mesh.userData.totalObjVertices = vertices;
                 mesh.userData.totalObjResults = results;
 //            http://stackoverflow.com/questions/17146650/combining-multiple-line-geometries-into-a-single-geometry
-                var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+//                 var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+                var lines = new THREE.Line( edgesGeometry, edgesMaterial, THREE.LinePieces );
 
                 lines.userData.pointsTable = pointsTable;
                 lines.userData.name = objectElement[j].name;
