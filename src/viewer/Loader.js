@@ -182,8 +182,8 @@ var Loader = function (editor, textureUrl) {
 
                 modelGroup.add(mesh);
 
-                editor.octree.add(mesh);
-                editor.octree.add(lines);
+                // editor.octree.add(mesh);
+                // editor.octree.add(lines);
 
                 lines.name = objectElement[j].name;
                 lines.uniqueId = lines.uuid;
@@ -770,6 +770,9 @@ var Loader = function (editor, textureUrl) {
             if(this.coordFactor < maxCoordinate) {
                 this.coordFactor = maxCoordinate;
             }
+        }
+
+        for (var i = 0; i < pictureData.length; i++) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
