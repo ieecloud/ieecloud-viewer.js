@@ -48,6 +48,21 @@ var Editor = function (options) {
     this.sceneAxis = new THREE.Scene();
     this.sceneHelpers = new THREE.Scene();
     this.pickingScene = new THREE.Scene();
+    this.octree = new THREE.Octree( {
+        // uncomment below to see the octree (may kill the fps)
+        //scene: scene,
+        // when undeferred = true, objects are inserted immediately
+        // instead of being deferred until next octree.update() call
+        // this may decrease performance as it forces a matrix update
+        undeferred: true,
+        // set the max depth of tree
+        depthMax: Infinity,
+        // max number of objects before nodes split or merge
+        objectsThreshold: 8,
+        // percent between 0 and 1 that nodes will overlap each other
+        // helps insert objects that lie over more than one node
+        overlapPct: 0.15
+    } );
 
     this.object = {};
     this.geometries = {};

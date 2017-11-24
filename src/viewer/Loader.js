@@ -182,6 +182,9 @@ var Loader = function (editor, textureUrl) {
 
                 modelGroup.add(mesh);
 
+                editor.octree.add(mesh);
+                editor.octree.add(lines);
+
                 lines.name = objectElement[j].name;
                 lines.uniqueId = lines.uuid;
                 lines.parentName = objectElement[j].parentName;

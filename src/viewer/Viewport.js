@@ -36,6 +36,7 @@ var Viewport = function (editor) {
     container.add(rulerInfo);
 
     var scene = editor.scene;
+    var octree =  editor.octree;
     var sceneAxis = editor.sceneAxis;
     var sceneHelpers = editor.sceneHelpers;
     var scenePicker = editor.pickingScene;
@@ -98,26 +99,6 @@ var Viewport = function (editor) {
     // camera2
     var camera2 = new THREE.PerspectiveCamera(50, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 2000);
     camera2.up = camera.up; // important!
-
-
-
-    var octree = new THREE.Octree( {
-        // uncomment below to see the octree (may kill the fps)
-        //scene: scene,
-        // when undeferred = true, objects are inserted immediately
-        // instead of being deferred until next octree.update() call
-        // this may decrease performance as it forces a matrix update
-        undeferred: false,
-        // set the max depth of tree
-        depthMax: Infinity,
-        // max number of objects before nodes split or merge
-        objectsThreshold: 8,
-        // percent between 0 and 1 that nodes will overlap each other
-        // helps insert objects that lie over more than one node
-        overlapPct: 0.15
-    } );
-
-
 
     var selectedResultPoints = {};
     var textResults = {};
@@ -1353,7 +1334,6 @@ var Viewport = function (editor) {
     signals.objectAdded.add(function (object) {
 
         var materialsNeedUpdate = false;
-
         object.traverse(function (child) {
 
             if (child instanceof THREE.Light) {
@@ -1365,16 +1345,9 @@ var Viewport = function (editor) {
                     unRotatedObjects.push(child);
                 }
             }
-
-
-
-            if (child instanceof THREE.Mesh || child instanceof THREE.LineSegments) {
-                octree.add( child);
-            }
-
             objects.push(child);
-
         });
+
 
         nearestPoint.hide();
         highlighter.hide();
@@ -1724,7 +1697,7 @@ var Viewport = function (editor) {
         renderer.render(scene, camera);
         renderer.render(sceneHelpers, camera);
         renderer2.render(sceneAxis, camera2);
-        octree.update();
+        // octree.update();
 
 
     }
