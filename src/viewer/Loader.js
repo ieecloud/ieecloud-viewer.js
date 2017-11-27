@@ -170,8 +170,7 @@ var Loader = function (editor, textureUrl) {
                 mesh.userData.totalObjVertices = vertices;
                 mesh.userData.totalObjResults = results;
 //            http://stackoverflow.com/questions/17146650/combining-multiple-line-geometries-into-a-single-geometry
-//                 var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
-                var lines = new THREE.Line( edgesGeometry, edgesMaterial, THREE.LinePieces );
+                var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
 
                 lines.userData.pointsTable = pointsTable;
                 lines.userData.name = objectElement[j].name;
@@ -503,6 +502,26 @@ var Loader = function (editor, textureUrl) {
         var objectSettings = geometryObject.objectSettings;
 
         var drawResults = (DRAW_RESULTS && results && (results.length != 0));
+        //
+        var transparencyValue = objectSettings.transparancy > 0 ? true : false;
+        var opacityValue = objectSettings.transparancy > 0 ? (1 - objectSettings.transparancy) : 1;
+        var simpleFacesMaterial = new THREE.MeshLambertMaterial({
+            color: objectSettings.faceColor,
+            flatShading: true,
+            side: THREE.FrontSide,
+            transparent: transparencyValue,
+            opacity: opacityValue
+
+        });
+
+        var simpleLinesMaterial = new THREE.LineBasicMaterial({
+            color: objectSettings.lineColor,
+            opacity: 1,
+            linewidth: objectSettings.lineWidth
+        });
+
+
+
 
         for (var j = 0; j < groups.length; j++) {  //reading edges and faces by groups
 
@@ -603,16 +622,7 @@ var Loader = function (editor, textureUrl) {
                         });
                     }
                     else { // face without texture & 3dText
-                        var transparencyValue = settings.transparancy > 0 ? true : false;
-                        var opacityValue = settings.transparancy > 0 ? (1 - settings.transparancy) : 1;
-                        pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
-                            color: settings.faceColor,
-                            flatShading: true,
-                            side: THREE.FrontSide,
-                            transparent: transparencyValue,
-                            opacity: opacityValue
-
-                        });
+                        pictureGeometryElement.facesMaterial = simpleFacesMaterial;
 
                     }
 
@@ -638,11 +648,14 @@ var Loader = function (editor, textureUrl) {
             //
             // } );
 
-            pictureGeometryElement.edgesMaterial = new THREE.LineBasicMaterial({
-                color: settings.lineColor,
-                opacity: 1,
-                linewidth: settings.lineWidth
-            });
+            // pictureGeometryElement.edgesMaterial = new THREE.LineBasicMaterial({
+            //     color: settings.lineColor,
+            //     opacity: 1,
+            //     linewidth: settings.lineWidth
+            // });
+
+
+            pictureGeometryElement.edgesMaterial = simpleLinesMaterial;
 
             pictureGeometryElement.simpleShapes = [];  //Simple shapes
 
