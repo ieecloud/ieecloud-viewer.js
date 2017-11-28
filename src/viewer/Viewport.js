@@ -1448,7 +1448,7 @@ var Viewport = function (editor) {
                     scene.remove(child);
                 }
 
-                if (child instanceof THREE.Line) {
+                if (child instanceof THREE.LineSegments) {
                     if (child.geometry) {
                         child.geometry.dispose();
                     }
