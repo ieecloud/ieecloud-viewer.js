@@ -62,7 +62,8 @@ module.exports = {
           'vendor/system.min.js',
           'vendor/CanvasRenderer.js',
           'vendor/Projector.js',
-          'vendor/Octree.js'
+          'vendor/Octree.js',
+          'vendor/test.js'
       ]
   }
 };

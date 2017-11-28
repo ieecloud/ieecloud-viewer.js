@@ -141,14 +141,13 @@ var Loader = function (editor, textureUrl) {
 //         // editor.scene.add(helper);
     };
 
-
     this.loadMeshes = function (pictureInfo) {
 
         var result = pictureInfo.geometryObjectData;
         var scaleFactor = pictureInfo.scaleFactor;
         var meshesData = {};
         var modelGroup = new THREE.Object3D();
-//
+
         _.forEach(result, function(value, key) {
             meshesData[key] = [];
             var totalObjectDataElement = value;
@@ -156,31 +155,48 @@ var Loader = function (editor, textureUrl) {
             var pointsTable = totalObjectDataElement.pointsTable;
             var vertices = totalObjectDataElement.totalObjVertices;
             var results = totalObjectDataElement.totalObjResults;
-            var edgesMaterial = objectElement[0].edgesMaterial;
+            var lineCommonPositionsArray = totalObjectDataElement.lineCommonPositionsArray;
+            var geoLineGeometry = new THREE.BufferGeometry();
+            geoLineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( lineCommonPositionsArray, 3 ) );
+            var lines = new THREE.LineSegments(geoLineGeometry, objectElement[0].edgesMaterial);
+            modelGroup.add(lines);
+            lines.userData.pointsTable = pointsTable;
+            // lines.userData.name = objectElement[j].name;
+            lines.userData.totalObjVertices = vertices;
+            lines.userData.totalObjResults = results;
+            commonLinesMaterial = objectElement[0].edgesMaterial;
             for (var j = 0; j < objectElement.length; j++) {
                 var objectGeometry = objectElement[j].objectGeometry;
                 var facesMaterial = objectElement[j].facesMaterial;
-                var edgesGeometry = objectElement[j].edgesGeometry;
+                // var edgesGeometry = objectElement[j].edgesGeometry;
                 var edgesMaterial = objectElement[j].edgesMaterial;
 
+               if(objectGeometry){
+                   var mesh = new THREE.Mesh(objectGeometry, facesMaterial);
+                   mesh.userData.pointsTable = pointsTable;
+                   mesh.userData.name = objectElement[j].name;
+                   mesh.userData.totalObjVertices = vertices;
+                   mesh.userData.totalObjResults = results;
 
-                var mesh = new THREE.Mesh(objectGeometry, facesMaterial);
-                mesh.userData.pointsTable = pointsTable;
-                mesh.userData.name = objectElement[j].name;
-                mesh.userData.totalObjVertices = vertices;
-                mesh.userData.totalObjResults = results;
+                   mesh.name = objectElement[j].name;
+                   mesh.uniqueId = mesh.uuid;
+                   mesh.parentName = objectElement[j].parentName;
+                   mesh.defaultColor = facesMaterial.color.clone();
+
+                   modelGroup.add(mesh);
+               }
+
 //            http://stackoverflow.com/questions/17146650/combining-multiple-line-geometries-into-a-single-geometry
-                var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+//                 var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+//
+//                 lines.userData.pointsTable = pointsTable;
+//                 lines.userData.name = objectElement[j].name;
+//                 lines.userData.totalObjVertices = vertices;
+//                 lines.userData.totalObjResults = results;
 
-                lines.userData.pointsTable = pointsTable;
-                lines.userData.name = objectElement[j].name;
-                lines.userData.totalObjVertices = vertices;
-                lines.userData.totalObjResults = results;
+                // modelGroup.add(lines);
 
 
-                modelGroup.add(lines);
-
-                modelGroup.add(mesh);
 
                 // editor.octree.add(mesh);
                 // editor.octree.add(lines);
@@ -190,22 +206,19 @@ var Loader = function (editor, textureUrl) {
                 lines.parentName = objectElement[j].parentName;
                 lines.defaultColor = edgesMaterial.color.clone();
 
-                mesh.name = objectElement[j].name;
-                mesh.uniqueId = mesh.uuid;
-                mesh.parentName = objectElement[j].parentName;
-                mesh.defaultColor = facesMaterial.color.clone();
 
-                if (objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count > 0) {
-                    lines.name = objectElement[j].name + ".EDGE";
-                    mesh.name = objectElement[j].name + ".FACE";
-                    meshesData[key].push(lines);
-                    meshesData[key].push(mesh);
-                } else if (objectGeometry.attributes.position.count === 0 && edgesGeometry.attributes.position.count > 0) {
-                    meshesData[key].push(lines);
-                } else if (objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count === 0) {
-                    meshesData[key].push(mesh);
-                }
 
+//                 if (objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count > 0) {
+//                     lines.name = objectElement[j].name + ".EDGE";
+//                     mesh.name = objectElement[j].name + ".FACE";
+//                     meshesData[key].push(lines);
+//                     meshesData[key].push(mesh);
+//                 } else if (objectGeometry.attributes.position.count === 0 && edgesGeometry.attributes.position.count > 0) {
+//                     meshesData[key].push(lines);
+//                 } else if (objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count === 0) {
+//                     meshesData[key].push(mesh);
+//                 }
+// // ??
                 var simpleShapes = objectElement[j].simpleShapes;
                 var v = 0;
                 var simpleShapesGeometry = new THREE.Geometry();
@@ -229,6 +242,7 @@ var Loader = function (editor, textureUrl) {
                 modelGroup.add(shapes);
             }
         });
+
         var textData = pictureInfo.textData;
         _.forEach(textData, function(value, key) {
             var textElement = value;
@@ -236,11 +250,10 @@ var Loader = function (editor, textureUrl) {
                 var textMesh = scope.createText2D(textElement[key].label, textElement[key].color, null, textElement[key].size);
                 textMesh.userData = {};
                 textMesh.userData.quaternion = "camera";
-                textMesh.position.copy(textElement[i].position);
+                textMesh.position.copy(textElement[key].position);
                 modelGroup.add(textMesh);
             });
         });
-
         editor.addModelGroup(modelGroup);
         return meshesData;
     };
@@ -489,7 +502,8 @@ var Loader = function (editor, textureUrl) {
         }
     };
 
-    this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray) {
+    this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray, lineCommonPositionsArray) {
+
         var groups = geometryObject.groups; // group names
         var results = geometryObject.results; // group names
 
@@ -520,9 +534,6 @@ var Loader = function (editor, textureUrl) {
             linewidth: objectSettings.lineWidth
         });
 
-
-
-
         for (var j = 0; j < groups.length; j++) {  //reading edges and faces by groups
 
             var settings = groupSettings[j];
@@ -534,7 +545,7 @@ var Loader = function (editor, textureUrl) {
             var pictureGeometryElement = {};
             //Creating THREE.geometry for faces and lines in group
             var faceGeometry = new THREE.Geometry();
-            var lineGeometry = new THREE.BufferGeometry();
+            // var lineGeometry = new THREE.BufferGeometry();
             var edges = edgeGroups[j];
             var offset = 0;
             var positions = [];
@@ -544,11 +555,20 @@ var Loader = function (editor, textureUrl) {
                 positions.push(array1[0]);
                 positions.push(array1[1]);
                 positions.push(array1[2]);
+
+                lineCommonPositionsArray.push(array1[0]);
+                lineCommonPositionsArray.push(array1[1]);
+                lineCommonPositionsArray.push(array1[2]);
                 var array2 = vertices[edges[offset + 1]].toArray();
 
                 positions.push(array2[0]);
                 positions.push(array2[1]);
                 positions.push(array2[2]);
+
+
+                lineCommonPositionsArray.push(array2[0]);
+                lineCommonPositionsArray.push(array2[1]);
+                lineCommonPositionsArray.push(array2[2]);
 
                 // var vertice1 = vertices[edges[offset]];
                 // var vertice2 = vertices[edges[offset + 1]];
@@ -557,8 +577,10 @@ var Loader = function (editor, textureUrl) {
 
                 offset += 2;
             }
-            lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+            // lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
             // lineGeometry.setPositions(positions);
+
+            // console.log("CONCAT", lineCommonPositionsArray);
 
 
             var faces = faceGroups[j];
@@ -571,7 +593,7 @@ var Loader = function (editor, textureUrl) {
 
 
             faceGeometry.computeBoundingBox();
-            lineGeometry.computeBoundingBox();
+            // lineGeometry.computeBoundingBox();
 
             faceGeometry.computeFaceNormals();
             // faceGeometry.computeVertexNormals();
@@ -584,12 +606,19 @@ var Loader = function (editor, textureUrl) {
             faceGeometry = null;
 
 
+
+            if(bObjGeometry.attributes.position.count > 0){
+                pictureGeometryElement.objectGeometry = bObjGeometry;
+            }
+
+
+
             // var bLineGeometry = new THREE.BufferGeometry();
             // bLineGeometry.fromGeometry(lineGeometry);
             // lineGeometry = null;
 
-            pictureGeometryElement.objectGeometry = bObjGeometry;
-            pictureGeometryElement.edgesGeometry = lineGeometry;
+            // pictureGeometryElement.objectGeometry = bObjGeometry;
+            // pictureGeometryElement.edgesGeometry = lineGeometry;
             pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
             pictureGeometryElement.name = groups[j];
             pictureGeometryElement.parentName = complexObjectName;
@@ -710,14 +739,15 @@ var Loader = function (editor, textureUrl) {
             textPositionsData[ind].color = objectSettings.textColor;
         }
         var objectPartsArray = [];
+        var lineCommonPositionsArray = [];
 
-        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray);
-
+        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray, lineCommonPositionsArray);
         var totalGeometryObj = {};
         totalGeometryObj.objectPartsArray = objectPartsArray;
         totalGeometryObj.pointsTable = pointsTable;
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
+        totalGeometryObj.lineCommonPositionsArray = lineCommonPositionsArray;
 
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
 
@@ -785,7 +815,6 @@ var Loader = function (editor, textureUrl) {
                 this.coordFactor = maxCoordinate;
             }
         }
-
         for (var i = 0; i < pictureData.length; i++) {
 
             var geometryObject = pictureData[i];

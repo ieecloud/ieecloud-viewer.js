@@ -81,12 +81,12 @@ var Viewport = function (editor) {
     var modal = new UI.Modal();
     container.add(modal);
 
-    // var rendererStats  = new THREEx.RendererStats();
-    //
-    // rendererStats.domElement.style.position   = 'absolute';
-    // rendererStats.domElement.style.left  = '0px';
-    // rendererStats.domElement.style.bottom    = '0px';
-    // container.dom.appendChild( rendererStats.domElement );
+    var rendererStats  = new THREEx.RendererStats();
+
+    rendererStats.domElement.style.position   = 'absolute';
+    rendererStats.domElement.style.left  = '0px';
+    rendererStats.domElement.style.bottom    = '0px';
+    container.dom.appendChild( rendererStats.domElement );
 
 
     // renderer
@@ -1611,6 +1611,7 @@ var Viewport = function (editor) {
     }
 
     renderer.setClearColor(clearColor);
+    renderer.sortObjects = false;
     renderer.autoClear = false;
     renderer.autoUpdateScene = false;
     container.dom.appendChild(renderer.domElement);
@@ -1699,7 +1700,7 @@ var Viewport = function (editor) {
     function render() {
         var startDate   = new Date();
         sceneHelpers.updateMatrixWorld();
-        // scene.updateMatrixWorld();
+        scene.updateMatrixWorld();
         sceneAxis.updateMatrixWorld();
         // renderer.clearDepth();
         renderer.clear();
@@ -1707,10 +1708,15 @@ var Viewport = function (editor) {
         renderer.render(sceneHelpers, camera);
         renderer2.render(sceneAxis, camera2);
         // octree.update();
-        // rendererStats.update(renderer);
+        rendererStats.update(renderer);
         var endDate   = new Date();
         var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
         console.log("render", seconds);
+
+        // console.log("Calls:",  renderer.info.render.calls);
+        // console.log("Vertices:", renderer.info.render.vertices);
+        // console.log("Faces:",   renderer.info.render.faces);
+        // console.log("Points:",  renderer.info.render.points);
 
 
     }
