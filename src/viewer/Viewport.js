@@ -1440,7 +1440,9 @@ var Viewport = function (editor) {
                             if (child.material.normalMap) child.material.normalMap.dispose();
                             if (child.material.specularMap) child.material.specularMap.dispose();
                             if (child.material.envMap) child.material.envMap.dispose();
-                            // child.material.dispose(); !!! cause problem with rendering
+                            child.material.dispose();
+                            // !!! cause problem with rendering
+
                         }
 
 
