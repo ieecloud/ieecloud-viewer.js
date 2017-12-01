@@ -15,6 +15,8 @@ function Viewer(target, options) {
 
     var init = function ($this) {
         window.URL = window.URL || window.webkitURL;
+        window.THREE = THREE;
+        window.signals = signals;
         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
         $this.threeEditor = new Editor($this.options);
         var viewport = new Viewport($this.threeEditor);

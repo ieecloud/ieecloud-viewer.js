@@ -1,5 +1,5 @@
 var Editor = function (options) {
-    var SIGNALS = signals;
+    var SIGNALS = window.signals;
 
     this.signals = {
         // notifications
