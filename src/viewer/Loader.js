@@ -131,6 +131,7 @@ var Loader = function (editor, textureUrl) {
             mesh.defaultColor = objectElement[0].facesMaterial.color.clone();
 
             modelGroup.add(mesh);
+            editor.octree.add(mesh);
 
             // for (var j = 0; j < objectElement.length; j++) {
                 // var objectGeometry = objectElement[j].objectGeometry;
@@ -220,6 +221,7 @@ var Loader = function (editor, textureUrl) {
             // lines.userData.name = objectElement[j].name;
             lines.userData.totalObjVertices = vertices;
             lines.userData.totalObjResults = results;
+            editor.octree.add(lines);
         });
 
         var textData = pictureInfo.textData;

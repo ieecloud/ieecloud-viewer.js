@@ -1709,7 +1709,7 @@ var Viewport = function (editor) {
         renderer.render(scene, camera);
         renderer.render(sceneHelpers, camera);
         renderer2.render(sceneAxis, camera2);
-        // octree.update();
+        octree.update();
         // rendererStats.update(renderer);
         // var endDate   = new Date();
         // var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
