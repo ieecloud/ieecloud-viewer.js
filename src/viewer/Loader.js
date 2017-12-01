@@ -132,9 +132,9 @@ var Loader = function (editor, textureUrl) {
 
             modelGroup.add(mesh);
 
-            for (var j = 0; j < objectElement.length; j++) {
-                var objectGeometry = objectElement[j].objectGeometry;
-                var facesMaterial = objectElement[j].facesMaterial;
+            // for (var j = 0; j < objectElement.length; j++) {
+                // var objectGeometry = objectElement[j].objectGeometry;
+                // var facesMaterial = objectElement[j].facesMaterial;
                 // var edgesGeometry = objectElement[j].edgesGeometry;
                 // var edgesMaterial = objectElement[j].edgesMaterial;
 
@@ -186,30 +186,30 @@ var Loader = function (editor, textureUrl) {
 //                 } else if (objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count === 0) {
 //                     meshesData[key].push(mesh);
 //                 }
+// TODO move to common geometry
+                // var simpleShapes = objectElement[j].simpleShapes;
+                // var v = 0;
+                // var simpleShapesGeometry = new THREE.Geometry();
+                // for (var k = 0; k < simpleShapes.length; k++) {
+                //     for (var n = 0; n < simpleShapes[k].vertices.length; n++) {
+                //         simpleShapesGeometry.vertices.push(simpleShapes[k].vertices[n]);
+                //     }
+                //     for (var n = 0; n < simpleShapes[k].faces.length; n++) {
+                //         var face = simpleShapes[k].faces[n];
+                //         face.a += v;
+                //         face.b += v;
+                //         face.c += v;
+                //
+                //         simpleShapesGeometry.faces.push(simpleShapes[k].faces[n]);
+                //     }
+                //     v += simpleShapes[k].vertices.length;
+                //
+                // }
+                //
+                // var shapes = new THREE.Mesh(simpleShapesGeometry, facesMaterial);
 
-                var simpleShapes = objectElement[j].simpleShapes;
-                var v = 0;
-                var simpleShapesGeometry = new THREE.Geometry();
-                for (var k = 0; k < simpleShapes.length; k++) {
-                    for (var n = 0; n < simpleShapes[k].vertices.length; n++) {
-                        simpleShapesGeometry.vertices.push(simpleShapes[k].vertices[n]);
-                    }
-                    for (var n = 0; n < simpleShapes[k].faces.length; n++) {
-                        var face = simpleShapes[k].faces[n];
-                        face.a += v;
-                        face.b += v;
-                        face.c += v;
-
-                        simpleShapesGeometry.faces.push(simpleShapes[k].faces[n]);
-                    }
-                    v += simpleShapes[k].vertices.length;
-
-                }
-
-                var shapes = new THREE.Mesh(simpleShapesGeometry, facesMaterial);
-                // TODO move to common geometry
                 // modelGroup.add(shapes);
-            }
+            // }
 
 
             var geoLineGeometry = new THREE.BufferGeometry();
@@ -422,32 +422,32 @@ var Loader = function (editor, textureUrl) {
 
     }
 
-    this.parseModelFaces = function (faceGeometry, faces, vertices, uv, faceColor, results, maxResult, minResult,
+    this.parseModelFaces = function (/*faceGeometry, */faces, vertices, uv, faceColor, results, maxResult, minResult,
                                      faceCommonGeometryData) {
         var offset = 0;
         var drawResults = (DRAW_RESULTS && results && (results.length != 0));
         var drawTexture = (!drawResults) && (uv.length != 0);
 
-        var positions = [];
-        var colors = [];
-        var normals = [];
-        var uvs = [];
+        // var positions = [];
+        // var colors = [];
+        // var normals = [];
+        // var uvs = [];
         while (offset < faces.length) {
             var cb = new THREE.Vector3();
             var ab = new THREE.Vector3();
             var vA = vertices[faces[offset]];
             var array1 = vA.toArray();
-            positions.push( array1[0], array1[1], array1[2] );
+            // positions.push( array1[0], array1[1], array1[2] );
             faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
 
             var vB = vertices[faces[offset + 1]];
             array1 = vertices[faces[offset + 1]].toArray();
-            positions.push( array1[0], array1[1], array1[2] );
+            // positions.push( array1[0], array1[1], array1[2] );
             faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
 
             var vC = vertices[faces[offset + 2]];
             array1 = vertices[faces[offset + 2]].toArray();
-            positions.push( array1[0], array1[1], array1[2] );
+            // positions.push( array1[0], array1[1], array1[2] );
             faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
 
             cb.subVectors(vC, vB);
@@ -456,33 +456,33 @@ var Loader = function (editor, textureUrl) {
 
             cb.normalize();
             array1 = cb.toArray();
-            normals.push( array1[0], array1[1], array1[2] );
-            normals.push( array1[0], array1[1], array1[2] );
-            normals.push( array1[0], array1[1], array1[2] );
+            // normals.push( array1[0], array1[1], array1[2] );
+            // normals.push( array1[0], array1[1], array1[2] );
+            // normals.push( array1[0], array1[1], array1[2] );
 
 
             faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
             faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
             faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
 
-            colors.push(faceColor, faceColor, faceColor);
-            colors.push(faceColor, faceColor, faceColor);
-            colors.push(faceColor, faceColor, faceColor);
+            // colors.push(faceColor, faceColor, faceColor);
+            // colors.push(faceColor, faceColor, faceColor);
+            // colors.push(faceColor, faceColor, faceColor);
 
             faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
             faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
             faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
 
             if (drawResults) { // if results exist generating vertex coordinates according to results.
-                uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
-                    0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
+                // uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
+                //     0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
 
                 faceCommonGeometryData.uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
                     0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
             }
 
             if (drawTexture) {
-                uvs.push(uv[offset * 2], uv[offset * 2 + 1], uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
+                // uvs.push(uv[offset * 2], uv[offset * 2 + 1], uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
                 faceCommonGeometryData.uvs.push(uv[offset * 2], uv[offset * 2 + 1], uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
             }
 
@@ -491,17 +491,17 @@ var Loader = function (editor, textureUrl) {
             ab = new THREE.Vector3();
             vA = vertices[faces[offset]];
             array1 = vA.toArray();
-            positions.push( array1[0], array1[1], array1[2]);
+            // positions.push( array1[0], array1[1], array1[2]);
             faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
 
             vB = vertices[faces[offset + 2]];
             array1 = vertices[faces[offset + 2]].toArray();
-            positions.push( array1[0], array1[1], array1[2]);
+            // positions.push( array1[0], array1[1], array1[2]);
             faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
 
             vC = vertices[faces[offset + 1]];
             array1 = vertices[faces[offset + 1]].toArray();
-            positions.push( array1[0], array1[1], array1[2]);
+            // positions.push( array1[0], array1[1], array1[2]);
             faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
 
             cb.subVectors(vC, vB);
@@ -510,18 +510,18 @@ var Loader = function (editor, textureUrl) {
 
             cb.normalize();
             array1 = cb.toArray();
-            normals.push( array1[0], array1[1], array1[2]);
-            normals.push( array1[0], array1[1], array1[2]);
-            normals.push( array1[0], array1[1], array1[2]);
+            // normals.push( array1[0], array1[1], array1[2]);
+            // normals.push( array1[0], array1[1], array1[2]);
+            // normals.push( array1[0], array1[1], array1[2]);
 
 
             faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
             faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
             faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
 
-            colors.push(faceColor, faceColor, faceColor);
-            colors.push(faceColor, faceColor, faceColor);
-            colors.push(faceColor, faceColor, faceColor);
+            // colors.push(faceColor, faceColor, faceColor);
+            // colors.push(faceColor, faceColor, faceColor);
+            // colors.push(faceColor, faceColor, faceColor);
 
 
             faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
@@ -529,24 +529,24 @@ var Loader = function (editor, textureUrl) {
             faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
 
             if (drawResults) { // if results exist generating vertex coordinates according to results.
-                uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult),
-                    0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult));
+                // uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult),
+                //     0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult));
 
                 faceCommonGeometryData.uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult),
                     0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult));
             }
 
             if (drawTexture) {
-                uvs.push(1 - uv[offset * 2], uv[offset * 2 + 1], 1 - uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], 1 - uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
+                // uvs.push(1 - uv[offset * 2], uv[offset * 2 + 1], 1 - uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], 1 - uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
                 faceCommonGeometryData.uvs.push(1 - uv[offset * 2], uv[offset * 2 + 1], 1 - uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], 1 - uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
             }
             offset = offset + 3;
 
         }
-        faceGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ));
-        faceGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-        faceGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ));
-        faceGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ));
+        // faceGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ));
+        // faceGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+        // faceGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ));
+        // faceGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ));
     };
 
 
@@ -654,9 +654,9 @@ var Loader = function (editor, textureUrl) {
             //Creating THREE.geometry for faces and lines in group
             var faceGeometry = new THREE.BufferGeometry();
             // var faceGeometry = new THREE.Geometry();
-            // var lineGeometry = new THREE.BufferGeometry();
+            var lineGeometry = new THREE.BufferGeometry();
             var edges = edgeGroups[j];
-            var edges = edgeGroups[j];
+            // var edges = edgeGroups[j];
             var offset = 0;
             // var positions = [];
             while (offset < edges.length) {
@@ -693,11 +693,11 @@ var Loader = function (editor, textureUrl) {
 
             var drawTexture = (!drawResults) && (uv.length != 0)
 
-            scope.parseModelFaces(faceGeometry, faces, vertices, uv, settings.faceColor, results,
+            scope.parseModelFaces(/*faceGeometry,*/ faces, vertices, uv, settings.faceColor, results,
                 maxResult, minResult, faceCommonGeometryData);
 
 
-            faceGeometry.computeBoundingBox();
+            // faceGeometry.computeBoundingBox();
             // lineGeometry.computeBoundingBox();
 
             // faceGeometry.computeVertexNormals();
@@ -716,9 +716,9 @@ var Loader = function (editor, textureUrl) {
             // }
 
 
-            if(faceGeometry.attributes.position.count > 0){
-                pictureGeometryElement.objectGeometry = faceGeometry;
-            }
+            // if(faceGeometry.attributes.position.count > 0){
+            //     pictureGeometryElement.objectGeometry = faceGeometry;
+            // }
 
 
 
@@ -796,12 +796,12 @@ var Loader = function (editor, textureUrl) {
 
             pictureGeometryElement.edgesMaterial = simpleLinesMaterial;
 
-            pictureGeometryElement.simpleShapes = [];  //Simple shapes
+            // pictureGeometryElement.simpleShapes = [];  //Simple shapes
 
-            if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
-                scope.parseSimpleShapes(geometryObject.simpleShapes, j, pictureGeometryElement, vertices);
-
-            }
+            // if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
+            //     scope.parseSimpleShapes(geometryObject.simpleShapes, j, pictureGeometryElement, vertices);
+            //
+            // }
             objectPartsArray.push(pictureGeometryElement)
 
         }
