@@ -738,7 +738,7 @@ var Viewport = function (editor) {
             if (intersects.length > 0) {
 
                 if (event && (event.altKey || event.metaKey)) {
-                    var obj = searchNearestObject(intersects, THREE.Line);
+                    var obj = searchNearestObject(intersects, THREE.LineSegments);
                     // TODO: in editor mode select tree node
                     if (obj.selectedFlag) {
                         scope.unSelectObject(obj);
@@ -810,7 +810,10 @@ var Viewport = function (editor) {
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) === 0) {
             var intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
-                toggleSelect(editor.loader.objectsTree, function(oNode){ if(oNode["parentName"] === intersects[0].object.parentName) return true; });
+                var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
+                var intersectLine = searchNearestIntersect(intersects, THREE.LineSegments);
+                var intersect = getNearestIntersect(intersectLine, intersectMesh);
+                toggleSelect(editor.loader.objectsTree, function(oNode){ if(oNode["parentName"] === intersect.object.parentName) return true; });
             } else {
                 editor.select(camera);
             }
@@ -887,7 +890,7 @@ var Viewport = function (editor) {
 
     var runNearestAlgorithm = function (intersects) {
         var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
-        var intersectLine = searchNearestIntersect(intersects, THREE.Line);
+        var intersectLine = searchNearestIntersect(intersects, THREE.LineSegments);
         var intersect = getNearestIntersect(intersectLine, intersectMesh);
         // var intersect = intersects[0];
         if (intersect) {

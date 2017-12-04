@@ -125,9 +125,9 @@ var Loader = function (editor, textureUrl) {
             mesh.userData.totalObjVertices = vertices;
             mesh.userData.totalObjResults = results;
 
-            // mesh.name = objectElement[j].name;
+            mesh.name = totalObjectDataElement.name;
             mesh.uniqueId = mesh.uuid;
-            // mesh.parentName = objectElement[j].parentName;
+            mesh.parentName = totalObjectDataElement.name;
             mesh.defaultColor = objectElement[0].facesMaterial.color.clone();
 
             modelGroup.add(mesh);
@@ -213,15 +213,29 @@ var Loader = function (editor, textureUrl) {
             // }
 
 
-            var geoLineGeometry = new THREE.BufferGeometry();
-            geoLineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( lineCommonPositionsArray, 3 ) );
-            var lines = new THREE.LineSegments(geoLineGeometry, objectElement[0].edgesMaterial);
+            var geoCommonLineGeometry = new THREE.BufferGeometry();
+            geoCommonLineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( lineCommonPositionsArray, 3 ) );
+            var lines = new THREE.LineSegments(geoCommonLineGeometry, objectElement[0].edgesMaterial);
             modelGroup.add(lines);
             lines.userData.pointsTable = pointsTable;
             // lines.userData.name = objectElement[j].name;
+            lines.parentName = totalObjectDataElement.name;
+            lines.defaultColor = objectElement[0].edgesMaterial.color.clone();
             lines.userData.totalObjVertices = vertices;
             lines.userData.totalObjResults = results;
             editor.octree.add(lines);
+
+
+            if (geoCommonMeshGeometry.attributes.position.count > 0 && geoCommonLineGeometry.attributes.position.count > 0) {
+                    lines.name = totalObjectDataElement.name + ".EDGE";
+                    mesh.name = totalObjectDataElement.name + ".FACE";
+                    meshesData[key].push(lines);
+                    meshesData[key].push(mesh);
+                } else if (geoCommonMeshGeometry.attributes.position.count === 0 && geoCommonLineGeometry.attributes.position.count > 0) {
+                    meshesData[key].push(lines);
+                } else if (geoCommonMeshGeometry.attributes.position.count > 0 && geoCommonLineGeometry.attributes.position.count === 0) {
+                    meshesData[key].push(mesh);
+                }
         });
 
         var textData = pictureInfo.textData;
@@ -617,7 +631,7 @@ var Loader = function (editor, textureUrl) {
         var groups = geometryObject.groups; // group names
         var results = geometryObject.results; // group names
 
-        var complexObjectName = geometryObject.name;
+        var name = geometryObject.name;
 
         var edgeGroups = geometryObject.edges;
         var faceGroups = geometryObject.faces;
@@ -733,7 +747,7 @@ var Loader = function (editor, textureUrl) {
             // pictureGeometryElement.edgesGeometry = lineGeometry;
             pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
             pictureGeometryElement.name = groups[j];
-            pictureGeometryElement.parentName = complexObjectName;
+            pictureGeometryElement.parentName = name;
             if (drawResults) { // Draw face with spectral texture according to results
                 pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                     map: colorMapTexture,
@@ -868,6 +882,7 @@ var Loader = function (editor, textureUrl) {
         totalGeometryObj.totalObjResults = results;
         totalGeometryObj.lineCommonPositionsArray = lineCommonPositionsArray;
         totalGeometryObj.faceCommonGeometryData = faceCommonGeometryData;
+        totalGeometryObj.name = name;
 
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
 
