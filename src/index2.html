@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>ieecloud viewer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <script src="http://static.ieecloud.com/js/require.js"></script>
+	</head>
+	<body>
+
+    <style>
+        .viewer {
+            position: relative;
+            margin-top: 50px;
+            height: 800px;
+            width: 100%;
+            background-color: #fff;
+        }
+    </style>
+
+    <div id="c1"></div>
+    <div class="viewer">
+        <div id="viewer" class = "viewer"></div>
+    </div>
+
+    <script>
+
+        requirejs.config({
+            paths: {
+                'viewer': ['http://localhost:8000/bin/ieecloud-viewer.js-0.0.0.min']
+            }
+        });
+
+        require(['viewer'], function(viewer) {
+
+            var options = {
+                textureUrl: "http://static.ieecloud.com/images/",
+                mode: "3d_point",
+                resultDigits: 3,
+                drawResults: false,
+                gridVisible: true,
+                resultColor: "white",
+                backgroundColor: "#d4d4d4",
+                resultTextColor: "white",
+                id: "1",
+                onSelect3dPoint: function (point) {
+                }
+            };
+
+
+            $.getJSON("http://static.ieecloud.com/data/view.json", function (json) {
+                //d3.ieecloudEditor('reloadModel', json);
+                new Viewer(document.getElementById("viewer"), options);
+                //$("#viewer").ieecloudEditor('reloadModel', json);
+            });
+        });
+
+    </script>
+
+	</body>
+</html>
