@@ -21,6 +21,7 @@ var Editor = function (options) {
         endRender: new SIGNALS.Signal(),
         treeLoad: new SIGNALS.Signal(),
         startRender: new SIGNALS.Signal(),
+        onPrintScreenDone: new SIGNALS.Signal(),
         showRuler: new SIGNALS.Signal(),
         showVProtractor: new SIGNALS.Signal(),
         showHProtractor: new SIGNALS.Signal(),
@@ -84,6 +85,10 @@ Editor.prototype = {
 
     onRenderDone: function () {
         this.signals.endRender.dispatch();
+    },
+
+    onPrintScreenDone: function (urlRenderer) {
+        this.signals.onPrintScreenDone.dispatch(urlRenderer);
     },
 
     onTreeLoad: function (tree) {

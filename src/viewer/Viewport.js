@@ -1338,6 +1338,7 @@ var Viewport = function (editor) {
 
     signals.printScreen.add(function (toFileName) {
         var urlRenderer	= renderer.domElement.toDataURL("image/png");
+        editor.onPrintScreenDone(urlRenderer);
         var element = document.createElement('a');
         element.setAttribute('href', urlRenderer);
         element.setAttribute('download', toFileName);

@@ -40,17 +40,20 @@
 
     <script>
 
-         $("#viewer").ieecloudEditor({
+        $("#viewer").ieecloudEditor({
             textureUrl: "",
             mode: "3d_geometry",
             resultDigits: 3,
             drawResults: false,
             gridVisible: true,
-            resultColor:"white",
-            backgroundColor:"#d4d4d4",
-            resultTextColor:"white",
+            resultColor: "white",
+            backgroundColor: "#d4d4d4",
+            resultTextColor: "white",
             id: "1",
             onSelect3dPoint: function (point) {
+            },
+            onPrintScreenDone: function (urlRenderer) {
+                console.log(urlRenderer);
             }
         });
 

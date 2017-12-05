@@ -71,6 +71,12 @@ function Viewer(target, options) {
             }
         });
 
+        $this.threeEditor.signals.onPrintScreenDone.add(function (urlRenderer) {
+            if ($this.options.onPrintScreenDone) {
+                $this.options.onPrintScreenDone(urlRenderer);
+            }
+        });
+
     };
 
 
