@@ -144,8 +144,8 @@ function Viewer(target, options) {
         this.threeEditor.saveModelPosition();
     };
 
-    Viewer.prototype.printScreen = function (objData) {
-        this.threeEditor.printScreen(objData);
+    Viewer.prototype.printScreen = function (toFileName) {
+        this.threeEditor.printScreen(toFileName);
     };
 
     Viewer.prototype.setMode = function (mode) {

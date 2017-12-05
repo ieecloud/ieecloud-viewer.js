@@ -186,8 +186,8 @@ Editor.prototype = {
         this.loader.createJsonModelWithRotation(modelRotation);
     },
 
-    printScreen: function (url) {
-        this.signals.printScreen.dispatch(url);
+    printScreen: function (toFileName) {
+        this.signals.printScreen.dispatch(toFileName);
     },
 
 

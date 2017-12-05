@@ -1336,9 +1336,15 @@ var Viewport = function (editor) {
         editor.createJsonModelWithRotation(modelRotation);
     });
 
-    signals.printScreen.add(function (url) {
-
-        var urlRenderer = THREEx.Screenshot.toDataURL(renderer);
+    signals.printScreen.add(function (toFileName) {
+        var urlRenderer	= renderer.domElement.toDataURL("image/png");
+        var element = document.createElement('a');
+        element.setAttribute('href', urlRenderer);
+        element.setAttribute('download', toFileName);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
     });
 
     signals.objectAdded.add(function (object) {
@@ -1603,7 +1609,7 @@ var Viewport = function (editor) {
 
     if (System.support.webgl === true) {
 
-        renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: false});
+        renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: true});
         // pickingRenderTarget = new THREE.WebGLRenderTarget();
         // pickingRenderTarget.texture.generateMipmaps = false;
         // pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
