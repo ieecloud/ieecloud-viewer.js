@@ -1339,13 +1339,13 @@ var Viewport = function (editor) {
     signals.printScreen.add(function (toFileName) {
         var urlRenderer	= renderer.domElement.toDataURL("image/png");
         editor.onPrintScreenDone(urlRenderer);
-        var element = document.createElement('a');
-        element.setAttribute('href', urlRenderer);
-        element.setAttribute('download', toFileName);
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
+        // var element = document.createElement('a');
+        // element.setAttribute('href', urlRenderer);
+        // element.setAttribute('download', toFileName);
+        // element.style.display = 'none';
+        // document.body.appendChild(element);
+        // element.click();
+        // document.body.removeChild(element);
     });
 
     signals.objectAdded.add(function (object) {
