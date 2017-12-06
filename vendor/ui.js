@@ -429,6 +429,52 @@ UI.Input.prototype.setValue = function ( value ) {
 };
 
 
+
+// Image
+
+UI.Image = function ( src , dblClickCallback) {
+
+    UI.Element.call( this );
+
+    var scope = this;
+    var dom = document.createElement( 'div' );
+    var image = document.createElement( 'img' );
+
+    dom.appendChild(image);
+
+    this.dom = dom;
+    this.image = image;
+    this.setSrc( src );
+
+    this.dblClickCallback = dblClickCallback;
+
+    dom.addEventListener('dblclick', function(event){
+        event.stopPropagation();
+        scope.dblClickCallback();
+    });
+
+    return this;
+
+};
+
+UI.Image.prototype = Object.create( UI.Element.prototype );
+UI.Image.prototype.constructor = UI.Image;
+
+UI.Image.prototype.getSrc = function () {
+
+    return this.image.src;
+
+};
+
+UI.Image.prototype.setSrc = function ( value ) {
+
+    this.image.src = value;
+
+    return this;
+
+};
+
+
 // TextArea
 
 UI.TextArea = function () {

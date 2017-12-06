@@ -1348,6 +1348,7 @@ var Viewport = function (editor) {
         // document.body.removeChild(element);
     });
 
+
     signals.objectAdded.add(function (object) {
         // var startDate   = new Date();
         var materialsNeedUpdate = false;
@@ -1733,6 +1734,6 @@ var Viewport = function (editor) {
 
     }
 
-    return {mainContainer: container, slaveContainer: container2};
+    return {mainContainer: container, slaveContainer: container2, renderer : renderer};
 
 };
