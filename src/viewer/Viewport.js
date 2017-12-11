@@ -1419,7 +1419,7 @@ var Viewport = function (editor) {
     });
 
 
-    signals.objectsRemoved.add(function (objsToRemove) {
+    signals.objectsRemoved.add(function (objsToRemove, scene, deleteFromObjects) {
         var materialsNeedUpdate = false;
         for (var i = objsToRemove.length - 1; i >= 0; i--) {
             var obj = objsToRemove[i];
@@ -1427,7 +1427,9 @@ var Viewport = function (editor) {
                 if (child instanceof THREE.Light) {
                     materialsNeedUpdate = true;
                 }
-                objects.splice(objects.indexOf(child), 1);
+                if(deleteFromObjects){
+                    objects.splice(objects.indexOf(child), 1);
+                }
 
                 if (child instanceof THREE.Mesh) {
                     if (child.geometry) {
@@ -1590,15 +1592,11 @@ var Viewport = function (editor) {
     signals.removeSelectedResults.add(function () {
         var objectToDispose = [];
         for (var key in selectedResultPoints) {
-            var resultPointMesh = selectedResultPoints[key];
-            var resultTextMesh = textResults[key];
-            objectToDispose.push(resultPointMesh);
-            objectToDispose.push(resultTextMesh);
-            sceneHelpers.remove(resultPointMesh);
-            sceneHelpers.remove(resultTextMesh);
+            objectToDispose.push(selectedResultPoints[key]);
+            objectToDispose.push(textResults[key]);
         }
 
-        editor.signals.objectsRemoved.dispatch(objectToDispose);
+        editor.signals.objectsRemoved.dispatch(objectToDispose, sceneHelpers, false);
 
 
         render();

@@ -238,7 +238,7 @@ Editor.prototype = {
         }
         this.lastModel = null;
         delete this.lastModel;
-        this.signals.objectsRemoved.dispatch(objsToRemove);
+        this.signals.objectsRemoved.dispatch(objsToRemove, this.scene, true);
         this.signals.sceneGraphChanged.dispatch();
 
     },
