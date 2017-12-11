@@ -187,6 +187,16 @@ Editor.prototype = {
     },
 
 
+    setOptions: function (newOptions) {
+        this.options = newOptions;
+        this.id = newOptions.id;
+        this.mode = newOptions.mode;
+        this.resultDigits = newOptions.resultDigits;
+        this.loader.setTextureUrl(newOptions.textureUrl);
+        this.signals.setMode.dispatch();
+    },
+
+
     createJsonModelWithRotation: function (modelRotation) {
         this.loader.createJsonModelWithRotation(modelRotation);
     },

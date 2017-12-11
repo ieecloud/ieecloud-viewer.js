@@ -93,6 +93,14 @@ function Viewer(target, options) {
         this.threeEditor.loader.handleJSONData(modelJsn);
     };
 
+    Viewer.prototype.attachTo = function (divTarget, options) {
+        $(this.target).remove( "#main" + this.threeEditor.id );
+        this.threeEditor.setOptions(options);
+        this.target = divTarget;
+        this.target.append(this.viewport.mainContainer.dom);
+        this.target.append(this.viewport.slaveContainer.dom);
+    };
+
     Viewer.prototype.resize = function () {
         scope.threeEditor.signals.windowResize.dispatch();
     };

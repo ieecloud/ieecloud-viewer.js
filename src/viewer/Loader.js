@@ -795,6 +795,10 @@ var Loader = function (editor, textureUrl) {
         return (result - minResult) / (maxResult - minResult);
     }
 
+    this.setTextureUrl = function (url) {
+        this.textureUrl = url;
+    };
+
     this.createJsonModelWithRotation = function (currentModelRotation) {
 
         var modelRotation = this.modelRotation;

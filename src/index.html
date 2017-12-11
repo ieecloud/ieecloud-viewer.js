@@ -35,9 +35,12 @@
     <button id="changeImageBtn" class="btn">Change Image</button>
     <input id="modeInput"/>
     <button id="setModeBtn" class="btn">Set Mode</button>
-    <div id="viewer" class="viewer">
-    </div>
+    <button id="attachToNewDiv" class="btn">Attach to new div</button>
+    <div id="viewer" class="viewer"></div>
+    <div id="viewer2" class="viewer"></div>
 </div>
+
+
 
 
 <script>
@@ -48,7 +51,7 @@
         resultDigits: 3,
         drawResults: false,
         gridVisible: true,
-        detailModelView: false,
+        detailModelView: true,
         resultColor: "white",
         backgroundColor: "#d4d4d4",
         resultTextColor: "white",
@@ -58,6 +61,22 @@
         onPrintScreenDone: function (urlRenderer) {
             console.log(urlRenderer);
         }
+    });
+
+    $("#attachToNewDiv").click(function () {
+        var options = {
+            textureUrl: "",
+            mode: "3d_point",
+            resultDigits: 2,
+            drawResults: false,
+            gridVisible: false,
+            detailModelView: false,
+            resultColor: "white",
+            backgroundColor: "#d4d4d4",
+            resultTextColor: "white",
+            id: "1"
+        };
+        $("#viewer").ieecloudEditor('attachTo', document.getElementById("viewer2"), options);
     });
 
     $("#showRulerBtn").click(function () {
@@ -89,7 +108,7 @@
     });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/levels.json", function (json) {
+        $.getJSON("../resources/results.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
     });
