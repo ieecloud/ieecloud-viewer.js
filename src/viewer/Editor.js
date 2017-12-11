@@ -28,6 +28,7 @@ var Editor = function (options) {
         toggleRotate: new SIGNALS.Signal(),
         toggleSearchNearestMode: new SIGNALS.Signal(),
         saveModelPosition: new SIGNALS.Signal(),
+        removeSelectedResults: new SIGNALS.Signal(),
         printScreen: new SIGNALS.Signal(),
         materialChanged: new SIGNALS.Signal(),
         setMode: new SIGNALS.Signal()
@@ -159,6 +160,10 @@ Editor.prototype = {
     changeAxis: function (direction) {
         this.signals.axisChanged.dispatch(direction);
         this.loader.computeBoundingBox();
+    },
+
+    removeSelectedResults: function (flag) {
+        this.signals.removeSelectedResults.dispatch(flag);
     },
 
     showRuler: function (flag) {

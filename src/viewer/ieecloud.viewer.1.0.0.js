@@ -125,6 +125,11 @@ function Viewer(target, options) {
         return this.threeEditor.loader.getObjectsTreeModel();
     };
 
+
+    Viewer.prototype.removeSelectedResults = function () {
+       this.threeEditor.removeSelectedResults();
+    };
+
     Viewer.prototype.changeAxisUpY = function () {
         this.threeEditor.changeAxis("upY");
     };

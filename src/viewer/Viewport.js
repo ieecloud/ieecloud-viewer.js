@@ -1585,6 +1585,26 @@ var Viewport = function (editor) {
 
     });
 
+
+
+    signals.removeSelectedResults.add(function () {
+        var objectToDispose = [];
+        for (var key in selectedResultPoints) {
+            var resultPointMesh = selectedResultPoints[key];
+            var resultTextMesh = textResults[key];
+            objectToDispose.push(resultPointMesh);
+            objectToDispose.push(resultTextMesh);
+            sceneHelpers.remove(resultPointMesh);
+            sceneHelpers.remove(resultTextMesh);
+        }
+
+        editor.signals.objectsRemoved.dispatch(objectToDispose);
+
+
+        render();
+
+    });
+
     signals.windowResize.add(function () {
 
         camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;

@@ -36,6 +36,7 @@
     <input id="modeInput"/>
     <button id="setModeBtn" class="btn">Set Mode</button>
     <button id="attachToNewDiv" class="btn">Attach to new div</button>
+    <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
     <div id="viewer" class="viewer"></div>
     <div id="viewer2" class="viewer"></div>
 </div>
@@ -47,7 +48,7 @@
 
     $("#viewer").ieecloudEditor({
         textureUrl: "",
-        mode: "3d_geometry",
+        mode: "3d_point",
         resultDigits: 3,
         drawResults: false,
         gridVisible: true,
@@ -77,6 +78,11 @@
             id: "1"
         };
         $("#viewer").ieecloudEditor('attachTo', document.getElementById("viewer2"), options);
+    });
+
+
+    $("#removeAllResultsBtn").click(function () {
+        $("#viewer").ieecloudEditor('removeSelectedResults');
     });
 
     $("#showRulerBtn").click(function () {
