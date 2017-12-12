@@ -15,8 +15,6 @@ function Viewer(target, options) {
 
     var init = function ($this) {
         window.URL = window.URL || window.webkitURL;
-        window.THREE = THREE;
-        window.signals = signals;
         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
         $this.threeEditor = new Editor($this.options);
         $this.viewport = new Viewport($this.threeEditor);
@@ -96,6 +94,7 @@ function Viewer(target, options) {
     Viewer.prototype.attachTo = function (divTarget, options) {
         $(this.target).remove( "#main" + this.threeEditor.id );
         this.threeEditor.setOptions(options);
+        this.options = options;
         this.target = divTarget;
         this.target.append(this.viewport.mainContainer.dom);
         this.target.append(this.viewport.slaveContainer.dom);
@@ -175,7 +174,6 @@ function Viewer(target, options) {
 
 
 (function ($) {
-
     $.fn.ieecloudEditor = function (method) {
         var args = arguments;
         var rv;
