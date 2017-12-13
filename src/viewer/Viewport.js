@@ -94,14 +94,14 @@ var Viewport = function (editor) {
     renderer2.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
     container2.dom.appendChild(renderer2.domElement);
 
+    var initialCameraPosition = new THREE.Vector3(63, -149, 36);
+    var initialCameraUp =  new THREE.Vector3(0, 0, 1);
+    var initialCameraLookAt = scene.position;
+
     var camera = new THREE.PerspectiveCamera(10, container.dom.offsetWidth / container.dom.offsetHeight, 1, 15000);
-    camera.position.z = 63;
-    camera.position.y = -149;
-    camera.position.x = 36;
-
-
-    camera.up = new THREE.Vector3(0, 0, 1);
-    camera.lookAt(scene.position);
+    camera.position.copy(initialCameraPosition);
+    camera.up.copy(initialCameraUp);
+    camera.lookAt(initialCameraLookAt);
 
     // camera2
     var camera2 = new THREE.PerspectiveCamera(50, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 2000);
@@ -1251,6 +1251,8 @@ var Viewport = function (editor) {
 
 
     signals.scaleChanged.add(function (boundingBox, modelRotation) {
+        scope.initialBoundigBox = boundingBox;
+        scope.initialModelRotation = modelRotation;
         var subVector = new THREE.Vector3(0, 0, 0);
         subVector.subVectors(boundingBox.min, boundingBox.max);
 
@@ -1599,6 +1601,15 @@ var Viewport = function (editor) {
         editor.signals.objectsRemoved.dispatch(objectToDispose, sceneHelpers, false);
 
 
+        render();
+
+    });
+
+    signals.resetCameraRotation.add(function () {
+        camera.position.copy(initialCameraPosition);
+        camera.up.copy(initialCameraUp);
+        camera.lookAt(initialCameraLookAt);
+        editor.signals.scaleChanged.dispatch(scope.initialBoundigBox, scope.initialModelRotation);
         render();
 
     });

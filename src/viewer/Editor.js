@@ -29,6 +29,7 @@ var Editor = function (options) {
         toggleSearchNearestMode: new SIGNALS.Signal(),
         saveModelPosition: new SIGNALS.Signal(),
         removeSelectedResults: new SIGNALS.Signal(),
+        resetCameraRotation: new SIGNALS.Signal(),
         printScreen: new SIGNALS.Signal(),
         materialChanged: new SIGNALS.Signal(),
         setMode: new SIGNALS.Signal()
@@ -162,8 +163,12 @@ Editor.prototype = {
         this.loader.computeBoundingBox();
     },
 
-    removeSelectedResults: function (flag) {
-        this.signals.removeSelectedResults.dispatch(flag);
+    removeSelectedResults: function () {
+        this.signals.removeSelectedResults.dispatch();
+    },
+
+    resetCameraRotation: function () {
+        this.signals.resetCameraRotation.dispatch();
     },
 
     showRuler: function (flag) {

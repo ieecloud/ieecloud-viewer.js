@@ -92,6 +92,8 @@ function Viewer(target, options) {
     };
 
     Viewer.prototype.attachTo = function (divTarget, options) {
+        this.removeSelectedResults();
+        this.resetCameraRotation();
         $(this.target).remove( "#main" + this.threeEditor.id );
         this.threeEditor.setOptions(options);
         this.options = options;
@@ -127,6 +129,10 @@ function Viewer(target, options) {
 
     Viewer.prototype.removeSelectedResults = function () {
        this.threeEditor.removeSelectedResults();
+    };
+
+    Viewer.prototype.resetCameraRotation = function () {
+       this.threeEditor.resetCameraRotation();
     };
 
     Viewer.prototype.changeAxisUpY = function () {
