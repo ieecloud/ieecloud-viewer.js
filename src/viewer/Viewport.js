@@ -1609,7 +1609,9 @@ var Viewport = function (editor) {
         camera.position.copy(initialCameraPosition);
         camera.up.copy(initialCameraUp);
         camera.lookAt(initialCameraLookAt);
-        editor.signals.scaleChanged.dispatch(scope.initialBoundigBox, scope.initialModelRotation);
+        if(editor.lastModel){
+            editor.signals.scaleChanged.dispatch(scope.initialBoundigBox, scope.initialModelRotation);
+        }
         render();
 
     });
