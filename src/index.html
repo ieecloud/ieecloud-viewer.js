@@ -25,6 +25,7 @@
 
 <div class="viewer">
     <button id="loadModel" class="btn">Load Model</button>
+    <button id="removeModel" class="btn">Remove Model</button>s
     <button id="showRulerBtn" class="btn">Ruler</button>
     <button id="showProtractorVBtn" class="btn">Protractor V</button>
     <button id="showProtractorHBtn" class="btn">Protractor H</button>
@@ -111,6 +112,10 @@
 
     $("#takeScreenShort").click(function () {
         $("#viewer").ieecloudEditor('printScreen', "printScreen.png");
+    });
+
+    $("#removeModel").click(function () {
+        $("#viewer").ieecloudEditor('removeModel');
     });
 
     $("#loadModel").click(function () {
