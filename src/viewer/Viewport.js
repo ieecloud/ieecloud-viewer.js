@@ -1249,30 +1249,139 @@ var Viewport = function (editor) {
         return maxz;
     };
 
+    function calculateNewFov(boundingBox) {
+        var newFov = null;
+
+        /*
+			  5____4
+			1/___0/|
+			| 6__|_7
+			2/___3/
+
+			0: max.x, max.y, max.z
+			1: min.x, max.y, max.z
+			2: min.x, min.y, max.z
+			3: max.x, min.y, max.z
+			4: max.x, max.y, min.z
+			5: min.x, max.y, min.z
+			6: min.x, min.y, min.z
+			7: max.x, min.y, min.z
+			*/
+        var corners = 8;
+        var boundingBoxVertices = [];
+        for (var i = 0; i < corners; i++) {
+            var x = i & 1 ? boundingBox.min.x : boundingBox.max.x;
+            var y = i & 2 ? boundingBox.min.z : boundingBox.max.z;
+            var z = i & 4 ? boundingBox.min.y : boundingBox.max.y;
+            boundingBoxVertices.push(new THREE.Vector4(x, z, y));
+        }
+
+        var modelWorldVertices = boundingBoxVertices.map(function (vt) {
+            return vt.applyMatrix4(editor.lastModel.matrixWorld);
+        });
+        var mat3 = new THREE.Matrix4();
+        var ndc = new Array(corners);
+        mat3.multiplyMatrices(camera.matrixWorld, mat3.getInverse(camera.projectionMatrix));
+        var scratchVar;
+
+        for (var i = 0; i < corners; i++) {
+            scratchVar = modelWorldVertices[i].clone().applyMatrix4(camera.matrixWorldInverse);
+            scratchVar.applyMatrix4(camera.projectionMatrix);
+            scratchVar.divideScalar(scratchVar.w);
+            ndc[i] = scratchVar;
+
+        }
+        var topIdx = 0,
+            bottomIdx = 0,
+            leftIdx = 0,
+            rightIdx = 0;
+        var top = ndc[0].y;
+        var bottom = ndc[0].y;
+        var right = ndc[0].x;
+        var left = ndc[0].x;
+        var closestVertex, closestVertexDistance = Number.POSITIVE_INFINITY;
+        var vtx;
+
+        // find opposite corners and nearest z coordinate
+        for (var i = 1; i < corners; i++) {
+
+            vtx = ndc[i];
+
+            if (vtx.x < left) {
+                left = vtx.x;
+                leftIdx = i;
+            } else if (vtx.x > right) {
+                right = vtx.x;
+                rightIdx = i;
+            }
+
+            if (vtx.y < bottom) {
+                bottom = vtx.y;
+                bottomIdx = i;
+            } else if (vtx.y > top) {
+                top = vtx.y;
+                topIdx = i;
+            }
+
+            if (vtx.z < closestVertexDistance) {
+                closestVertex = i;
+                closestVertexDistance = vtx.z;
+            }
+
+        }
+        var yNDCPercentCoverage = (Math.abs(ndc[topIdx].y) + Math.abs(ndc[bottomIdx].y)) / 2;
+        yNDCPercentCoverage = Math.min(1, yNDCPercentCoverage);
+
+        var xNDCPercentCoverage = (Math.abs(ndc[leftIdx].x) + Math.abs(ndc[rightIdx].x)) / 2;
+        xNDCPercentCoverage = Math.min(1, xNDCPercentCoverage);
+
+        var ulCoords = [ndc[leftIdx].x, ndc[topIdx].y, closestVertexDistance, 1];
+        var blCoords = [ndc[leftIdx].x, ndc[bottomIdx].y, closestVertexDistance, 1];
+        var urCoords = [ndc[rightIdx].x, ndc[topIdx].y, closestVertexDistance, 1];
+
+        var ul = new THREE.Vector4().fromArray(ulCoords);
+        ul.applyMatrix4(mat3).divideScalar(ul.w);
+
+        var bl = new THREE.Vector4().fromArray(blCoords);
+        bl.applyMatrix4(mat3).divideScalar(bl.w);
+
+        var ur = new THREE.Vector4().fromArray(urCoords);
+        ur.applyMatrix4(mat3).divideScalar(ur.w);
+
+        var center = new THREE.Vector3();
+        center.addVectors(ur, bl);
+        center.divideScalar(2);
+
+        var dist = camera.position.distanceTo(center);
+
+        var upperLeft = new THREE.Vector3().fromArray(ul.toArray().slice(0, 3));
+
+        var aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+        if ((1 - yNDCPercentCoverage) < (1 - xNDCPercentCoverage)) { // height case
+            var bottomLeft = new THREE.Vector3().fromArray(bl.toArray().slice(0, 3));
+            var height = upperLeft.distanceTo(bottomLeft);
+            newFov = 2 * Math.atan(height / (2 * dist)) * ( 180 / Math.PI );
+        } else {
+            var upperRight = new THREE.Vector3().fromArray(ur.toArray().slice(0, 3));
+            var width = upperRight.distanceTo(upperLeft);
+            newFov = 2 * Math.atan((width / aspect) / (2 * dist)) * ( 180 / Math.PI );
+        }
+        return newFov;
+    }
 
     signals.scaleChanged.add(function (boundingBox, modelRotation) {
         scope.initialBoundigBox = boundingBox;
         scope.initialModelRotation = modelRotation;
-        var subVector = new THREE.Vector3(0, 0, 0);
-        subVector.subVectors(boundingBox.min, boundingBox.max);
-
-        var height = subVector.length();
-        var radius = height / 2;
-
-
-        var heightModel = Math.abs(boundingBox.min.z - boundingBox.max.z);
-        var widthModel = Math.abs(boundingBox.min.x - boundingBox.max.x);
-        var paramToFit = Math.max(widthModel, heightModel);
-        var dist = camera.position.distanceTo(editor.lastModel.position) - radius;
-        camera.fov = 2 * Math.atan(paramToFit / ( 2 * dist )) * ( 180 / Math.PI );
+        var fov = calculateNewFov(boundingBox);
+        var addVector = new THREE.Vector3(0, 0, 0);
+        addVector.addVectors(boundingBox.min, boundingBox.max);
+        var center = addVector.multiplyScalar(0.5);
+        camera.fov = fov;
+        controls.setCenter(center);
         var newCameraFar = getFar(boundingBox);
         if (camera.far < newCameraFar) {
             camera.far = newCameraFar;
         }
-        var addVector = new THREE.Vector3(0, 0, 0);
-        addVector.addVectors(boundingBox.min, boundingBox.max);
-        var center = addVector.multiplyScalar(0.5);
-        controls.setCenter(center);
         if (modelRotation) {
             camera.position.z = modelRotation.position.z;
             camera.position.y = modelRotation.position.y;
