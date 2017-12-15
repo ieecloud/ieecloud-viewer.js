@@ -25,7 +25,7 @@
 
 <div class="viewer">
     <button id="loadModel" class="btn">Load Model</button>
-    <button id="removeModel" class="btn">Remove Model</button>s
+    <button id="removeModel" class="btn">Remove Model</button>
     <button id="showRulerBtn" class="btn">Ruler</button>
     <button id="showProtractorVBtn" class="btn">Protractor V</button>
     <button id="showProtractorHBtn" class="btn">Protractor H</button>
@@ -66,6 +66,7 @@
     });
 
     $("#attachToNewDiv").click(function () {
+        $("#viewer").ieecloudEditor('removeModel');
         var options = {
             textureUrl: "",
             mode: "3d_point",
