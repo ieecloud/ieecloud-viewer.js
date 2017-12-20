@@ -4,42 +4,74 @@
     <title>ieecloud viewer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+
+        .full-screen{
+            overflow: hidden;
+            margin: 0px;
+
+        }
+
+
+
+        .viewer-full-screen {
+            position: absolute;
+            margin-top: 0px;
+            height: 100%;
+            width: 100%;
+            background-color: #fff;
+        }
+
+        .btn-wrapper{
+            position: absolute;
+        }
+
+        .viewer-full-screen .btn-wrapper .btn{
+            position: relative;
+            z-index: 1000;
+        }
+
+        .viewer-small-screen {
+            position: relative;
+            margin-top: 50px;
+            height: 800px;
+            width: 1500px;
+            background-color: #fff;
+        }
+
+    </style>
 </head>
-<body>
+<body id="body" class="full-screen">
 
-<style>
 
-    .viewer {
-        position: relative;
-        margin-top: 50px;
-        height: 800px;
-        width: 1500px;
-        background-color: #fff;
-    }
-
-</style>
 
 <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
 <script type="text/javascript" src="<%= file %>"></script>
 <% }); %>
 
-<div class="viewer">
-    <button id="loadModel" class="btn">Load Model</button>
-    <button id="removeModel" class="btn">Remove Model</button>
-    <button id="showRulerBtn" class="btn">Ruler</button>
-    <button id="showProtractorVBtn" class="btn">Protractor V</button>
-    <button id="showProtractorHBtn" class="btn">Protractor H</button>
-    <button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>
-    <button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>
-    <button id="takeScreenShort" class="btn">Take Screen Short</button>
-    <button id="returnToImageViewBtn" class="btn">Return to image view</button>
-    <button id="changeImageBtn" class="btn">Change Image</button>
-    <input id="modeInput"/>
-    <button id="setModeBtn" class="btn">Set Mode</button>
-    <button id="attachToNewDiv" class="btn">Attach to new div</button>
-    <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
+<div id="viewer-wrapper" class="viewer-full-screen">
+    <div id="btn-wrapper-id" class="btn-wrapper">
+        <div class="buttons">
+            <button id="loadModel" class="btn">Load Model</button>
+            <button id="removeModel" class="btn">Remove Model</button>
+            <button id="showRulerBtn" class="btn">Ruler</button>
+            <button id="showProtractorVBtn" class="btn">Protractor V</button>
+            <button id="showProtractorHBtn" class="btn">Protractor H</button>
+            <button id="exitFromFullScreen" class="btn">Exit from full screen</button>
+            <button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>
+            <button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>
+            <button id="takeScreenShort" class="btn">Take Screen Short</button>
+            <button id="returnToImageViewBtn" class="btn">Return to image view</button>
+            <button id="changeImageBtn" class="btn">Change Image</button>
+            <input id="modeInput"/>
+            <button id="setModeBtn" class="btn">Set Mode</button>
+            <button id="attachToNewDiv" class="btn">Attach to new div</button>
+            <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
+
+        </div>
+
+    </div>
     <div id="viewer" class="viewer"></div>
-    <div id="viewer2" class="viewer"></div>
 </div>
 
 
@@ -53,7 +85,7 @@
         resultDigits: 3,
         drawResults: false,
         gridVisible: true,
-        detailModelView: true,
+        detailModelView: false,
         resultColor: "white",
         backgroundColor: "#d4d4d4",
         resultTextColor: "white",
@@ -123,6 +155,15 @@
         $.getJSON("../resources/results.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
+    });
+
+
+    $("#exitFromFullScreen").click(function () {
+        $("#viewer-wrapper").removeClass('viewer-full-screen');
+        $("#viewer-wrapper").addClass('viewer-small-screen');
+        $("#body").removeClass('full-screen');
+        $("#btn-wrapper-id").removeClass('btn-wrapper');
+        window.dispatchEvent(new Event('resize'));
     });
 
 
