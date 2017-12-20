@@ -26,7 +26,7 @@
             position: absolute;
         }
 
-        .viewer-full-screen .btn-wrapper .btn{
+        .viewer-full-screen .btn-wrapper .buttons{
             position: relative;
             z-index: 1000;
         }
@@ -37,6 +37,11 @@
             height: 800px;
             width: 1500px;
             background-color: #fff;
+        }
+
+        .viewer-small-screen .buttons{
+            position: relative;
+            z-index: 1000;
         }
 
     </style>
@@ -58,6 +63,7 @@
             <button id="showProtractorVBtn" class="btn">Protractor V</button>
             <button id="showProtractorHBtn" class="btn">Protractor H</button>
             <button id="exitFromFullScreen" class="btn">Exit from full screen</button>
+            <button id="toFullScreen" class="btn">To full Screen</button>
             <button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>
             <button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>
             <button id="takeScreenShort" class="btn">Take Screen Short</button>
@@ -163,6 +169,14 @@
         $("#viewer-wrapper").addClass('viewer-small-screen');
         $("#body").removeClass('full-screen');
         $("#btn-wrapper-id").removeClass('btn-wrapper');
+        window.dispatchEvent(new Event('resize'));
+    });
+
+    $("#toFullScreen").click(function () {
+        $("#viewer-wrapper").addClass('viewer-full-screen');
+        $("#viewer-wrapper").removeClass('viewer-small-screen');
+        $("#body").addClass('full-screen');
+        $("#btn-wrapper-id").addClass('btn-wrapper');
         window.dispatchEvent(new Event('resize'));
     });
 
