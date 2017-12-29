@@ -49,6 +49,12 @@ function Viewer(target, options) {
             }
         });
 
+        $this.threeEditor.signals.dispatchModelPosition.add(function (modelPosition) {
+            if ($this.options.onSaveModelPosition) {
+                $this.options.onSaveModelPosition(modelPosition);
+            }
+        });
+
         $this.threeEditor.signals.startRender.add(function () {
             if ($this.options.onStartRender) {
                 $this.options.onStartRender();

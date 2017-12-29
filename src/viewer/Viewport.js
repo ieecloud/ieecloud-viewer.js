@@ -97,8 +97,21 @@ var Viewport = function (editor) {
     var initialCameraPosition = new THREE.Vector3(63, -149, 36);
     var initialCameraUp =  new THREE.Vector3(0, 0, 1);
     var initialCameraLookAt = scene.position;
+    var initialFov = 10;
 
-    var camera = new THREE.PerspectiveCamera(10, container.dom.offsetWidth / container.dom.offsetHeight, 1, 15000);
+
+    if (editor.options.rotationScale) {
+        var position = editor.options.rotationScale.position;
+        if (position) {
+            initialCameraPosition = new THREE.Vector3(position.x, position.y, position.z);
+        }
+        var fov = editor.options.rotationScale.fov;
+        if (fov) {
+            initialFov = fov;
+        }
+    }
+
+    var camera = new THREE.PerspectiveCamera(initialFov, container.dom.offsetWidth / container.dom.offsetHeight, 1, 15000);
     camera.position.copy(initialCameraPosition);
     camera.up.copy(initialCameraUp);
     camera.lookAt(initialCameraLookAt);
@@ -1435,11 +1448,12 @@ var Viewport = function (editor) {
 
         var modelRotation = {};
         modelRotation.position = {};
-        modelRotation.position.x = camera.position.z;
+        modelRotation.position.x = camera.position.x;
         modelRotation.position.y = camera.position.y;
         modelRotation.position.z = camera.position.z;
         modelRotation.fov = camera.fov;
-        editor.createJsonModelWithRotation(modelRotation);
+        editor.dispatchModelPosition(modelRotation);
+        // editor.createJsonModelWithRotation(modelRotation);
     });
 
     signals.printScreen.add(function (toFileName) {

@@ -18,6 +18,7 @@ var Editor = function (options) {
         objectColorUnSelected: new SIGNALS.Signal(),
         selectTree: new SIGNALS.Signal(),
         select3dPoint: new SIGNALS.Signal(),
+        dispatchModelPosition: new SIGNALS.Signal(),
         endRender: new SIGNALS.Signal(),
         treeLoad: new SIGNALS.Signal(),
         startRender: new SIGNALS.Signal(),
@@ -112,7 +113,6 @@ Editor.prototype = {
     saveModelPosition: function () {
         this.signals.saveModelPosition.dispatch();
     },
-
 
     unSelectObject: function (object) {
         this.signals.objectColorUnSelected.dispatch(object);
@@ -209,6 +209,11 @@ Editor.prototype = {
 
     createJsonModelWithRotation: function (modelRotation) {
         this.loader.createJsonModelWithRotation(modelRotation);
+    },
+
+
+    dispatchModelPosition: function (modelRotation) {
+        this.signals.dispatchModelPosition.dispatch(modelRotation);
     },
 
     printScreen: function (toFileName) {

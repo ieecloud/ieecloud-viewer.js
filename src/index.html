@@ -73,6 +73,7 @@
             <button id="setModeBtn" class="btn">Set Mode</button>
             <button id="attachToNewDiv" class="btn">Attach to new div</button>
             <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
+            <button id="saveModelPositionBtn" class="btn">Save Model Position</button>
 
         </div>
 
@@ -91,12 +92,17 @@
         resultDigits: 3,
         drawResults: false,
         gridVisible: true,
+        rotationScale: {fov:0.35082010187266344, position: {x:
+            48.22379092090737, y: -38.052186013287574, z: 154.37283345146167}},
         detailModelView: false,
         resultColor: "white",
         backgroundColor: "#d4d4d4",
         resultTextColor: "white",
         id: "1",
         onSelect3dPoint: function (point) {
+        },
+        onSaveModelPosition: function(modelPosition){
+            console.log(modelPosition);
         },
         onPrintScreenDone: function (urlRenderer) {
             console.log(urlRenderer);
@@ -151,6 +157,11 @@
 
     $("#takeScreenShort").click(function () {
         $("#viewer").ieecloudEditor('printScreen', "printScreen.png");
+    });
+
+
+    $("#saveModelPositionBtn").click(function () {
+        $("#viewer").ieecloudEditor('saveModelPosition');
     });
 
     $("#removeModel").click(function () {
