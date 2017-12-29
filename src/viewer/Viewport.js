@@ -56,7 +56,7 @@ var Viewport = function (editor) {
     var FIRST_LIMIT_FOV = 0.0006;
     var SECOND_LIMIT_FOV = 0.000000001;
     var ROTATE = false;
-    var USE_OCTREE = true;
+    var USE_OCTREE = false;
 
 
     var mainMouseMove = true;
@@ -487,7 +487,7 @@ var Viewport = function (editor) {
     };
 
     var nearest = function (c, distance, pointsTable, objVertices) {
-        var list = new Array();
+        var list = [];
         var r = calculateR(c);
         var dr = (pointsTable.maxR - pointsTable.minR) / pointsTable.tableSize;
         var index = Math.round((pointsTable.tableSize * (r - pointsTable.minR) / (pointsTable.maxR - pointsTable.minR)));
@@ -510,7 +510,7 @@ var Viewport = function (editor) {
                 if (calculateR(n) > r + distance) {
                     break;
                 }
-                if (calcDistance(n, c) < distance) {
+                if (n.distanceTo(c) < distance) {
                     list.push(n);
                 }
             }
@@ -525,7 +525,7 @@ var Viewport = function (editor) {
                 if (calculateR(n) < r - distance) {
                     break;
                 }
-                if (calcDistance(n, c) < distance) {
+                if (n.distanceTo(c) < distance) {
                     list.push(n);
                 }
 
@@ -542,7 +542,7 @@ var Viewport = function (editor) {
                 if (calculateR(n) > r + distance) {
                     break;
                 }
-                if (calcDistance(n, c) < distance) {
+                if (n.distanceTo(c) < distance) {
                     list.push(n);
                 }
             }
@@ -889,10 +889,7 @@ var Viewport = function (editor) {
     };
 
     var runNearestAlgorithm = function (intersects) {
-        var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
-        var intersectLine = searchNearestIntersect(intersects, THREE.LineSegments);
-        var intersect = getNearestIntersect(intersectLine, intersectMesh);
-        // var intersect = intersects[0];
+        var intersect = intersects[0];
         if (intersect) {
 
             var vertices = intersect.object.userData.totalObjVertices;
