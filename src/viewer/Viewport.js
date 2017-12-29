@@ -701,12 +701,10 @@ var Viewport = function (editor) {
         textResultPosition.z = nearestPoint.position.z;
         textResultMesh.position.copy(textResultPosition);
         unRotatedObjects.push(textResultMesh);
-        var key = resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z;
+        var key = THREE.Math.generateUUID();
         textResults[key] = textResultMesh;
         textResultMesh.update(nearestPoint);
         sceneHelpers.add(textResultMesh);
-
-
         var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {
             material: {color: editor.options.resultPointColor},
             size: editor.options.resultPointSize
@@ -1398,7 +1396,7 @@ var Viewport = function (editor) {
                     textResultPosition.y = result.position.y;
                     textResultPosition.z = result.position.z;
                     textResultMesh.position.copy(textResultPosition);
-                    var key = result.resultValue + result.position.x + result.position.y + result.position.z;
+                    var key = THREE.Math.generateUUID();
                     textResults[key] = textResultMesh;
                     textResultMesh.update();
                     sceneHelpers.add(textResultMesh);
