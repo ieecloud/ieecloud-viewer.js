@@ -1715,7 +1715,7 @@ var Viewport = function (editor) {
             objectToDispose.push(selectedResultPoints[key]);
             objectToDispose.push(textResults[key]);
         }
-
+        nearestPoint.hide();
         editor.signals.objectsRemoved.dispatch(objectToDispose, sceneHelpers, false);
 
 
