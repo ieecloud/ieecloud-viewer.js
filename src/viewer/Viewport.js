@@ -1337,11 +1337,9 @@ var Viewport = function (editor) {
             }
 
         }
-        var yNDCPercentCoverage = (Math.abs(ndc[topIdx].y) + Math.abs(ndc[bottomIdx].y)) / 2;
-        yNDCPercentCoverage = Math.min(1, yNDCPercentCoverage);
 
-        var xNDCPercentCoverage = (Math.abs(ndc[leftIdx].x) + Math.abs(ndc[rightIdx].x)) / 2;
-        xNDCPercentCoverage = Math.min(1, xNDCPercentCoverage);
+        var yDistance = boundingBox.max.y - boundingBox.min.y;
+        var xDistance = boundingBox.max.x - boundingBox.min.x;
 
         var ulCoords = [ndc[leftIdx].x, ndc[topIdx].y, closestVertexDistance, 1];
         var blCoords = [ndc[leftIdx].x, ndc[bottomIdx].y, closestVertexDistance, 1];
@@ -1365,7 +1363,7 @@ var Viewport = function (editor) {
         var upperLeft = new THREE.Vector3().fromArray(ul.toArray().slice(0, 3));
 
         var aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-        if ((1 - yNDCPercentCoverage) < (1 - xNDCPercentCoverage)) { // height case
+        if (yDistance > xDistance) { // height case
             var bottomLeft = new THREE.Vector3().fromArray(bl.toArray().slice(0, 3));
             var height = upperLeft.distanceTo(bottomLeft);
             newFov = 2 * Math.atan(height / (2 * dist)) * ( 180 / Math.PI );
