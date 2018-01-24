@@ -1760,7 +1760,11 @@ var Viewport = function (editor) {
 
     if (System.support.webgl === true) {
 
-        renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: true});
+        // logarithmicDepthBuffer - whether to use a logarithmic depth buffer. It may be neccesary to use this if dealing with huge differences in scale in a single scene. Default is false. See the camera / logarithmicdepthbuffer example.
+        // The renderer on the left (the red knot) uses a standard linear depth buffer (1 to 1000). Selecting Perspective or Orthographic will re-render the scene with the selected camera type, and both appear to work as expected.
+        // The renderer on the right (the green knot) uses a logarithmic depth buffer (1e-6 to 1e27).
+
+        renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: true, logarithmicDepthBuffer: true});
         // pickingRenderTarget = new THREE.WebGLRenderTarget();
         // pickingRenderTarget.texture.generateMipmaps = false;
         // pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
