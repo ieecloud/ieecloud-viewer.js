@@ -1338,8 +1338,8 @@ var Viewport = function (editor) {
 
         }
 
-        var yDistance = boundingBox.max.y - boundingBox.min.y;
-        var xDistance = boundingBox.max.x - boundingBox.min.x;
+        var yDistance = Math.abs(boundingBox.max.y - boundingBox.min.y);
+        var xDistance = Math.abs( boundingBox.min.x - boundingBox.max.x );
 
         var ulCoords = [ndc[leftIdx].x, ndc[topIdx].y, closestVertexDistance, 1];
         var blCoords = [ndc[leftIdx].x, ndc[bottomIdx].y, closestVertexDistance, 1];
@@ -1363,7 +1363,7 @@ var Viewport = function (editor) {
         var upperLeft = new THREE.Vector3().fromArray(ul.toArray().slice(0, 3));
 
         var aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-        if (yDistance > xDistance) { // height case
+        if (yDistance >= xDistance) { // height case
             var bottomLeft = new THREE.Vector3().fromArray(bl.toArray().slice(0, 3));
             var height = upperLeft.distanceTo(bottomLeft);
             newFov = 2 * Math.atan(height / (2 * dist)) * ( 180 / Math.PI );
