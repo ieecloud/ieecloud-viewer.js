@@ -453,7 +453,7 @@ var Viewport = function (editor) {
     }
 
 
-    var getIntersects = function (event, object) {
+    var  getIntersects = function (event, object) {
         var point = new THREE.Vector2();
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
 
@@ -462,22 +462,42 @@ var Viewport = function (editor) {
         mouse.set(( point.x * 2 ) - 1, -( point.y * 2 ) + 1);
 
         raycaster.setFromCamera(mouse, camera);
-        if (USE_OCTREE) {
-            var octreeObjects = octree.search(raycaster.ray.origin, raycaster.ray.far, true, raycaster.ray.direction);
-            return raycaster.intersectOctreeObjects(octreeObjects);
+
+        raycaster.setFromCamera( mouse, camera );
+
+        console.log('mouse x:' + mouse.x + ' y:' + mouse.y + ' z:' + mouse.z);
+        console.log('camera x:' + camera.position.x + ' y:' + camera.position.y + ' z:' + camera.position.z);
+
+        var objs;
+        if (object instanceof Array) {
+            objs = raycaster.intersectObjects(object, true);
+
         } else {
-            var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
-
-            raycaster.set(camera.position, direction);
-
-            //this.ray.origin.copy( camera.position );
-            //this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
-            if (object instanceof Array) {
-                return raycaster.intersectObjects(object, true);
-
-            }
-            return raycaster.intersectObject(object, true);
+            objs = raycaster.intersectObject(object, true);
         }
+
+        // var point = objs[0].point;
+        //
+        // console.log('point x:' + point.x + ' y:' + point.y + ' z:' + point.z);
+
+        return objs;
+
+        // if (USE_OCTREE) {
+        //     var octreeObjects = octree.search(raycaster.ray.origin, raycaster.ray.far, true, raycaster.ray.direction);
+        //     return raycaster.intersectOctreeObjects(octreeObjects);
+        // } else {
+        //     var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
+        //
+        //     raycaster.set(camera.position, direction);
+        //
+        //     //this.ray.origin.copy( camera.position );
+        //     //this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
+        //     if (object instanceof Array) {
+        //         return raycaster.intersectObjects(object, true);
+        //
+        //     }
+        //     return raycaster.intersectObject(object, true);
+        // }
     };
 
     var getMousePosition = function (dom, x, y) {
@@ -902,8 +922,8 @@ var Viewport = function (editor) {
     var runNearestAlgorithm = function (intersects) {
         var intersect = intersects[0];
         if (intersect) {
-
             var vertices = intersect.object.userData.totalObjVertices;
+
             var results = intersect.object.userData.totalObjResults;
             var pointsTable = intersect.object.userData.pointsTable;
 
@@ -913,50 +933,69 @@ var Viewport = function (editor) {
                 return;
             }
             nearestPoint.show();
-            var list = nearest(c, distance, pointsTable, vertices);
-            if (list.length > 0) {
-                var resultVal = 10;
-                var resultIndex = list[0].index;
-                if (resultIndex !== undefined) {
-                    resultVal = results[resultIndex] ? results[resultIndex] : 0;
-                    resultVal = !isNaN(resultVal) ? resultVal : 0;
-
-                }
-                resultVal = resultVal.round(editor.resultDigits);
-                var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
-                info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal);
-                var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
-                nearestPoint.position.copy(position);
-                nearestPoint.userData.result = resultVal;
-                nearestPoint.update();
-                render();
-            }
+            console.log("nearest point: " + c);
+            nearestPoint.position.copy(c);
+            nearestPoint.update();
+            render();
+            // var list = nearest(c, distance, pointsTable, vertices);
+            // if (list.length > 0) {
+            //     var resultVal = 10;
+            //     var resultIndex = list[0].index;
+            //     if (resultIndex !== undefined) {
+            //         resultVal = results[resultIndex] ? results[resultIndex] : 0;
+            //         resultVal = !isNaN(resultVal) ? resultVal : 0;
+            //
+            //     }
+            //     resultVal = resultVal.round(editor.resultDigits);
+            //     var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
+            //     info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal);
+            //     var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
+            //     nearestPoint.position.copy(position);
+            //     nearestPoint.userData.result = resultVal;
+            //     nearestPoint.update();
+            //     render();
+            // }
         }
     };
     var lastMove = Date.now();
+    var thread;
+    var arrow;
     scope.onMouseMoveViewerHandler = function (event) {
-        if (!mainMouseMove) {
-            return;
-        }
 
-        if (controls.state >= 0) {
-            return;
-        }
+        var onmousestop = function() {
+            if (!mainMouseMove) {
+                return;
+            }
 
-        if (objects.length === 0) {
-            return;
-        }
+            if (controls.state >= 0) {
+                return;
+            }
 
-        if (Date.now() - lastMove < 31) { // 32 frames a second
-            return;
-        } else {
-            lastMove = Date.now();
-        }
+            if (objects.length === 0) {
+                return;
+            }
 
-        var intersects = getIntersects(event, objects);
-        if (intersects.length > 0) {
-            runNearestAlgorithm(intersects);
-        }
+            if (Date.now() - lastMove < 31) { // 32 frames a second
+                return;
+            } else {
+                lastMove = Date.now();
+            }
+
+            var intersects = getIntersects(event, objects);
+            if (intersects.length > 0) {
+                runNearestAlgorithm(intersects);
+
+                // if(arrow) {
+                //     scene.remove(arrow);
+                // }
+                // arrow = new THREE.ArrowHelper( camera.getWorldDirection(), camera.getWorldPosition(), 1000, Math.random() * 0xffffff );
+                // scene.add( arrow );
+            }
+        };
+
+        clearTimeout(thread);
+        thread = setTimeout(onmousestop, 100);
+
     };
 
     scope.onMouseMoveEditorHandler = function (event) {
