@@ -339,8 +339,14 @@ var Loader = function (editor, textureUrl) {
                         var node = obj[i];
                         if (node.index != -1) {
                             if (result[node.index]) {
-                                node.children = result[node.index];
+                                var treejsNodes = result[node.index];
+                                var treeNodes = [];
+                                _.forEach(treejsNodes, function(value, key) {
+                                    treeNodes.push({text: _.trim(value.name).length > 0 ? value.name : "UnknownName", object: value})
+                                });
+                                node.children = treeNodes;
                                 node.uniqueId = THREE.Math.generateUUID();
+                                node.text = node.name;
                             }
 
                         }
@@ -354,7 +360,15 @@ var Loader = function (editor, textureUrl) {
                         var node = obj[prop];
                         if (node.index != -1) {
                             if (result[node.index]) {
-                                node.children = result[node.index];
+
+                                var treejsNodes = result[node.index];
+                                var treeNodes = [];
+                                _.forEach(treejsNodes, function(value, key) {
+                                    treeNodes.push({text: _.trim(value.name).length > 0 ? value.name : "UnknownName", object: value})
+                                });
+
+                                node.children = treeNodes;
+                                node.text = node.name;
                                 node.uniqueId = THREE.Math.generateUUID();
                             }
                         }

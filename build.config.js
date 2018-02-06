@@ -52,6 +52,8 @@ module.exports = {
           'bower_components/jquery/dist/jquery.min.js',
           'bower_components/signals/dist/signals.min.js',
           'bower_components/lodash/dist/lodash.min.js',
+          'node_modules/inspire-tree/dist/inspire-tree.js',
+          'node_modules/inspire-tree-dom/dist/inspire-tree-dom.js',
           'vendor/three.min.js',
           'vendor/ui.js',
           'vendor/fatlines/LineSegmentsGeometry.js',
