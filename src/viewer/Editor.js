@@ -49,6 +49,7 @@ var Editor = function (options) {
     this.loader = new Loader(this, options.textureUrl);
 
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(options.sceneBackgroundColor);
     this.sceneAxis = new THREE.Scene();
     this.sceneHelpers = new THREE.Scene();
     this.pickingScene = new THREE.Scene();

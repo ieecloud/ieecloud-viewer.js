@@ -14,8 +14,8 @@ var Viewport = function (editor) {
     infoMode.setRight('5px');
     infoMode.setTop('5px');
     infoMode.setFontSize('12px');
-    infoMode.setColor('#ffffff');
-    infoMode.setValue('mode=' + editor.mode)
+    infoMode.setColor(editor.options.infoTextColor);
+    infoMode.setValue('mode=' + editor.mode);
     container.add(infoMode);
 
 
@@ -24,7 +24,7 @@ var Viewport = function (editor) {
     info.setRight('5px');
     info.setBottom('5px');
     info.setFontSize('12px');
-    info.setColor('#ffffff');
+    info.setColor(editor.options.infoTextColor);
     container.add(info);
 
     var rulerInfo = new UI.Text();
@@ -32,7 +32,7 @@ var Viewport = function (editor) {
     rulerInfo.setLeft('5px');
     rulerInfo.setBottom('5px');
     rulerInfo.setFontSize('12px');
-    rulerInfo.setColor('#ffffff');
+    rulerInfo.setColor(editor.options.infoTextColor);
     container.add(rulerInfo);
 
     var scene = editor.scene;
@@ -63,12 +63,15 @@ var Viewport = function (editor) {
 
     // helpers
 
-    var grid = new THREEext.GridHelper(500, 25);
-    sceneHelpers.add(grid);
-
-    if (!editor.options.gridVisible) {
-        grid.hide();
+    if (editor.options.gridVisible) {
+        var grid = new THREEext.GridHelper(500, 25);
+        sceneHelpers.add(grid);
     }
+
+    // Uncaught TypeError: grid.hide is not a function
+    // if (!editor.options.gridVisible) {
+    //     grid.hide();
+    // }
 
     // inset canvas
     // -----------------------------------------------
@@ -374,7 +377,9 @@ var Viewport = function (editor) {
 
 
     var object = new THREE.AxisHelper(100);
-    sceneHelpers.add(object);
+    if (editor.options.axisVisible) {
+        sceneHelpers.add(object);
+    }
 
     var axis = new THREE.SmallAxisObject3d(camera, container2.dom);
     sceneAxis.add(axis);
@@ -396,9 +401,12 @@ var Viewport = function (editor) {
     var oldFogFar = 5000;
     var oldFogDensity = 0.00025;
 
+    // raycaster line precision
+    var CONST_LINE_PRECISION_DEFAULT = 0.00000001;
+    var CONST_LINE_PRECISION_FOR_LINES = 0.05;
 
     var raycaster = new THREE.Raycaster();
-    raycaster.linePrecision = 0.01;
+    raycaster.linePrecision = CONST_LINE_PRECISION_DEFAULT;
     var mouse = new THREE.Vector2();
     var mouse2 = new THREE.Vector2();
 
@@ -452,8 +460,7 @@ var Viewport = function (editor) {
 
     }
 
-
-    var  getIntersects = function (event, object) {
+    var getIntersects = function (event, object) {
         var point = new THREE.Vector2();
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
 
@@ -463,41 +470,34 @@ var Viewport = function (editor) {
 
         raycaster.setFromCamera(mouse, camera);
 
-        raycaster.setFromCamera( mouse, camera );
+        raycaster.linePrecision = CONST_LINE_PRECISION_DEFAULT;
+        var resultObjects = getIntersectsByRaycaster(raycaster, object);
+        raycaster.linePrecision = CONST_LINE_PRECISION_FOR_LINES;
+        var resultLines = getIntersectsByRaycaster(raycaster, object);
 
-        console.log('mouse x:' + mouse.x + ' y:' + mouse.y + ' z:' + mouse.z);
-        console.log('camera x:' + camera.position.x + ' y:' + camera.position.y + ' z:' + camera.position.z);
-
-        var objs;
-        if (object instanceof Array) {
-            objs = raycaster.intersectObjects(object, true);
-
-        } else {
-            objs = raycaster.intersectObject(object, true);
+        if (resultObjects.length > 0 && resultLines > 0) {
+            return resultObjects[0].distance >= resultLines[0].distance ? resultObjects : resultLines;
         }
+        return resultObjects.length > 0 ? resultObjects : resultLines;
+    };
 
-        // var point = objs[0].point;
-        //
-        // console.log('point x:' + point.x + ' y:' + point.y + ' z:' + point.z);
+    var getIntersectsByRaycaster = function (raycaster, object) {
+        if (USE_OCTREE) {
+            var octreeObjects = octree.search(raycaster.ray.origin, raycaster.ray.far, true, raycaster.ray.direction);
+            return raycaster.intersectOctreeObjects(octreeObjects);
+        } else {
+            var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
 
-        return objs;
+            raycaster.set(camera.position, direction);
 
-        // if (USE_OCTREE) {
-        //     var octreeObjects = octree.search(raycaster.ray.origin, raycaster.ray.far, true, raycaster.ray.direction);
-        //     return raycaster.intersectOctreeObjects(octreeObjects);
-        // } else {
-        //     var direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
-        //
-        //     raycaster.set(camera.position, direction);
-        //
-        //     //this.ray.origin.copy( camera.position );
-        //     //this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
-        //     if (object instanceof Array) {
-        //         return raycaster.intersectObjects(object, true);
-        //
-        //     }
-        //     return raycaster.intersectObject(object, true);
-        // }
+            //this.ray.origin.copy( camera.position );
+            //this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
+            if (object instanceof Array) {
+                return raycaster.intersectObjects(object, true);
+            } else {
+                return raycaster.intersectObject(object, true);
+            }
+        }
     };
 
     var getMousePosition = function (dom, x, y) {
@@ -922,8 +922,8 @@ var Viewport = function (editor) {
     var runNearestAlgorithm = function (intersects) {
         var intersect = intersects[0];
         if (intersect) {
-            var vertices = intersect.object.userData.totalObjVertices;
 
+            var vertices = intersect.object.userData.totalObjVertices;
             var results = intersect.object.userData.totalObjResults;
             var pointsTable = intersect.object.userData.pointsTable;
 
@@ -933,35 +933,30 @@ var Viewport = function (editor) {
                 return;
             }
             nearestPoint.show();
-            console.log("nearest point: " + c);
-            nearestPoint.position.copy(c);
-            nearestPoint.update();
-            render();
-            // var list = nearest(c, distance, pointsTable, vertices);
-            // if (list.length > 0) {
-            //     var resultVal = 10;
-            //     var resultIndex = list[0].index;
-            //     if (resultIndex !== undefined) {
-            //         resultVal = results[resultIndex] ? results[resultIndex] : 0;
-            //         resultVal = !isNaN(resultVal) ? resultVal : 0;
-            //
-            //     }
-            //     resultVal = resultVal.round(editor.resultDigits);
-            //     var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
-            //     info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal);
-            //     var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
-            //     nearestPoint.position.copy(position);
-            //     nearestPoint.userData.result = resultVal;
-            //     nearestPoint.update();
-            //     render();
-            // }
+
+            var list = nearest(c, distance, pointsTable, vertices);
+            if (list.length > 0) {
+                var resultVal = 10;
+                var resultIndex = list[0].index;
+                if (resultIndex !== undefined) {
+                    resultVal = results[resultIndex] ? results[resultIndex] : 0;
+                    resultVal = !isNaN(resultVal) ? resultVal : 0;
+
+                }
+                resultVal = resultVal.round(editor.resultDigits);
+                var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
+                info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal);
+                var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
+                nearestPoint.position.copy(position);
+                nearestPoint.userData.result = resultVal;
+                nearestPoint.update();
+                render();
+            }
         }
     };
     var lastMove = Date.now();
     var thread;
-    var arrow;
     scope.onMouseMoveViewerHandler = function (event) {
-
         var onmousestop = function() {
             if (!mainMouseMove) {
                 return;
@@ -984,18 +979,11 @@ var Viewport = function (editor) {
             var intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
                 runNearestAlgorithm(intersects);
-
-                // if(arrow) {
-                //     scene.remove(arrow);
-                // }
-                // arrow = new THREE.ArrowHelper( camera.getWorldDirection(), camera.getWorldPosition(), 1000, Math.random() * 0xffffff );
-                // scene.add( arrow );
             }
         };
 
         clearTimeout(thread);
-        thread = setTimeout(onmousestop, 100);
-
+        thread = setTimeout(onmousestop, 150);
     };
 
     scope.onMouseMoveEditorHandler = function (event) {
@@ -1193,17 +1181,27 @@ var Viewport = function (editor) {
     controls.addEventListener('zoom', function (event) {
         // temp solution
         // TODO: add logic with auto calculate step zoom
-        if (event.distance > 0) {
-            DEFAULT_STEP_ZOOM = 0.0006;
-            FIRST_LIMIT_FOV = 0.0006;
-        }
+        // if (event.distance > 0) {
+        //     DEFAULT_STEP_ZOOM = 0.0006;
+        //     FIRST_LIMIT_FOV = 0.0006;
+        // }
+        // var oldCameraFov = camera.fov;
+        // var newCameraFov = oldCameraFov + event.distance * DEFAULT_STEP_ZOOM;
+        // if (newCameraFov < FIRST_LIMIT_FOV) {
+        //     newCameraFov = FIRST_LIMIT_FOV;
+        //     DEFAULT_STEP_ZOOM = 0.0001;
+        //     FIRST_LIMIT_FOV = SECOND_LIMIT_FOV;
+        // }
+
+        var step = 2;
+        var approaching = event.distance > 0 ? step : 1/step;
+
         var oldCameraFov = camera.fov;
-        var newCameraFov = oldCameraFov + event.distance * DEFAULT_STEP_ZOOM;
-        if (newCameraFov < FIRST_LIMIT_FOV) {
-            newCameraFov = FIRST_LIMIT_FOV;
-            DEFAULT_STEP_ZOOM = 0.0001;
-            FIRST_LIMIT_FOV = SECOND_LIMIT_FOV;
-        }
+        var newCameraFov = oldCameraFov * approaching;
+
+        console.log('oldFov:' + oldCameraFov + ' newFov:' + newCameraFov + ' dif:' + (oldCameraFov - newCameraFov) + ' zoom:' + camera.zoom);
+        console.log('initialBoundigBox:' + scope.initialBoundigBox);
+
         camera.fov = newCameraFov;
         camera.updateProjectionMatrix();
 
