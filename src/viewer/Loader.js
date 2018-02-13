@@ -12,11 +12,49 @@ var Loader = function (editor, textureUrl) {
         return scope.objectsTree;
     };
 
+
     this.selectObject = function (branch) {
         scope.traverseTree(branch, function (child) {
             scope.selectViewerObjects(child);
         });
     };
+
+    this.showObject = function (branch) {
+        scope.traverseTree(branch, function (child) {
+            scope.showViewerObjects(child);
+        });
+    };
+
+
+    this.hideObject = function (branch) {
+        scope.traverseTree(branch, function (child) {
+            scope.hideViewerObjects(child);
+        });
+    };
+
+    // TODO:refactor
+    this.showViewerObjects = function (object) {
+        if (object && object instanceof Array) {
+            for (var i = 0; i < object.length; i++) {
+                editor.showObject(object[i]);
+            }
+        } else if (typeof object == "object") {
+            editor.showObject(object);
+        }
+    };
+
+
+    this.hideViewerObjects = function (object) {
+        if (object && object instanceof Array) {
+            for (var i = 0; i < object.length; i++) {
+                editor.hideObject(object[i]);
+            }
+        } else if (typeof object == "object") {
+            editor.hideObject(object);
+        }
+    };
+
+
 
     this.selectViewerObjects = function (object) {
         if (object && object instanceof Array) {

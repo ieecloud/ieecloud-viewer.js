@@ -400,7 +400,7 @@
             <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
             <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
         </div>
-        <div  id="tree-wrapper" style="width:200px;overflow: scroll;
+        <div  id="tree-wrapper" style="width:300px;overflow: scroll;
     height: 100vh; position: relative;z-index: 1000;background-color: black;
             opacity: 0.5; color:white;">
             <div class="tree"></div>
@@ -417,6 +417,7 @@
 <script>
 
     var tree;
+    $("#tree-wrapper").hide();
 
     $("#viewer").ieecloudEditor({
         textureUrl: "",
@@ -442,6 +443,22 @@
                 });
                 new InspireTreeDOM(tree, {
                     target: '.tree'
+                });
+
+                tree.nodes().select();
+
+                tree.on('node.checked', function(node, event) {
+                    if(node.object){
+                        $("#viewer").ieecloudEditor("showObject", node.object);
+                    }
+
+                });
+
+                tree.on('node.unchecked', function(node, event) {
+                    if(node.object){
+                        $("#viewer").ieecloudEditor("hideObject", node.object);
+                    }
+
                 });
             }
         },

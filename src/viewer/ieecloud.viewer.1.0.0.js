@@ -128,6 +128,16 @@ function Viewer(target, options) {
         this.threeEditor.loader.unSelectObject(objData);
     };
 
+
+    Viewer.prototype.showObject = function (objData) {
+        this.threeEditor.loader.showObject(objData);
+    };
+
+    Viewer.prototype.hideObject = function (objData) {
+        this.threeEditor.loader.hideObject(objData);
+    };
+
+
     Viewer.prototype.getTreeModel = function () {
         return this.threeEditor.loader.getObjectsTreeModel();
     };

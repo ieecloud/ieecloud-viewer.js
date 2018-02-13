@@ -33,7 +33,9 @@ var Editor = function (options) {
         resetCameraRotation: new SIGNALS.Signal(),
         printScreen: new SIGNALS.Signal(),
         materialChanged: new SIGNALS.Signal(),
-        setMode: new SIGNALS.Signal()
+        setMode: new SIGNALS.Signal(),
+        objectShow: new SIGNALS.Signal(),
+        objectHide: new SIGNALS.Signal(),
 
     };
 
@@ -103,6 +105,11 @@ Editor.prototype = {
         this.signals.objectColorSelected.dispatch(object);
     },
 
+
+    showObject: function (object) {
+        this.signals.objectShow.dispatch(object);
+    },
+
     selectTree: function (object) {
         this.signals.selectTree.dispatch(object, true);
     },
@@ -117,6 +124,10 @@ Editor.prototype = {
 
     unSelectObject: function (object) {
         this.signals.objectColorUnSelected.dispatch(object);
+    },
+
+    hideObject: function (object) {
+        this.signals.objectHide.dispatch(object);
     },
 
     unSelectTree: function (object) {

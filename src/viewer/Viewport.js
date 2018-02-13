@@ -1259,6 +1259,25 @@ var Viewport = function (editor) {
 
     signals.objectColorUnSelected.add(function (object) {
         scope.unSelectObject(object);
+        render();
+
+    });
+
+
+
+    signals.objectShow.add(function (object) {
+        if (object !== null) {
+            object.visible = true;
+        }
+
+        render();
+
+    });
+
+    signals.objectHide.add(function (object) {
+        if (object !== null) {
+            object.visible = false;
+        }
 
         render();
 
