@@ -384,6 +384,8 @@
             <button id="removeModel" class="btn">Remove Model</button>
             <button id="showTree" class="btn">Show Tree</button>
             <button id="hideTree" class="btn">Hide Tree</button>
+            <button id="selectAllTree" class="btn">Select All Tree Nodes</button>
+            <button id="deselectAllTree" class="btn">Deselect All Tree Nodes</button>
             <!--<button id="showRulerBtn" class="btn">Ruler</button>-->
             <!--<button id="showProtractorVBtn" class="btn">Protractor V</button>-->
             <!--<button id="showProtractorHBtn" class="btn">Protractor H</button>-->
@@ -537,6 +539,15 @@
 
     $("#hideTree").click(function () {
         $("#tree-wrapper").hide();
+    });
+
+
+    $("#selectAllTree").click(function () {
+        tree.nodes().select();
+    });
+
+    $("#deselectAllTree").click(function () {
+        tree.nodes().deselect();
     });
 
     $("#loadModel").click(function () {
