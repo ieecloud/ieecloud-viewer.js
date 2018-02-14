@@ -1314,7 +1314,8 @@ var Viewport = function (editor) {
     };
 
     function calculateNewFov(boundingBox) {
-        var newFov = null;
+        var result = {};
+
 
         /*
 			  5____4
@@ -1414,6 +1415,8 @@ var Viewport = function (editor) {
         center.addVectors(ur, bl);
         center.divideScalar(2);
 
+        result.center = center;
+
         var dist = camera.position.distanceTo(center);
 
         var upperLeft = new THREE.Vector3().fromArray(ul.toArray().slice(0, 3));
@@ -1422,24 +1425,24 @@ var Viewport = function (editor) {
         if (size.z >= size.x) { // height case
             var bottomLeft = new THREE.Vector3().fromArray(bl.toArray().slice(0, 3));
             var height = upperLeft.distanceTo(bottomLeft);
-            newFov = 2 * Math.atan(height / (2 * dist)) * ( 180 / Math.PI );
+            result.newFov = 2 * Math.atan(height / (2 * dist)) * ( 180 / Math.PI );
         } else {
             var upperRight = new THREE.Vector3().fromArray(ur.toArray().slice(0, 3));
             var width = upperRight.distanceTo(upperLeft);
-            newFov = 2 * Math.atan((width / aspect) / (2 * dist)) * ( 180 / Math.PI );
+            result.newFov = 2 * Math.atan((width / aspect) / (2 * dist)) * ( 180 / Math.PI );
         }
-        return newFov;
+        return result;
     }
 
     signals.scaleChanged.add(function (boundingBox, modelRotation) {
         scope.initialBoundigBox = boundingBox;
         scope.initialModelRotation = modelRotation;
-        var fov = calculateNewFov(boundingBox);
+        var result = calculateNewFov(boundingBox);
         var addVector = new THREE.Vector3(0, 0, 0);
         addVector.addVectors(boundingBox.min, boundingBox.max);
         var center = addVector.multiplyScalar(0.5);
-        camera.fov = fov;
-        controls.setCenter(center);
+        camera.fov = result.newFov;
+        controls.setCenter(result.center);
         var newCameraFar = getFar(boundingBox);
         if (camera.far < newCameraFar) {
             camera.far = newCameraFar;
