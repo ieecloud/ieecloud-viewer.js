@@ -387,6 +387,8 @@ var Loader = function (editor, textureUrl) {
                                 node.text = node.name;
                             }
 
+                        }else{
+                            node.text = node.name;
                         }
                         traverse(obj[i]);
                     } else {
@@ -409,6 +411,8 @@ var Loader = function (editor, textureUrl) {
                                 node.text = node.name;
                                 node.uniqueId = THREE.Math.generateUUID();
                             }
+                        }else{
+                            node.text = node.name;
                         }
                         traverse(obj[prop]);
                     } else {
