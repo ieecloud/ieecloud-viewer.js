@@ -13,26 +13,34 @@ var Viewport = function (editor) {
     infoMode.setPosition('absolute');
     infoMode.setRight('5px');
     infoMode.setTop('5px');
-    infoMode.setFontSize('12px');
-    infoMode.setColor(editor.options.infoTextColor);
-    infoMode.setValue('mode=' + editor.mode);
+    infoMode.setFontSize('17px');
+    infoMode.setStyle('-webkit-text-fill-color', ['white']);
+    infoMode.setStyle('-webkit-text-stroke', ['0.7px rgba(0, 0, 0, 0.6)']);
+    infoMode.setColor('black');
+    // infoMode.setColor(editor.options.infoTextColor);
+    infoMode.setValue('mode=' + editor.mode + '; searchMode=' + editor.searchNearestPointMode);
     container.add(infoMode);
-
 
     var info = new UI.Text();
     info.setPosition('absolute');
     info.setRight('5px');
     info.setBottom('5px');
-    info.setFontSize('12px');
-    info.setColor(editor.options.infoTextColor);
+    info.setFontSize('17px');
+    info.setStyle('-webkit-text-fill-color', ['white']);
+    info.setStyle('-webkit-text-stroke', ['0.7px rgba(0, 0, 0, 0.6)']);
+    info.setColor('black');
+    // info.setColor(editor.options.infoTextColor);
     container.add(info);
 
     var rulerInfo = new UI.Text();
     rulerInfo.setPosition('absolute');
     rulerInfo.setLeft('5px');
     rulerInfo.setBottom('5px');
-    rulerInfo.setFontSize('12px');
-    rulerInfo.setColor(editor.options.infoTextColor);
+    rulerInfo.setFontSize('17px');
+    rulerInfo.setStyle('-webkit-text-fill-color', ['white']);
+    rulerInfo.setStyle('-webkit-text-stroke', ['0.7px rgba(0, 0, 0, 0.6)']);
+    rulerInfo.setColor('black');
+    // rulerInfo.setColor(editor.options.infoTextColor);
     container.add(rulerInfo);
 
     var scene = editor.scene;
@@ -403,7 +411,7 @@ var Viewport = function (editor) {
 
     // raycaster line precision
     var CONST_LINE_PRECISION_DEFAULT = 0.00000001;
-    var CONST_LINE_PRECISION_FOR_LINES = 0.05;
+    var CONST_LINE_PRECISION_FOR_LINES = 0.01;
 
     var raycaster = new THREE.Raycaster();
     raycaster.linePrecision = CONST_LINE_PRECISION_DEFAULT;
@@ -470,15 +478,30 @@ var Viewport = function (editor) {
 
         raycaster.setFromCamera(mouse, camera);
 
-        raycaster.linePrecision = CONST_LINE_PRECISION_DEFAULT;
-        var resultObjects = getIntersectsByRaycaster(raycaster, object);
-        raycaster.linePrecision = CONST_LINE_PRECISION_FOR_LINES;
-        var resultLines = getIntersectsByRaycaster(raycaster, object);
+        var startTime = Date.now();
 
-        if (resultObjects.length > 0 && resultLines > 0) {
-            return resultObjects[0].distance >= resultLines[0].distance ? resultObjects : resultLines;
+        var searchableObjects = [];
+        if(editor.searchNearestPointMode === 'MESHES') {
+            raycaster.linePrecision = CONST_LINE_PRECISION_DEFAULT;
+            searchableObjects = scene.meshes;
+        } else if(editor.searchNearestPointMode === 'LINES') {
+            raycaster.linePrecision = CONST_LINE_PRECISION_FOR_LINES;
+            searchableObjects = scene.lines;
         }
-        return resultObjects.length > 0 ? resultObjects : resultLines;
+
+        var resultObjects = getIntersectsByRaycaster(raycaster, searchableObjects);
+        console.log('get getIntersectsByRaycaster1 time:' + (Date.now() - startTime) + ' objects size:' + searchableObjects.length + ' editor.searchNearestPointMode:' + editor.searchNearestPointMode);
+        // raycaster.linePrecision = CONST_LINE_PRECISION_FOR_LINES;
+        // startTime = Date.now();
+        // var resultLines = getIntersectsByRaycaster(raycaster, object);
+        // console.log('get getIntersectsByRaycaster2 time:' + (Date.now() - startTime));
+        // var resultLines = [];
+        //
+        // if (resultObjects.length > 0 && resultLines > 0) {
+        //     return resultObjects[0].distance >= resultLines[0].distance ? resultObjects : resultLines;
+        // }
+        // return resultObjects.length > 0 ? resultObjects : resultLines;
+        return resultObjects;
     };
 
     var getIntersectsByRaycaster = function (raycaster, object) {
@@ -926,6 +949,8 @@ var Viewport = function (editor) {
             var vertices = intersect.object.userData.totalObjVertices;
             var results = intersect.object.userData.totalObjResults;
             var pointsTable = intersect.object.userData.pointsTable;
+            var objectNames = intersect.object.userData.objectNames;
+            var pointsNumbers = intersect.object.userData.pointsNumbers;
 
             var distance = intersect.distance * editor.loader.coordFactor;
             var c = intersect.point;
@@ -938,14 +963,27 @@ var Viewport = function (editor) {
             if (list.length > 0) {
                 var resultVal = 10;
                 var resultIndex = list[0].index;
+                var objectName = '';
                 if (resultIndex !== undefined) {
                     resultVal = results[resultIndex] ? results[resultIndex] : 0;
                     resultVal = !isNaN(resultVal) ? resultVal : 0;
 
+                    if(pointsNumbers) {
+                        var numberSum = 0;
+                        for(var i=0; i < pointsNumbers.length; i++) {
+                            numberSum = numberSum + pointsNumbers[i];
+                            if(resultIndex < numberSum) {
+                                if(objectNames[i]) {
+                                    objectName = objectNames[i];
+                                }
+                                break;
+                            }
+                        }
+                    }
                 }
                 resultVal = resultVal.round(editor.resultDigits);
                 var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
-                info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal);
+                info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal + ', objectName = ' + objectName);
                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
                 nearestPoint.position.copy(position);
                 nearestPoint.userData.result = resultVal;
@@ -976,9 +1014,15 @@ var Viewport = function (editor) {
                 lastMove = Date.now();
             }
 
-            var intersects = getIntersects(event, objects);
-            if (intersects.length > 0) {
-                runNearestAlgorithm(intersects);
+            if(editor.searchNearestPointMode !== undefined && editor.searchNearestPointMode !== '') {
+                var startTime = Date.now();
+                var intersects = getIntersects(event, objects);
+                console.log('get getIntersects time:' + (Date.now() - startTime));
+                startTime = Date.now();
+                if (intersects.length > 0) {
+                    runNearestAlgorithm(intersects);
+                }
+                console.log('runNearestAlgorithm time:' + (Date.now() - startTime));
             }
         };
 
@@ -1194,13 +1238,10 @@ var Viewport = function (editor) {
         // }
 
         var step = 2;
-        var approaching = event.distance > 0 ? step : 1/step;
+        var approaching = event.distance > 0 ? 1/step : step;
 
         var oldCameraFov = camera.fov;
         var newCameraFov = oldCameraFov * approaching;
-
-        console.log('oldFov:' + oldCameraFov + ' newFov:' + newCameraFov + ' dif:' + (oldCameraFov - newCameraFov) + ' zoom:' + camera.zoom);
-        console.log('initialBoundigBox:' + scope.initialBoundigBox);
 
         camera.fov = newCameraFov;
         camera.updateProjectionMatrix();
@@ -1288,8 +1329,16 @@ var Viewport = function (editor) {
         nearestPoint.hide();
         highlighter.hide();
         highlighterProtractor.hide();
-        infoMode.setValue('mode=' + editor.mode);
+        infoMode.setValue('mode=' + editor.mode + '; searchMode=' + editor.searchNearestPointMode);
         render();
+    });
+
+    signals.setSearchNearestPointMode.add(function () {
+        nearestPoint.hide();
+        highlighter.hide();
+        highlighterProtractor.hide();
+        infoMode.setValue('mode=' + editor.mode + '; searchMode=' + editor.searchNearestPointMode);
+        // render();
     });
 
 
@@ -1499,7 +1548,6 @@ var Viewport = function (editor) {
 
         render();
     });
-
 
     signals.saveModelPosition.add(function () {
 
