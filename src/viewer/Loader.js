@@ -144,6 +144,8 @@ var Loader = function (editor, textureUrl) {
             var pointsTable = totalObjectDataElement.pointsTable;
             var vertices = totalObjectDataElement.totalObjVertices;
             var results = totalObjectDataElement.totalObjResults;
+            var objectNames = totalObjectDataElement.objectNames;
+            var pointsNumbers = totalObjectDataElement.pointsNumbers;
 
             for (var j = 0; j < objectElement.length; j++) {
                 var objectGeometry = objectElement[j].objectGeometry;
@@ -157,6 +159,8 @@ var Loader = function (editor, textureUrl) {
                     mesh.userData.name = objectElement[j].name;
                     mesh.userData.totalObjVertices = vertices;
                     mesh.userData.totalObjResults = results;
+                    mesh.userData.objectNames = objectNames;
+                    mesh.userData.pointsNumbers = pointsNumbers;
 
                     mesh.name = objectElement[j].name;
                     mesh.uniqueId = mesh.uuid;
@@ -171,6 +175,8 @@ var Loader = function (editor, textureUrl) {
                 lines.userData.name = objectElement[j].name;
                 lines.userData.totalObjVertices = vertices;
                 lines.userData.totalObjResults = results;
+                lines.userData.objectNames = objectNames;
+                lines.userData.pointsNumbers = pointsNumbers;
 
                 modelGroup.add(lines);
                 editor.octree.add(lines);
@@ -240,6 +246,8 @@ var Loader = function (editor, textureUrl) {
             var pointsTable = totalObjectDataElement.pointsTable;
             var vertices = totalObjectDataElement.totalObjVertices;
             var results = totalObjectDataElement.totalObjResults;
+            var objectNames = totalObjectDataElement.objectNames;
+            var pointsNumbers = totalObjectDataElement.pointsNumbers;
             var lineCommonPositionsArray = totalObjectDataElement.lineCommonPositionsArray;
             var faceCommonGeometryData = totalObjectDataElement.faceCommonGeometryData;
 
@@ -254,6 +262,8 @@ var Loader = function (editor, textureUrl) {
             mesh.userData.pointsTable = pointsTable;
             mesh.userData.totalObjVertices = vertices;
             mesh.userData.totalObjResults = results;
+            mesh.userData.objectNames = objectNames;
+            mesh.userData.pointsNumbers = pointsNumbers;
 
             mesh.name = totalObjectDataElement.name;
             mesh.uniqueId = mesh.uuid;
@@ -261,6 +271,12 @@ var Loader = function (editor, textureUrl) {
             mesh.defaultColor = objectElement[0].facesMaterial.color.clone();
 
             modelGroup.add(mesh);
+
+            if(!editor.scene.meshes) {
+                editor.scene.meshes = [];
+            }
+            editor.scene.meshes.push( mesh );
+
             editor.octree.add(mesh);
 // TODO move to common geometry
             // var simpleShapes = objectElement[j].simpleShapes;
@@ -294,7 +310,14 @@ var Loader = function (editor, textureUrl) {
             lines.defaultColor = objectElement[0].edgesMaterial.color.clone();
             lines.userData.totalObjVertices = vertices;
             lines.userData.totalObjResults = results;
+            lines.userData.objectNames = objectNames;
+            lines.userData.pointsNumbers = pointsNumbers;
             editor.octree.add(lines);
+
+            if(!editor.scene.lines) {
+                editor.scene.lines = [];
+            }
+            editor.scene.lines.push( lines );
 
             if (geoCommonMeshGeometry.attributes.position.count > 0 && geoCommonLineGeometry.attributes.position.count > 0) {
                 lines.name = totalObjectDataElement.name + ".EDGE";
@@ -535,7 +558,7 @@ var Loader = function (editor, textureUrl) {
                                      faceCommonGeometryData) {
         var offset = 0;
         var drawResults = (DRAW_RESULTS && results && (results.length != 0));
-        var drawTexture = (!drawResults) && (uv.length != 0);
+        var drawTexture = (!drawResults) && (uv && uv.length != 0);
 
         var positions = [];
         var colors = [];
@@ -720,7 +743,7 @@ var Loader = function (editor, textureUrl) {
             var uv = uvGroups[j];
             var fi = faces.length;
 
-            var drawTexture = (!drawResults) && (uv.length != 0)
+            var drawTexture = (!drawResults) && (uv && uv.length != 0)
 
             scope.parseModelFaces(faceGeometry, faces, vertices, uv, settings.faceColor, results,
                 maxResult, minResult, faceCommonGeometryData);
@@ -794,6 +817,8 @@ var Loader = function (editor, textureUrl) {
         var edges = geometryObject.edges;
         var results = geometryObject.results;
         var pointsTable = geometryObject.pointsTable;
+        var objectNames = geometryObject.objectNames;
+        var pointsNumbers = geometryObject.pointsNumbers;
         var vertices = [];
 
         var drawResults = (DRAW_RESULTS && results && (results.length != 0));
@@ -834,6 +859,8 @@ var Loader = function (editor, textureUrl) {
         var totalGeometryObj = {};
         totalGeometryObj.objectPartsArray = objectPartsArray;
         totalGeometryObj.pointsTable = pointsTable;
+        totalGeometryObj.objectNames = objectNames;
+        totalGeometryObj.pointsNumbers = pointsNumbers;
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
         totalGeometryObj.lineCommonPositionsArray = lineCommonPositionsArray;

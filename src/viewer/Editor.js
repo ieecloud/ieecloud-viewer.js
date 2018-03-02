@@ -34,9 +34,9 @@ var Editor = function (options) {
         printScreen: new SIGNALS.Signal(),
         materialChanged: new SIGNALS.Signal(),
         setMode: new SIGNALS.Signal(),
+        setSearchNearestPointMode: new SIGNALS.Signal(),
         objectShow: new SIGNALS.Signal(),
-        objectHide: new SIGNALS.Signal(),
-
+        objectHide: new SIGNALS.Signal()
     };
 
     this.MODE_FACES_EDGES = "faces_and_nodes";
@@ -46,6 +46,7 @@ var Editor = function (options) {
     this.options = options;
     this.id = options.id;
     this.mode = options.mode;
+    this.searchNearestPointMode = options.searchNearestPointMode;
     this.resultDigits = options.resultDigits;
 
     this.loader = new Loader(this, options.textureUrl);
@@ -208,14 +209,20 @@ Editor.prototype = {
         this.signals.setMode.dispatch();
     },
 
+    setSearchNearestPointMode: function (mode) {
+        this.searchNearestPointMode = mode;
+        this.signals.setSearchNearestPointMode.dispatch();
+    },
 
     setOptions: function (newOptions) {
         this.options = newOptions;
         this.id = newOptions.id;
         this.mode = newOptions.mode;
+        this.searchNearestPointMode = newOptions.searchNearestPointMode;
         this.resultDigits = newOptions.resultDigits;
         this.loader.setTextureUrl(newOptions.textureUrl);
         this.signals.setMode.dispatch();
+        this.signals.setSearchNearestPointMode.dispatch();
     },
 
 

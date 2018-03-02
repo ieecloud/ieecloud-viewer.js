@@ -191,6 +191,11 @@ function Viewer(target, options) {
     Viewer.prototype.setMode = function (mode) {
         this.threeEditor.setMode(mode);
     };
+
+    Viewer.prototype.setSearchNearestPointMode = function (mode) {
+        this.threeEditor.setSearchNearestPointMode(mode);
+    };
+
     init(this);
 }
 
@@ -236,7 +241,8 @@ function Viewer(target, options) {
         backgroundColor: "#aaa",
         nearestPointColor: "red",
         resultPointColor: "white",
-        resultPointSize: 0.005
+        resultPointSize: 0.005,
+        searchNearestPointMode: "MESHES"
 
     };
 

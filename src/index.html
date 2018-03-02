@@ -430,14 +430,16 @@
         textureUrl: "",
         mode: "3d_point",
         resultDigits: 3,
-        drawResults: false,
-        gridVisible: true,
+        drawResults: true,
+        gridVisible: false,
 //        rotationScale: {fov:0.35082010187266344, position: {x:
 //            48.22379092090737, y: -38.052186013287574, z: 154.37283345146167}},
         detailModelView: false,
         resultColor: "white",
         backgroundColor: "#d4d4d4",
         resultTextColor: "white",
+        nearestPointColor: "red",
+        searchNearestPointMode:"MESHES",
         id: "1",
         onTreeLoad:function(treeData){
            var tData = treeData.children;
