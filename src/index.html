@@ -405,6 +405,11 @@
         <div  id="tree-wrapper" style="width:300px;overflow: scroll;
     height: 100vh; position: relative;z-index: 1000;background-color: black;
             opacity: 0.5; color:white;">
+            <input style="width:70%" id="search-input"/>
+            <button id="search-btn" class="btn">Search</button>
+            <input type="radio"  name="filterBy" id="all-filter" checked value="ALL"/> All
+            <input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges
+            <input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces
             <div class="tree"></div>
         </div>
 
@@ -462,6 +467,26 @@
                     }
 
                 });
+
+                $("#search-btn").on('click', function(event) {
+                    var results = tree.search($("#search-input").val());
+                    var filterValue = $('input[name="filterBy"]').filter(':checked').val();
+
+                    if(filterValue === 'ALL'){
+                        return;
+                    }
+                    var toHide = filterValue === 'EDGE' ? 'FACE' : 'EDGE';
+                    var nodes = results._result;
+                    var showNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, filterValue);});
+                    var hideNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, toHide);});
+                    _.forEach(hideNodes, function(node) {
+                        node.hide();
+                    });
+                    _.forEach(showNodes, function(node) {
+                        node.show();
+                    });
+                });
+
             }
         },
         onSelect3dPoint: function (point) {
