@@ -483,9 +483,12 @@
                     var hideNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, toHide);});
                     _.forEach(hideNodes, function(node) {
                         node.hide();
+                        node.deselect();
                     });
+
                     _.forEach(showNodes, function(node) {
                         node.show();
+                        node.select();
                     });
                 });
 
