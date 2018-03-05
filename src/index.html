@@ -430,7 +430,7 @@
         textureUrl: "",
         mode: "3d_point",
         resultDigits: 3,
-        drawResults: true,
+        drawResults: false,
         gridVisible: false,
 //        rotationScale: {fov:0.35082010187266344, position: {x:
 //            48.22379092090737, y: -38.052186013287574, z: 154.37283345146167}},
@@ -471,28 +471,68 @@
                 });
 
                 $("#search-btn").on('click', function(event) {
+
+                    function showHideNodes(showNodes, hideNodes) {
+                        _.forEach(hideNodes, function (node) {
+                            node.hide();
+                            node.deselect();
+                        });
+
+                        _.forEach(showNodes, function (node) {
+                            node.show();
+                            node.select();
+                        });
+                    }
+
                     var results = tree.search($("#search-input").val());
                     var filterValue = $('input[name="filterBy"]').filter(':checked').val();
                     var nodes = results._result;
-                    if(filterValue === 'ALL'){
-                        _.forEach(nodes, function(node) {
-                            node.select();
+                    var toHide = '';
+                    if(filterValue === 'EDGE'){
+                        toHide = 'FACE';
+                    }else if(filterValue === 'FACE'){
+                        toHide = 'EDGE';
+                    }
+
+                    if (nodes instanceof InspireTree) {
+                        if (filterValue === 'ALL') {
+                            tree.nodes().show();
+                            tree.nodes().select();
+                            return;
+                        }
+                        var showNodes = [];
+                        var hideNodes = [];
+                        tree.nodes().recurseDown(function (node) {
+                            if (_.endsWith(node.text, filterValue)) {
+                                showNodes.push(node);
+                            }
+
+                            if (_.endsWith(node.text, toHide)) {
+                                hideNodes.push(node);
+                            }
                         });
+
+                        showHideNodes(showNodes, hideNodes);
                         return;
                     }
-                    var toHide = filterValue === 'EDGE' ? 'FACE' : 'EDGE';
+
 
                     var showNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, filterValue);});
-                    var hideNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, toHide);});
-                    _.forEach(hideNodes, function(node) {
-                        node.hide();
-                        node.deselect();
+                    var hideNodes = [];
+                    if(_.trim(toHide).length != 0){
+                        hideNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, toHide);});
+                    }else{
+                        nodes.select();
+                    }
+                    var nodesNotSearched = [];
+                    tree.nodes().recurseDown(function (node) {
+                        if (_.indexOf(nodes, node) === -1) {
+                            nodesNotSearched.push(node);
+                        }
                     });
 
-                    _.forEach(showNodes, function(node) {
-                        node.show();
-                        node.select();
-                    });
+
+                    showHideNodes(showNodes, _.union(hideNodes, nodesNotSearched));
                 });
 
             }
