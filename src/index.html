@@ -473,12 +473,15 @@
                 $("#search-btn").on('click', function(event) {
                     var results = tree.search($("#search-input").val());
                     var filterValue = $('input[name="filterBy"]').filter(':checked').val();
-
+                    var nodes = results._result;
                     if(filterValue === 'ALL'){
+                        _.forEach(nodes, function(node) {
+                            node.select();
+                        });
                         return;
                     }
                     var toHide = filterValue === 'EDGE' ? 'FACE' : 'EDGE';
-                    var nodes = results._result;
+
                     var showNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, filterValue);});
                     var hideNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, toHide);});
                     _.forEach(hideNodes, function(node) {
