@@ -384,8 +384,6 @@
             <button id="removeModel" class="btn">Remove Model</button>
             <button id="showTree" class="btn">Show Tree</button>
             <button id="hideTree" class="btn">Hide Tree</button>
-            <button id="selectAllTree" class="btn">Select All Tree Nodes</button>
-            <button id="deselectAllTree" class="btn">Deselect All Tree Nodes</button>
             <!--<button id="showRulerBtn" class="btn">Ruler</button>-->
             <!--<button id="showProtractorVBtn" class="btn">Protractor V</button>-->
             <!--<button id="showProtractorHBtn" class="btn">Protractor H</button>-->
@@ -402,11 +400,14 @@
             <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
             <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
         </div>
-        <div  id="tree-wrapper" style="width:300px;overflow: scroll;
+        <div  id="tree-wrapper" style="width:400px;overflow: scroll;
     height: 100vh; position: relative;z-index: 1000;background-color: black;
             opacity: 0.5; color:white;">
-            <input style="width:70%" id="search-input"/>
-            <button id="search-btn" class="btn">Search</button>
+            <button id="selectAllTree" class="btn">Select All</button>
+            <button id="deselectAllTree" class="btn">Deselect All</button>
+            <input style="width:60%" id="search-input"/>
+            <button id="select-btn" class="btn">Select</button>
+            <button id="deselect-btn" class="btn">Deselect</button>
             <input type="radio"  name="filterBy" id="all-filter" checked value="ALL"/> All
             <input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges
             <input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces
@@ -424,6 +425,7 @@
 <script>
 
     var tree;
+    var lastFilterValue;
     $("#tree-wrapper").hide();
 
     $("#viewer").ieecloudEditor({
@@ -470,69 +472,60 @@
 
                 });
 
-                $("#search-btn").on('click', function(event) {
-
-                    function showHideNodes(showNodes, hideNodes) {
-                        _.forEach(hideNodes, function (node) {
-                            node.hide();
-                            node.deselect();
-                        });
-
-                        _.forEach(showNodes, function (node) {
-                            node.show();
-                            node.select();
-                        });
-                    }
-
-                    var results = tree.search($("#search-input").val());
+                let toggleNodes = (funcBeforeDoName , funcDoName) => {
+                    var queryString = $("#search-input").val();
                     var filterValue = $('input[name="filterBy"]').filter(':checked').val();
-                    var nodes = results._result;
-                    var toHide = '';
-                    if(filterValue === 'EDGE'){
-                        toHide = 'FACE';
-                    }else if(filterValue === 'FACE'){
-                        toHide = 'EDGE';
-                    }
-
-                    if (nodes instanceof InspireTree) {
-                        if (filterValue === 'ALL') {
-                            tree.nodes().show();
-                            tree.nodes().select();
-                            return;
+                    let query = new RegExp(queryString, 'i');
+                    let predicate = (node, filterValue) => {
+                        if(filterValue === 'ALL'){
+                            return query.test(node.text);
                         }
-                        var showNodes = [];
-                        var hideNodes = [];
-                        tree.nodes().recurseDown(function (node) {
-                            if (_.endsWith(node.text, filterValue)) {
-                                showNodes.push(node);
-                            }
+                        return query.test(node.text) && _.endsWith(node.text, filterValue);
+                    };
 
-                            if (_.endsWith(node.text, toHide)) {
-                                hideNodes.push(node);
+                    if(lastFilterValue === 'EDGE' || lastFilterValue === 'FACE'){
+                        tree.model.recurseDown((node) => {
+                            if (!node.removed()) {
+                                if (_.endsWith(node.text, lastFilterValue)) {
+                                    node[funcBeforeDoName]()
+                                }
                             }
                         });
+                    }
 
-                        showHideNodes(showNodes, hideNodes);
-                        return;
+                    if(lastFilterValue === 'ALL'){
+                        tree.model.recurseDown((node) => {
+                            if (!node.removed()) {
+                                var toShow;
+                                if (filterValue === 'EDGE') {
+                                    toShow = 'FACE';
+                                } else if (filterValue === 'FACE') {
+                                    toShow = 'EDGE';
+                                }
+                                if (_.endsWith(node.text, toShow)) {
+                                    node[funcBeforeDoName]()
+                                }
+                            }
+                        });
                     }
 
 
-                    var showNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, filterValue);});
-                    var hideNodes = [];
-                    if(_.trim(toHide).length != 0){
-                        hideNodes = _.filter(nodes, function(node) { return _.endsWith(node.text, toHide);});
-                    }else{
-                        nodes.select();
-                    }
-                    var nodesNotSearched = [];
-                    tree.nodes().recurseDown(function (node) {
-                        if (_.indexOf(nodes, node) === -1) {
-                            nodesNotSearched.push(node);
+                    lastFilterValue = filterValue;
+                    tree.model.recurseDown((node) => {
+                        if (!node.removed()) {
+                            if (predicate(node, filterValue)) {
+                                node[funcDoName]()
+                            }
                         }
                     });
+                };
 
+                $("#deselect-btn").on('click', function(event) {
+                    toggleNodes("select", "deselect");
+                });
 
-                    showHideNodes(showNodes, _.union(hideNodes, nodesNotSearched));
+                $("#select-btn").on('click', function(event) {
+                    toggleNodes("deselect", "select");
                 });
 
             }
