@@ -425,7 +425,6 @@
 <script>
 
     var tree;
-    var lastFilterValue;
     $("#tree-wrapper").hide();
 
     $("#viewer").ieecloudEditor({
@@ -476,45 +475,28 @@
                     var queryString = $("#search-input").val();
                     var filterValue = $('input[name="filterBy"]').filter(':checked').val();
                     let query = new RegExp(queryString, 'i');
-                    let predicate = (node, filterValue) => {
-                        if(filterValue === 'ALL'){
-                            return query.test(node.text);
-                        }
-                        return query.test(node.text) && _.endsWith(node.text, filterValue);
+                    let predicate = (node) => {
+                        return query.test(node.text);
                     };
 
-                    if(lastFilterValue === 'EDGE' || lastFilterValue === 'FACE'){
-                        tree.model.recurseDown((node) => {
-                            if (!node.removed()) {
-                                if (_.endsWith(node.text, lastFilterValue)) {
-                                    node[funcBeforeDoName]()
-                                }
-                            }
-                        });
-                    }
+                    let filterPredicate = (node, filterValue) => {
+                        return _.endsWith(node.text, filterValue);
+                    };
 
-                    if(lastFilterValue === 'ALL'){
-                        tree.model.recurseDown((node) => {
-                            if (!node.removed()) {
-                                var toShow;
-                                if (filterValue === 'EDGE') {
-                                    toShow = 'FACE';
-                                } else if (filterValue === 'FACE') {
-                                    toShow = 'EDGE';
-                                }
-                                if (_.endsWith(node.text, toShow)) {
-                                    node[funcBeforeDoName]()
-                                }
-                            }
-                        });
-                    }
-
-
-                    lastFilterValue = filterValue;
                     tree.model.recurseDown((node) => {
                         if (!node.removed()) {
-                            if (predicate(node, filterValue)) {
-                                node[funcDoName]()
+                            if (predicate(node)) {
+                                node[funcDoName]();
+                                if (filterValue !== 'ALL') {
+                                    node.recurseDown((nodeInner) => {
+                                        if (!nodeInner.removed()) {
+                                            nodeInner[funcBeforeDoName]();
+                                            if (filterPredicate(nodeInner, filterValue)) {
+                                                nodeInner[funcDoName]()
+                                            }
+                                        }
+                                    });
+                                }
                             }
                         }
                     });
@@ -609,15 +591,15 @@
 
 
     $("#selectAllTree").click(function () {
-        tree.nodes().select();
+        tree.nodes().selectDeep();
     });
 
     $("#deselectAllTree").click(function () {
-        tree.nodes().deselect();
+        tree.nodes().deselectDeep();
     });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/results.json", function (json) {
+        $.getJSON("../resources/Tree-bugs.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
     });
