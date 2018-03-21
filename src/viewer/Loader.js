@@ -325,8 +325,14 @@ var Loader = function (editor, textureUrl) {
                 meshesData[key].push(lines);
                 meshesData[key].push(mesh);
             } else if (geoCommonMeshGeometry.attributes.position.count === 0 && geoCommonLineGeometry.attributes.position.count > 0) {
+                if(_.trim(lines.name).length === 0){
+                    lines.name = totalObjectDataElement.name + ".EDGE";
+                }
                 meshesData[key].push(lines);
             } else if (geoCommonMeshGeometry.attributes.position.count > 0 && geoCommonLineGeometry.attributes.position.count === 0) {
+                if(_.trim(mesh.name).length === 0){
+                    mesh.name = totalObjectDataElement.name + ".FACE";
+                }
                 meshesData[key].push(mesh);
             }
         });
@@ -403,7 +409,7 @@ var Loader = function (editor, textureUrl) {
                                 var treejsNodes = result[node.index];
                                 var treeNodes = [];
                                 _.forEach(treejsNodes, function(value, key) {
-                                    treeNodes.push({text: _.trim(value.name).length > 0 ? value.name : "UnknownName", object: value})
+                                    treeNodes.push({text:  value.name, object: value})
                                 });
                                 node.children = treeNodes;
                                 node.uniqueId = THREE.Math.generateUUID();
@@ -427,7 +433,7 @@ var Loader = function (editor, textureUrl) {
                                 var treejsNodes = result[node.index];
                                 var treeNodes = [];
                                 _.forEach(treejsNodes, function(value, key) {
-                                    treeNodes.push({text: _.trim(value.name).length > 0 ? value.name : "UnknownName", object: value})
+                                    treeNodes.push({text:  value.name, object: value})
                                 });
 
                                 node.children = treeNodes;
