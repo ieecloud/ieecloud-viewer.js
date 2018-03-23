@@ -138,6 +138,11 @@ var Loader = function (editor, textureUrl) {
         var meshesData = {};
         var modelGroup = new THREE.Object3D();
         _.forEach(result, function (value, key) {
+
+            if(!value.objectPartsArray || value.objectPartsArray.length == 0) {
+                return;
+            }
+
             meshesData[key] = [];
             var totalObjectDataElement = value;
             var objectElement = totalObjectDataElement.objectPartsArray;
@@ -240,6 +245,11 @@ var Loader = function (editor, textureUrl) {
         var meshesData = {};
         var modelGroup = new THREE.Object3D();
         _.forEach(result, function(value, key) {
+
+            if(!value.objectPartsArray || value.objectPartsArray.length == 0) {
+                return;
+            }
+
             meshesData[key] = [];
             var totalObjectDataElement = value;
             var objectElement = totalObjectDataElement.objectPartsArray;
