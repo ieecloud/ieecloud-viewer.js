@@ -719,7 +719,7 @@ var Viewport = function (editor) {
     };
 
 
-    scope.onMouseDblClickViewerHandler = function (event) {
+    scope.onMouseClickViewerHandler = function (event) {
         var rect = container.dom.getBoundingClientRect();
 
         var x = (event.clientX - rect.left) / rect.width;
@@ -1043,17 +1043,17 @@ var Viewport = function (editor) {
         }
     };
 
-    var onDoubleClick = function (event) {
+    var onClick = function (event) {
         if (editor.mode === editor.MODE_FACES_EDGES || editor.mode === editor.MODE_3D_GEOMETRY) {
 //          not implemented yet
         } else if (editor.mode === editor.MODE_3D_POINT) {
-            scope.onMouseDblClickViewerHandler(event);
+            scope.onMouseClickViewerHandler(event);
         }
 
     };
 
     container.dom.addEventListener('mousedown', onMouseDown, false);
-    container.dom.addEventListener('dblclick', onDoubleClick, false);
+    container.dom.addEventListener('click', onClick, false);
     container.dom.addEventListener('mousemove', onMouseMove, false);
     container2.dom.addEventListener('mousemove', onMouseMove, false);
 

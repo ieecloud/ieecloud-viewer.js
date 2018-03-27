@@ -237,22 +237,26 @@ THREE.EditorControls = function (editorId, object, domElement) {
 
     function onMouseWheel(event) {
 
-        event.preventDefault();
-        var delta = 0;
 
-        if (event.wheelDelta) {
+        if (event && (event.ctrlKey || event.metaKey)) {
 
-            delta = event.wheelDelta / 4;
 
-        } else if (event.detail) {
+            event.preventDefault();
+            var delta = 0;
 
-            delta = -event.detail / 30;
+            if (event.wheelDelta) {
 
+                delta = event.wheelDelta / 4;
+
+            } else if (event.detail) {
+
+                delta = -event.detail / 30;
+
+            }
+
+            zoomEvent.distance = delta;
+            scope.dispatchEvent(zoomEvent);
         }
-
-        zoomEvent.distance = delta;
-        scope.dispatchEvent(zoomEvent);
-
     }
 
     domElement.addEventListener('contextmenu', function (event) {
