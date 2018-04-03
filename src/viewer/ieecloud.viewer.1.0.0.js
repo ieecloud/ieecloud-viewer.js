@@ -184,6 +184,10 @@ function Viewer(target, options) {
         this.threeEditor.saveModelPosition();
     };
 
+    Viewer.prototype.toggleIsolines = function (value) {
+        this.threeEditor.toggleIsolines(value);
+    };
+
     Viewer.prototype.printScreen = function (toFileName) {
         this.threeEditor.printScreen(toFileName);
     };

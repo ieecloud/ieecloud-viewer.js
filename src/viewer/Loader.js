@@ -171,6 +171,7 @@ var Loader = function (editor, textureUrl) {
                     mesh.uniqueId = mesh.uuid;
                     mesh.parentName = objectElement[j].parentName;
                     mesh.defaultColor = facesMaterial.color.clone();
+                    mesh.facesMaterial = facesMaterial;
 
                     modelGroup.add(mesh);
                     editor.octree.add(mesh);
@@ -279,6 +280,7 @@ var Loader = function (editor, textureUrl) {
             mesh.uniqueId = mesh.uuid;
             mesh.parentName = totalObjectDataElement.name;
             mesh.defaultColor = objectElement[0].facesMaterial.color.clone();
+            mesh.facesMaterial = objectElement[0].facesMaterial;
 
             modelGroup.add(mesh);
 
@@ -773,13 +775,13 @@ var Loader = function (editor, textureUrl) {
             pictureGeometryElement.name = groups[j];
             pictureGeometryElement.parentName = name;
             if (drawResults) { // Draw face with spectral texture according to results
-                pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
-                    map: colorMapTexture,
-                    flatShading: true,
-                    side: THREE.FrontSide
-
-                });
-
+                // pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
+                //     map: colorMapTexture,
+                //     flatShading: true,
+                //     side: THREE.FrontSide
+                //
+                // });
+                 pictureGeometryElement.facesMaterial = simpleFacesMaterial;
             } else {
                 if (drawTexture && settings.texture.name != undefined) {
                     // Draw face with texture
@@ -939,10 +941,9 @@ var Loader = function (editor, textureUrl) {
             }, function () {
                 console.log("error")
             });
-
-            editor.addTexture(colorMapTexture);
             colorMapTexture.magFilter = THREE.NearestFilter;
             colorMapTexture.minFilter = THREE.LinearFilter;
+            editor.addTexture(colorMapTexture);
         }
 
         // calculate scaleFactor

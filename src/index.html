@@ -388,7 +388,8 @@
             <!--<button id="showProtractorVBtn" class="btn">Protractor V</button>-->
             <!--<button id="showProtractorHBtn" class="btn">Protractor H</button>-->
             <button id="exitFromFullScreen" class="btn">Exit from full screen</button>
-            <button id="toFullScreen" class="btn">To full Screen</button>
+            <button id="addIsolines" class="btn">Add Isolines </button>
+            <button id="removeIsolines" class="btn">Remove Isolines </button>
             <!--<button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>-->
             <!--<button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>-->
             <!--<button id="takeScreenShort" class="btn">Take Screen Short</button>-->
@@ -431,7 +432,7 @@
         textureUrl: "",
         mode: "3d_point",
         resultDigits: 3,
-        drawResults: false,
+        drawResults: true,
         gridVisible: false,
 //        rotationScale: {fov:0.35082010187266344, position: {x:
 //            48.22379092090737, y: -38.052186013287574, z: 154.37283345146167}},
@@ -528,7 +529,7 @@
             textureUrl: "",
             mode: "3d_point",
             resultDigits: 2,
-            drawResults: false,
+            drawResults: true,
             gridVisible: false,
             detailModelView: false,
             resultColor: "white",
@@ -572,6 +573,14 @@
         $("#viewer").ieecloudEditor('printScreen', "printScreen.png");
     });
 
+    $("#addIsolines").click(function () {
+        $("#viewer").ieecloudEditor('toggleIsolines', true);
+    });
+
+    $("#removeIsolines").click(function () {
+        $("#viewer").ieecloudEditor('toggleIsolines', false);
+    });
+
 
     $("#saveModelPositionBtn").click(function () {
         $("#viewer").ieecloudEditor('saveModelPosition');
@@ -599,7 +608,7 @@
     });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/Tree-bugs.json", function (json) {
+        $.getJSON("../resources/results.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
     });

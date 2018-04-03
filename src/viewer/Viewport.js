@@ -1713,7 +1713,6 @@ var Viewport = function (editor) {
 
 
     signals.materialChanged.add(function (material) {
-
         render();
 
     });

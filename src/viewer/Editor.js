@@ -274,8 +274,23 @@ Editor.prototype = {
 
 
     addTexture: function (texture) {
-
+        this.colorMapTexture = texture;
         this.textures[texture.uuid] = texture;
+
+    },
+
+    toggleIsolines: function (showFlag) {
+        var isolineMaterial = new THREE.MeshLambertMaterial({
+            map: this.colorMapTexture,
+            flatShading: true,
+            side: THREE.FrontSide
+
+        });
+        for(var i=0; i <  this.scene.meshes.length; i++) {
+            this.scene.meshes[i].material = showFlag ? isolineMaterial : this.scene.meshes[i].facesMaterial;
+        }
+
+        this.signals.materialChanged.dispatch();
 
     },
 
