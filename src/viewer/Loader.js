@@ -933,7 +933,6 @@ var Loader = function (editor, textureUrl) {
         pictureInfo.modelRotation = this.modelRotation;
 
         var colorMapTexture;
-
         if (DRAW_RESULTS) {
             var imageName = scope.textureUrl ? scope.textureUrl + 'color-spectrum.png' : 'color-spectrum.png';
             colorMapTexture = THREE.ImageUtils.loadTexture(imageName, null, function () {

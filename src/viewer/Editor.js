@@ -274,20 +274,22 @@ Editor.prototype = {
 
 
     addTexture: function (texture) {
-        this.colorMapTexture = texture;
-        this.textures[texture.uuid] = texture;
-
-    },
-
-    toggleIsolines: function (showFlag) {
-        var isolineMaterial = new THREE.MeshLambertMaterial({
-            map: this.colorMapTexture,
+        this.isolineMaterial = new THREE.MeshLambertMaterial({
+            map: texture,
             flatShading: true,
             side: THREE.FrontSide
 
         });
+    },
+
+    toggleIsolines: function (showFlag) {
+
+        if(!this.options.drawResults){
+            return;
+        }
+
         for(var i=0; i <  this.scene.meshes.length; i++) {
-            this.scene.meshes[i].material = showFlag ? isolineMaterial : this.scene.meshes[i].facesMaterial;
+            this.scene.meshes[i].material = showFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
         }
 
         this.signals.materialChanged.dispatch();

@@ -736,6 +736,10 @@ var Viewport = function (editor) {
 
         var resultVal = nearestPoint.userData.result;
 
+        if(resultVal === 0){
+            return false;
+        }
+
         var textResultObjByName = scope.getSceneObjectByName("result-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z);
         if (textResultObjByName) {
             var textResultSphereObjByName = scope.getSceneObjectByName("sphereResult-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z);
