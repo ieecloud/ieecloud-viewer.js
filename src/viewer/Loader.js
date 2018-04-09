@@ -157,6 +157,7 @@ var Loader = function (editor, textureUrl) {
                 var facesMaterial = objectElement[j].facesMaterial;
                 var edgesGeometry = objectElement[j].edgesGeometry;
                 var edgesMaterial = objectElement[j].edgesMaterial;
+                var drawResults = objectElement[j].drawResults;
 
                 if (objectGeometry) {
                     var mesh = new THREE.Mesh(objectGeometry, facesMaterial);
@@ -172,6 +173,7 @@ var Loader = function (editor, textureUrl) {
                     mesh.parentName = objectElement[j].parentName;
                     mesh.defaultColor = facesMaterial.color.clone();
                     mesh.facesMaterial = facesMaterial;
+                    mesh.drawResults = drawResults;
 
                     modelGroup.add(mesh);
                     editor.octree.add(mesh);
@@ -281,6 +283,7 @@ var Loader = function (editor, textureUrl) {
             mesh.parentName = totalObjectDataElement.name;
             mesh.defaultColor = objectElement[0].facesMaterial.color.clone();
             mesh.facesMaterial = objectElement[0].facesMaterial;
+            mesh.drawResults = objectElement[0].drawResults;
 
             modelGroup.add(mesh);
 
@@ -774,6 +777,7 @@ var Loader = function (editor, textureUrl) {
             pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
             pictureGeometryElement.name = groups[j];
             pictureGeometryElement.parentName = name;
+            pictureGeometryElement.drawResults = drawResults;
             if (drawResults) { // Draw face with spectral texture according to results
                 // pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
                 //     map: colorMapTexture,

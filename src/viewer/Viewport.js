@@ -736,7 +736,7 @@ var Viewport = function (editor) {
 
         var resultVal = nearestPoint.userData.result;
 
-        if(resultVal === 0){
+        if(!resultVal || resultVal === 0){
             return false;
         }
 

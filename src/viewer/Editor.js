@@ -289,7 +289,9 @@ Editor.prototype = {
         }
 
         for(var i=0; i <  this.scene.meshes.length; i++) {
-            this.scene.meshes[i].material = showFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
+            if(this.scene.meshes[i].drawResults){
+                this.scene.meshes[i].material = showFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial ;
+            }
         }
 
         this.signals.materialChanged.dispatch();
