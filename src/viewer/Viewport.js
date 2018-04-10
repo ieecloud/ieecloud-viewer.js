@@ -736,10 +736,6 @@ var Viewport = function (editor) {
 
         var resultVal = nearestPoint.userData.result;
 
-        if(!resultVal || resultVal === 0){
-            return false;
-        }
-
         var textResultObjByName = scope.getSceneObjectByName("result-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z);
         if (textResultObjByName) {
             var textResultSphereObjByName = scope.getSceneObjectByName("sphereResult-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z);
@@ -969,8 +965,7 @@ var Viewport = function (editor) {
                 var resultIndex = list[0].index;
                 var objectName = '';
                 if (resultIndex !== undefined) {
-                    resultVal = results[resultIndex] ? results[resultIndex] : 0;
-                    resultVal = !isNaN(resultVal) ? resultVal : 0;
+                    resultVal = results[resultIndex];
 
                     if(pointsNumbers) {
                         var numberSum = 0;
@@ -985,7 +980,7 @@ var Viewport = function (editor) {
                         }
                     }
                 }
-                resultVal = resultVal.round(editor.resultDigits);
+                resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : undefined;
                 var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
                 info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal + ', objectName = ' + objectName);
                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);

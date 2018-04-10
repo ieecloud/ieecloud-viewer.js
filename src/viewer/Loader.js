@@ -155,12 +155,13 @@ var Loader = function (editor, textureUrl) {
             for (var j = 0; j < objectElement.length; j++) {
                 var objectGeometry = objectElement[j].objectGeometry;
                 var facesMaterial = objectElement[j].facesMaterial;
+                var drawResultsMaterial = objectElement[j].drawResultsMaterial;
                 var edgesGeometry = objectElement[j].edgesGeometry;
                 var edgesMaterial = objectElement[j].edgesMaterial;
                 var drawResults = objectElement[j].drawResults;
 
                 if (objectGeometry) {
-                    var mesh = new THREE.Mesh(objectGeometry, facesMaterial);
+                    var mesh = new THREE.Mesh(objectGeometry, drawResultsMaterial ? drawResultsMaterial: facesMaterial);
                     mesh.userData.pointsTable = pointsTable;
                     mesh.userData.name = objectElement[j].name;
                     mesh.userData.totalObjVertices = vertices;
@@ -271,7 +272,8 @@ var Loader = function (editor, textureUrl) {
             geoCommonMeshGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( faceCommonGeometryData.uvs, 2 ));
 
 
-            var mesh = new THREE.Mesh(geoCommonMeshGeometry, objectElement[0].facesMaterial);
+            var mesh = new THREE.Mesh(geoCommonMeshGeometry, objectElement[0].drawResultsMaterial  ?
+                objectElement[0].drawResultsMaterial : objectElement[0].facesMaterial);
             mesh.userData.pointsTable = pointsTable;
             mesh.userData.totalObjVertices = vertices;
             mesh.userData.totalObjResults = results;
@@ -779,12 +781,12 @@ var Loader = function (editor, textureUrl) {
             pictureGeometryElement.parentName = name;
             pictureGeometryElement.drawResults = drawResults;
             if (drawResults) { // Draw face with spectral texture according to results
-                // pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
-                //     map: colorMapTexture,
-                //     flatShading: true,
-                //     side: THREE.FrontSide
-                //
-                // });
+                pictureGeometryElement.drawResultsMaterial = new THREE.MeshLambertMaterial({
+                    map: colorMapTexture,
+                    flatShading: true,
+                    side: THREE.FrontSide
+
+                });
                  pictureGeometryElement.facesMaterial = simpleFacesMaterial;
             } else {
                 if (drawTexture && settings.texture.name != undefined) {
