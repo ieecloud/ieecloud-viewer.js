@@ -238,7 +238,7 @@ THREE.EditorControls = function (editorId, object, domElement) {
     function onMouseWheel(event) {
 
 
-        if (event && (event.ctrlKey || event.metaKey)) {
+        // if (event && (event.ctrlKey || event.metaKey)) {
 
 
             event.preventDefault();
@@ -256,7 +256,7 @@ THREE.EditorControls = function (editorId, object, domElement) {
 
             zoomEvent.distance = delta;
             scope.dispatchEvent(zoomEvent);
-        }
+        // }
     }
 
     domElement.addEventListener('contextmenu', function (event) {
