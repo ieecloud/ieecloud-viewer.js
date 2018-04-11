@@ -1474,7 +1474,8 @@ var Viewport = function (editor) {
         var upperLeft = new THREE.Vector3().fromArray(ul.toArray().slice(0, 3));
 
         var aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-        if (size.z >= size.x) { // height case
+        var gap = 0.1; // make height calculation preferable
+        if (size.z >= size.x - gap) { // height case
             var bottomLeft = new THREE.Vector3().fromArray(bl.toArray().slice(0, 3));
             var height = upperLeft.distanceTo(bottomLeft);
             result.newFov = 2 * Math.atan(height / (2 * dist)) * ( 180 / Math.PI );
