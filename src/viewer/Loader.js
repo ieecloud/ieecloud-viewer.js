@@ -474,6 +474,8 @@ var Loader = function (editor, textureUrl) {
         scope.objectsTree = [data.tree];
         editor.onTreeLoad(data.tree);
 
+        // TODO: improve
+        scope.computeBoundingBox(pictureInfo.modelRotation);
         scope.computeBoundingBox(pictureInfo.modelRotation);
         editor.onRenderDone();
         data = null;

@@ -1450,6 +1450,13 @@ var Viewport = function (editor) {
 
         var size = boundingBox.size();
 
+        var yNDCPercentCoverage = (Math.abs(ndc[topIdx].y) + Math.abs(ndc[bottomIdx].y)) / 2;
+        yNDCPercentCoverage = Math.min(1, yNDCPercentCoverage);
+
+        var xNDCPercentCoverage = (Math.abs(ndc[leftIdx].x) + Math.abs(ndc[rightIdx].x)) / 2;
+        xNDCPercentCoverage = Math.min(1, xNDCPercentCoverage);
+
+
         var ulCoords = [ndc[leftIdx].x, ndc[topIdx].y, closestVertexDistance, 1];
         var blCoords = [ndc[leftIdx].x, ndc[bottomIdx].y, closestVertexDistance, 1];
         var urCoords = [ndc[rightIdx].x, ndc[topIdx].y, closestVertexDistance, 1];
@@ -1474,8 +1481,7 @@ var Viewport = function (editor) {
         var upperLeft = new THREE.Vector3().fromArray(ul.toArray().slice(0, 3));
 
         var aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-        var gap = 0.1; // make height calculation preferable
-        if (size.z >= size.x - gap) { // height case
+        if ((1 - yNDCPercentCoverage) < (1 - xNDCPercentCoverage)) { // height case
             var bottomLeft = new THREE.Vector3().fromArray(bl.toArray().slice(0, 3));
             var height = upperLeft.distanceTo(bottomLeft);
             result.newFov = 2 * Math.atan(height / (2 * dist)) * ( 180 / Math.PI );
@@ -1539,7 +1545,7 @@ var Viewport = function (editor) {
             }
         }
 
-        camera.lookAt(center);
+        camera.lookAt(result.center);
         camera.updateProjectionMatrix();
         ruler.setCoordFactor(editor.loader.coordFactor);
         ruler.update();
@@ -1848,9 +1854,9 @@ var Viewport = function (editor) {
         camera.updateProjectionMatrix();
 
         renderer.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
-        // pickingRenderTarget.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
-
-
+        if(editor.lastModel) {
+            editor.signals.scaleChanged.dispatch(scope.initialBoundigBox, scope.initialModelRotation);
+        }
         ruler.update();
         protractorV.update();
         protractorH.update();
