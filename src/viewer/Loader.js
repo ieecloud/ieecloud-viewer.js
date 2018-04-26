@@ -878,7 +878,7 @@ var Loader = function (editor, textureUrl) {
             textPositionsData[ind].label = label;
             textPositionsData[ind].position = new THREE.Vector3(0, 0, 0);
             textPositionsData[ind].position.copy(vertices[ind]);
-            textPositionsData[ind].size = objectSettings.textSize;
+            textPositionsData[ind].size = objectSettings.textSize / this.coordFactor * 10;
             textPositionsData[ind].color = objectSettings.textColor;
         }
         var objectPartsArray = [];
