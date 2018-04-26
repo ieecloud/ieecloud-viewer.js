@@ -296,28 +296,34 @@ var Loader = function (editor, textureUrl) {
 
             editor.octree.add(mesh);
 // TODO move to common geometry
-            // var simpleShapes = objectElement[j].simpleShapes;
-            // var v = 0;
-            // var simpleShapesGeometry = new THREE.Geometry();
-            // for (var k = 0; k < simpleShapes.length; k++) {
-            //     for (var n = 0; n < simpleShapes[k].vertices.length; n++) {
-            //         simpleShapesGeometry.vertices.push(simpleShapes[k].vertices[n]);
-            //     }
-            //     for (var n = 0; n < simpleShapes[k].faces.length; n++) {
-            //         var face = simpleShapes[k].faces[n];
-            //         face.a += v;
-            //         face.b += v;
-            //         face.c += v;
-            //
-            //         simpleShapesGeometry.faces.push(simpleShapes[k].faces[n]);
-            //     }
-            //     v += simpleShapes[k].vertices.length;
-            //
-            // }
-            //
-            // var shapes = new THREE.Mesh(simpleShapesGeometry, facesMaterial);
 
-            // modelGroup.add(shapes);
+            _.forEach(objectElement, function(objElement) {
+                var simpleShapes = objElement.simpleShapes;
+                var v = 0;
+                var simpleShapesGeometry = new THREE.Geometry();
+                for (var k = 0; k < simpleShapes.length; k++) {
+                    for (var n = 0; n < simpleShapes[k].vertices.length; n++) {
+                        simpleShapesGeometry.vertices.push(simpleShapes[k].vertices[n]);
+                    }
+                    for (var n = 0; n < simpleShapes[k].faces.length; n++) {
+                        var face = simpleShapes[k].faces[n];
+                        face.a += v;
+                        face.b += v;
+                        face.c += v;
+
+                        simpleShapesGeometry.faces.push(simpleShapes[k].faces[n]);
+                    }
+                    v += simpleShapes[k].vertices.length;
+
+                }
+
+                var shapes = new THREE.Mesh(simpleShapesGeometry, objElement.facesMaterial);
+
+                modelGroup.add(shapes);
+
+            });
+
+
             var geoCommonLineGeometry = new THREE.BufferGeometry();
             geoCommonLineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( lineCommonPositionsArray, 3 ) );
             var lines = new THREE.LineSegments(geoCommonLineGeometry, objectElement[0].edgesMaterial);
@@ -753,80 +759,83 @@ var Loader = function (editor, textureUrl) {
             var edges = edgeGroups[j];
             var offset = 0;
             var positions = [];
-            while (offset < edges.length) {
-                var array1 = vertices[edges[offset]].toArray();
-                positions.push(array1[0], array1[1], array1[2]);
-                lineCommonPositionsArray.push(array1[0], array1[1], array1[2]);
-                var array2 = vertices[edges[offset + 1]].toArray();
-                positions.push(array2[0], array2[1], array2[2]);
-                lineCommonPositionsArray.push(array2[0], array2[1], array2[2]);
-                offset += 2;
-            }
-            lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
-            var faces = faceGroups[j];
-            var uv = uvGroups[j];
-            var fi = faces.length;
+            if(edges) {
 
-            var drawTexture = (!drawResults) && (uv && uv.length != 0)
+                while (offset < edges.length) {
+                    var array1 = vertices[edges[offset]].toArray();
+                    positions.push(array1[0], array1[1], array1[2]);
+                    lineCommonPositionsArray.push(array1[0], array1[1], array1[2]);
+                    var array2 = vertices[edges[offset + 1]].toArray();
+                    positions.push(array2[0], array2[1], array2[2]);
+                    lineCommonPositionsArray.push(array2[0], array2[1], array2[2]);
+                    offset += 2;
+                }
+                lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
-            scope.parseModelFaces(faceGeometry, faces, vertices, uv, settings.faceColor, results,
-                maxResult, minResult, faceCommonGeometryData);
+                var faces = faceGroups[j];
+                var uv = uvGroups[j];
+                var fi = faces.length;
+
+                var drawTexture = (!drawResults) && (uv && uv.length != 0)
+
+                scope.parseModelFaces(faceGeometry, faces, vertices, uv, settings.faceColor, results,
+                    maxResult, minResult, faceCommonGeometryData);
 
 
-            if(faceGeometry.attributes.position.count > 0){
-                pictureGeometryElement.objectGeometry = faceGeometry;
-            }
-            pictureGeometryElement.edgesGeometry = lineGeometry;
-            pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
-            pictureGeometryElement.name = groups[j];
-            pictureGeometryElement.parentName = name;
-            pictureGeometryElement.drawResults = drawResults;
-            if (drawResults) { // Draw face with spectral texture according to results
-                pictureGeometryElement.drawResultsMaterial = new THREE.MeshLambertMaterial({
-                    map: colorMapTexture,
-                    flatShading: true,
-                    side: THREE.FrontSide
+                if (faceGeometry.attributes.position.count > 0) {
+                    pictureGeometryElement.objectGeometry = faceGeometry;
+                }
+                pictureGeometryElement.edgesGeometry = lineGeometry;
+                pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
+                pictureGeometryElement.name = groups[j];
+                pictureGeometryElement.parentName = name;
+                pictureGeometryElement.drawResults = drawResults;
+                if (drawResults) { // Draw face with spectral texture according to results
+                    pictureGeometryElement.drawResultsMaterial = new THREE.MeshLambertMaterial({
+                        map: colorMapTexture,
+                        flatShading: true,
+                        side: THREE.FrontSide
 
-                });
-                 pictureGeometryElement.facesMaterial = simpleFacesMaterial;
-            } else {
-                if (drawTexture && settings.texture.name != undefined) {
-                    // Draw face with texture
-                    scope.createTexture(settings, pictureGeometryElement)
+                    });
+                    pictureGeometryElement.facesMaterial = simpleFacesMaterial;
                 } else {
+                    if (drawTexture && settings.texture.name != undefined) {
+                        // Draw face with texture
+                        scope.createTexture(settings, pictureGeometryElement)
+                    } else {
 
-                    if (text3d != undefined) {  // face without texture with 3dText
-                        var texture = new THREE.Texture(scope.createTextCanvas(text3d, settings.textColor, null, 256, settings.faceColor));
-                        texture.flipY = true;
-                        texture.needsUpdate = true;
+                        if (text3d != undefined) {  // face without texture with 3dText
+                            var texture = new THREE.Texture(scope.createTextCanvas(text3d, settings.textColor, null, 256, settings.faceColor));
+                            texture.flipY = true;
+                            texture.needsUpdate = true;
 
 
-                        pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
-                            map: texture,
-                            flatShading: true,
-                            side: THREE.FrontSide,
-                            transparent: settings.transparancy > 0 ? true : false,
-                            opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
-                        });
-                    }
-                    else { // face without texture & 3dText
-                        pictureGeometryElement.facesMaterial = simpleFacesMaterial;
+                            pictureGeometryElement.facesMaterial = new THREE.MeshLambertMaterial({
+                                map: texture,
+                                flatShading: true,
+                                side: THREE.FrontSide,
+                                transparent: settings.transparancy > 0 ? true : false,
+                                opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
+                            });
+                        }
+                        else { // face without texture & 3dText
+                            pictureGeometryElement.facesMaterial = simpleFacesMaterial;
+
+                        }
 
                     }
 
                 }
-
             }
 
             pictureGeometryElement.edgesMaterial = simpleLinesMaterial;
+            pictureGeometryElement.facesMaterial = simpleFacesMaterial;
+            pictureGeometryElement.simpleShapes = [];  //Simple shapes
+            if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
+                scope.parseSimpleShapes(geometryObject.simpleShapes, j, pictureGeometryElement, vertices);
 
-            // pictureGeometryElement.simpleShapes = [];  //Simple shapes
-
-            // if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
-            //     scope.parseSimpleShapes(geometryObject.simpleShapes, j, pictureGeometryElement, vertices);
-            //
-            // }
+            }
             objectPartsArray.push(pictureGeometryElement)
 
         }
@@ -948,6 +957,18 @@ var Loader = function (editor, textureUrl) {
             }, function () {
                 console.log("error")
             });
+
+            // Add texture hardcode for offline mode
+            // var image = new Image();
+            // image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAP8AAAD/CAIAAACxapedAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xNkRpr/UAAAQqSURBVHhe7dMxiBAEGIbhN8ELlZQUjRQsLDRMsNAwycJCCSGHCxRyMLgoCSEHA4UcFBQMukEJwYYbFAxsuCHBwEAHGwwMMjC4QKGLDAwUMjBQv26/+eDge+GZ3uVfvp+3iNSJN4jUifVE6sQrROrEy0TqxCoideIFInXieSJ14lkidWIJkTrxFJE6MZ9InZhHpE7MIVInHidSJ2YQqRPMmPgAqRIzI5ViVqRSPBGpFE9GKsXCSKVYHKkUSyOVYlmkUiyPVIqVkUqxOlIp1kQqxbpIpXgtUik2RirFpkileDtSKd6JVIrBSKXYFqkU70Uqxc5IpRiKVIoPI5Xi40il+CRSKfZGKsW+SKX4LFIpDkYqxeFIpTgaqRRfRJoWhieVKTVxjmORSvFlpFKcjFSKkUilOBWpFGcileJspFKMRirFt5FKcT5SKS5EKsXFSKW4HKkUVyKV4mqkUvwcqRTXI5ViLFIpbkQqxe+RSvFnpFLcjlSKO5FK8U+kUtyPVIoHkUrx6KFUivwnlSL/SqXIXakU+VsqRf6SSpFxqdIfE+u/KZUiv0mlyK9SKfKLVIr8JJUiP0qlyA9SKXJJKkW+l0qR76RS5JxUioxKpcg3UinytVSKnJZKkRGpFPlKKkVOSKXIcakUGZZKkc+lUuSIVIockkqRA1Ipsl8qRfZKpcgeqRTZLZUiu6RS5AOpFHlfKkV2SKXIdqkUeVcqRbZKpcgWqRTZJJUib0qlyOtSKbJeKkXWSqXIS1IpskoqRVZIpchzUinyjFSKLJFKkUVSKbJAKkXmSaXIHKkUGZBKkRlSqccilWIg0rQwc1KZasyOVIq5kUoxP1IpFkUqxeJIpVgaqRTLIpViRaRSvBipFKsjlWJNpEZrJ9b/aqRSbIhUio2RSrE5Uim2RCrF1kilGIxUiu2RSrEjUil2RirFUKRS7IpUit2RSrEnUik+jVSK/ZFKcSBSKQ5GKsXhSKU4GqkUw5FKcSxSKU5EKsXJSKUYiVSKU5FKcSZSKc5GKsVopFKci1SK85FKcSFSKS5GKsXlSKW4EqkUVyOV4lqkUlyPVIqxSKW4EakU45FKcStSKW5HKsXdSNPCnUllqnEvUinuRyrFw0dSKR49kEqR+1Ipck8qRe5KpchtqRS5JZUi41IpclMqRcakUuS6VIpck0qRq1IpckUqRS5LpcglqRS5IJUi56VS5JxUioxKpchZqRQ5I5Uip6VSZEQqRU5KpcgJqRQ5LpUiw1IpclQqRY5IpcghqRQ5IJUi+6RSZK9UiuyRSpHdUinykVSKDEmlyE6pFNkhlSLbpFJkUCpFtkqlyBapFNkslSIbpVJkg1SKrJNKkTVSKbJaKkVWSqXIcqkUWSaVIkulUuRpqRRZKJUiC6TpYf6kMsXIXKkUmSVVmj2x/gGp0gD/A8JXBneznKjMAAAAAElFTkSuQmCC';
+            //
+            // colorMapTexture = new THREE.Texture();
+            // colorMapTexture.image = image;
+            // image.onload = function() {
+            //     colorMapTexture.needsUpdate = true;
+            //     editor.reRender();
+            // };
+
             colorMapTexture.magFilter = THREE.NearestFilter;
             colorMapTexture.minFilter = THREE.LinearFilter;
             editor.addTexture(colorMapTexture);
