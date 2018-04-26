@@ -494,7 +494,7 @@ var Loader = function (editor, textureUrl) {
         var simpleShapes = simpleShapes[groupIndex];
         for (var k = 0; k < simpleShapes.length; k++) {
             if (simpleShapes[k].shape == "sphere") {
-                var sphere = new THREE.SphereGeometry(simpleShapes[k].radius, simpleShapes[k].segments, simpleShapes[k].segments);
+                var sphere = new THREE.SphereGeometry(simpleShapes[k].radius/this.coordFactor, simpleShapes[k].segments, simpleShapes[k].segments);
                 var index = simpleShapes[k].index;
                 var m = new THREE.Matrix4();
                 var v = vertices[index];
@@ -503,7 +503,8 @@ var Loader = function (editor, textureUrl) {
                 pictureGeometryElement.simpleShapes.push(sphere);
             }
             if (simpleShapes[k].shape == "cube") {
-                var cube = new THREE.CubeGeometry(simpleShapes[k].x, simpleShapes[k].y, simpleShapes[k].z);
+                var cubeCoord = simpleShapes[k].divideScalar (this.coordFactor );
+                var cube = new THREE.CubeGeometry(cubeCoord.x, cubeCoord.y, cubeCoord.z);
                 var index = simpleShapes[k].index;
                 var m = new THREE.Matrix4();
                 var v = vertices[index];
@@ -512,7 +513,7 @@ var Loader = function (editor, textureUrl) {
                 pictureGeometryElement.simpleShapes.push(cube);
             }
             if (simpleShapes[k].shape == "cylinder") {
-                var cylinder = new THREE.CylinderGeometry(simpleShapes[k].r1, simpleShapes[k].r2, simpleShapes[k].h, simpleShapes[k].segments, 8);
+                var cylinder = new THREE.CylinderGeometry(simpleShapes[k].r1/this.coordFactor, simpleShapes[k].r2/this.coordFactor, simpleShapes[k].h/this.coordFactor, simpleShapes[k].segments, 8);
                 var index = simpleShapes[k].index;
                 var m = new THREE.Matrix4();
                 var v = vertices[index];
