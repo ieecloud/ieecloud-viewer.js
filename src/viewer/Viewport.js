@@ -56,6 +56,7 @@ var Viewport = function (editor) {
     var clearColor = editor.options.backgroundColor;
     var objects = [];
     var unRotatedObjects = [];
+    var staticTexts = [];
     var center = new THREE.Vector3();
 
     var SELECT_COLOR = 300;
@@ -125,7 +126,8 @@ var Viewport = function (editor) {
     var camera = new THREE.PerspectiveCamera(initialFov, container.dom.offsetWidth / container.dom.offsetHeight, 1, 15000);
     camera.position.copy(initialCameraPosition);
     camera.up.copy(initialCameraUp);
-    camera.lookAt(initialCameraLookAt);
+    camera.lookAt(initialCameraLookAt)
+    editor.loader.setCamera(camera);
 
     // camera2
     var camera2 = new THREE.PerspectiveCamera(50, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 2000);
@@ -749,7 +751,7 @@ var Viewport = function (editor) {
         }
 
 
-        var textResultMesh = new THREE.ResultTextObject3d(camera, container.dom, {
+        var textResultMesh = new THREE.ResultTextObject3d(camera,  {
             value: resultVal,
             color: editor.options.resultTextColor
         });
@@ -763,7 +765,7 @@ var Viewport = function (editor) {
         unRotatedObjects.push(textResultMesh);
         var key = THREE.Math.generateUUID();
         textResults[key] = textResultMesh;
-        textResultMesh.update(nearestPoint);
+        textResultMesh.update(container.dom);
         sceneHelpers.add(textResultMesh);
         var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {
             material: {color: editor.options.resultPointColor},
@@ -984,7 +986,7 @@ var Viewport = function (editor) {
                         }
                     }
                 }
-                resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : undefined;
+                resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : 0;
                 var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
                 info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal + ', objectName = ' + objectName);
                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
@@ -1263,6 +1265,11 @@ var Viewport = function (editor) {
             textResults[key].update(selectedResultPoints[key]);
         }
 
+        for (var i = 0; i < staticTexts.length; i++) {
+            staticTexts[i].update(container.dom);
+        }
+
+
         signals.objectChanged.dispatch(camera);
 
     });
@@ -1514,7 +1521,7 @@ var Viewport = function (editor) {
             if (modelRotation.results) {
                 for (var i = 0; i < modelRotation.results.length; i++) {
                     var result = modelRotation.results[i];
-                    var textResultMesh = new THREE.ResultTextObject3d(camera, container.dom, {
+                    var textResultMesh = new THREE.ResultTextObject3d(camera, {
                         value: result.resultValue,
                         color: editor.options.resultTextColor
                     });
@@ -1527,7 +1534,7 @@ var Viewport = function (editor) {
                     textResultMesh.position.copy(textResultPosition);
                     var key = THREE.Math.generateUUID();
                     textResults[key] = textResultMesh;
-                    textResultMesh.update();
+                    textResultMesh.update(container.dom);
                     sceneHelpers.add(textResultMesh);
 
                     var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {
@@ -1555,6 +1562,10 @@ var Viewport = function (editor) {
         highlighter.update();
         highlighterProtractor.update();
         axis.update();
+        for (var i = 0; i < staticTexts.length; i++) {
+            staticTexts[i].update(container.dom);
+        }
+
 
         render();
     });
@@ -1597,6 +1608,14 @@ var Viewport = function (editor) {
                     child.quaternion.copy(camera.quaternion);
                     unRotatedObjects.push(child);
                 }
+
+                if (child.userData.text) {
+                    // console.log("SDSDSDSDSDSD");
+                    child.quaternion.copy(camera.quaternion);
+                    unRotatedObjects.push(child);
+                    staticTexts.push(child);
+                    // child.update(container.dom);
+                }
             }
             objects.push(child);
         });
@@ -1604,6 +1623,11 @@ var Viewport = function (editor) {
         // var endDate   = new Date();
         // var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
         // console.log("signals.objectAdded", seconds);
+        for (var i = 0; i < staticTexts.length; i++) {
+            staticTexts[i].update(container.dom);
+        }
+
+
         nearestPoint.hide();
         highlighter.hide();
         highlighterProtractor.hide();

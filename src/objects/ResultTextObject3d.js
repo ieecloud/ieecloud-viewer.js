@@ -15,7 +15,7 @@ THREE.ResultTextObject3dMaterial = function (parameters) {
 
 THREE.ResultTextObject3dMaterial.prototype = Object.create(THREE.MeshBasicMaterial.prototype);
 
-THREE.ResultTextObject3d = function (camera, domElement, params) {
+THREE.ResultTextObject3d = function (camera, params) {
     var worldPosition = new THREE.Vector3();
     var camPosition = new THREE.Vector3();
     var worldRotation = new THREE.Euler(0, 0, 1);
@@ -113,7 +113,7 @@ THREE.ResultTextObject3d = function (camera, domElement, params) {
         return this.children[0].geometry.vertices[0].x * this.scale.y;
     };
 
-    this.update = function (resultPointObject) {
+    this.update = function (domElement){
         var vFOV = camera.fov * Math.PI / 180;
         var height = 2 * Math.tan(vFOV / 2) * distance;
         var fraction = 0.5 / height;

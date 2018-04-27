@@ -7,6 +7,7 @@ var Loader = function (editor, textureUrl) {
     this.objectsTree = null;
     this.coordFactor = 1;
     this.modelRotation = null;
+    this.camera = null;
 
     this.getObjectsTreeModel = function () {
         return scope.objectsTree;
@@ -90,6 +91,10 @@ var Loader = function (editor, textureUrl) {
         } else if (typeof object == "object") {
             editor.unSelectObject(object);
         }
+    };
+
+    this.setCamera = function (camera) {
+        this.camera = camera;
     };
 
 
@@ -364,9 +369,15 @@ var Loader = function (editor, textureUrl) {
         _.forEach(textData, function(value, key) {
             var textElement = value;
             _.forEach(textElement, function(value, key) {
-                var textMesh = scope.createText2D(textElement[key].label, textElement[key].color, null, textElement[key].size);
+
+                var textMesh = new THREE.ResultTextObject3d(scope.camera, {
+                    value: textElement[key].label,
+                    color: editor.options.resultTextColor
+                });
+
+
                 textMesh.userData = {};
-                textMesh.userData.quaternion = "camera";
+                textMesh.userData = {"text" : true};
                 textMesh.position.copy(textElement[key].position);
                 modelGroup.add(textMesh);
             });
@@ -878,7 +889,8 @@ var Loader = function (editor, textureUrl) {
             textPositionsData[ind].label = label;
             textPositionsData[ind].position = new THREE.Vector3(0, 0, 0);
             textPositionsData[ind].position.copy(vertices[ind]);
-            textPositionsData[ind].size = objectSettings.textSize / this.coordFactor * 10;
+            // textPositionsData[ind].size = objectSettings.textSize / this.coordFactor * 10;
+            textPositionsData[ind].size = objectSettings.textSize;
             textPositionsData[ind].color = objectSettings.textColor;
         }
         var objectPartsArray = [];
