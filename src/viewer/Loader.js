@@ -238,11 +238,13 @@ var Loader = function (editor, textureUrl) {
         _.forEach(textData, function (value, key) {
             var textElement = value;
             _.forEach(textElement, function (value, key) {
-                var textMesh = scope.createText2D(textElement[key].label, textElement[key].color, null, textElement[key].size);
-                textMesh.userData = {};
-                textMesh.userData.quaternion = "camera";
-                textMesh.position.copy(textElement[key].position);
-                modelGroup.add(textMesh);
+                if(textElement[key].label) {
+                    var textMesh = scope.createText2D(textElement[key].label, textElement[key].color, null, textElement[key].size);
+                    textMesh.userData = {};
+                    textMesh.userData.quaternion = "camera";
+                    textMesh.position.copy(textElement[key].position);
+                    modelGroup.add(textMesh);
+                }
             });
         });
         editor.addModelGroup(modelGroup);
@@ -370,16 +372,19 @@ var Loader = function (editor, textureUrl) {
             var textElement = value;
             _.forEach(textElement, function(value, key) {
 
-                var textMesh = new THREE.ResultTextObject3d(scope.camera, {
-                    value: textElement[key].label,
-                    color: editor.options.resultTextColor
-                });
+                if(textElement[key].label) {
+
+                    var textMesh = new THREE.ResultTextObject3d(scope.camera, {
+                        value: textElement[key].label,
+                        color: editor.options.resultTextColor
+                    });
 
 
-                textMesh.userData = {};
-                textMesh.userData = {"text" : true};
-                textMesh.position.copy(textElement[key].position);
-                modelGroup.add(textMesh);
+                    textMesh.userData = {};
+                    textMesh.userData = {"text": true};
+                    textMesh.position.copy(textElement[key].position);
+                    modelGroup.add(textMesh);
+                }
             });
         });
         editor.addModelGroup(modelGroup);
