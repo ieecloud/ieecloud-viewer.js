@@ -319,11 +319,13 @@ var Loader = function (editor, textureUrl) {
                         simpleShapesGeometry.faces.push(simpleShapes[k].faces[n]);
                     }
                     v += simpleShapes[k].vertices.length;
-
+                    simpleShapesGeometry.name = simpleShapes[k].name;
                 }
 
                 var shapes = new THREE.Mesh(simpleShapesGeometry, objElement.facesMaterial);
 
+                shapes.name = simpleShapesGeometry.name;
+                meshesData[key].push(shapes);
                 modelGroup.add(shapes);
 
             });
@@ -511,6 +513,7 @@ var Loader = function (editor, textureUrl) {
                 var v = vertices[index];
                 m.makeTranslation(v.x, v.y, v.z);
                 sphere.applyMatrix(m);
+                sphere.name = simpleShapes[k].name;
                 pictureGeometryElement.simpleShapes.push(sphere);
             }
             if (simpleShapes[k].shape == "cube") {
@@ -521,6 +524,7 @@ var Loader = function (editor, textureUrl) {
                 var v = vertices[index];
                 m.makeTranslation(v.x, v.y, v.z);
                 cube.applyMatrix(m);
+                cube.name = simpleShapes[k].name;
                 pictureGeometryElement.simpleShapes.push(cube);
             }
             if (simpleShapes[k].shape == "cylinder") {
@@ -530,6 +534,7 @@ var Loader = function (editor, textureUrl) {
                 var v = vertices[index];
                 m.makeTranslation(v.x, v.y, v.z);
                 cylinder.applyMatrix(m);
+                cylinder.name = simpleShapes[k].name;
                 pictureGeometryElement.simpleShapes.push(cylinder);
             }
         }
