@@ -306,6 +306,9 @@ var Loader = function (editor, textureUrl) {
 
             _.forEach(objectElement, function(objElement) {
                 var simpleShapes = objElement.simpleShapes;
+                if(!simpleShapes || simpleShapes.length === 0) {
+                    return;
+                }
                 var v = 0;
                 var simpleShapesGeometry = new THREE.Geometry();
                 for (var k = 0; k < simpleShapes.length; k++) {
@@ -385,6 +388,7 @@ var Loader = function (editor, textureUrl) {
                     textMesh.userData = {};
                     textMesh.userData = {"text": true};
                     textMesh.position.copy(textElement[key].position);
+                    meshesData[key].push(textMesh);
                     modelGroup.add(textMesh);
                 }
             });
