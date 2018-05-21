@@ -373,22 +373,22 @@ var Loader = function (editor, textureUrl) {
         });
 
         var textData = pictureInfo.textData;
-        _.forEach(textData, function(value, key) {
+        _.forEach(textData, function(value, key1) {
             var textElement = value;
-            _.forEach(textElement, function(value, key) {
+            _.forEach(textElement, function(value, key2) {
 
-                if(textElement[key].label) {
+                if(textElement[key2].label) {
 
                     var textMesh = new THREE.ResultTextObject3d(scope.camera, {
-                        value: textElement[key].label,
+                        value: textElement[key2].label,
                         color: editor.options.resultTextColor
                     });
 
 
                     textMesh.userData = {};
                     textMesh.userData = {"text": true};
-                    textMesh.position.copy(textElement[key].position);
-                    meshesData[key].push(textMesh);
+                    textMesh.position.copy(textElement[key2].position);
+                    meshesData[key1].push(textMesh);
                     modelGroup.add(textMesh);
                 }
             });
