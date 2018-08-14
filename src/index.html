@@ -19,6 +19,8 @@
             margin-top: 0px;
             height: 100%;
             width: 100%;
+            max-width: 100%;
+            max-height: 100%;
             background-color: #fff;
         }
 
@@ -432,14 +434,14 @@
         textureUrl: "",
         mode: "3d_point",
         resultDigits: 3,
-        drawResults: true,
-        gridVisible: false,
-//        rotationScale: {fov:0.35082010187266344, position: {x:
-//            48.22379092090737, y: -38.052186013287574, z: 154.37283345146167}},
+        drawResults: false,
+        gridVisible: true,
+//        rotationScale: {position: {x:
+//            4.22379092090737, y: 4, z: 0}},
         detailModelView: false,
         resultColor: "white",
         backgroundColor: "#d4d4d4",
-        resultTextColor: "white",
+        resultTextColor: "black",
         nearestPointColor: "red",
         searchNearestPointMode:"MESHES",
         id: "1",
@@ -608,7 +610,7 @@
     });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/results.json", function (json) {
+        $.getJSON("../resources/box-rot.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
     });

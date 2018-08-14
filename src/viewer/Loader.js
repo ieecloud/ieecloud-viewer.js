@@ -277,6 +277,7 @@ var Loader = function (editor, textureUrl) {
             geoCommonMeshGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( faceCommonGeometryData.colors, 3 ) );
             geoCommonMeshGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( faceCommonGeometryData.normals, 3 ));
             geoCommonMeshGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( faceCommonGeometryData.uvs, 2 ));
+            // geoCommonMeshGeometry.center();
 
 
             var mesh = new THREE.Mesh(geoCommonMeshGeometry, objectElement[0].drawResultsMaterial  ?
@@ -338,6 +339,7 @@ var Loader = function (editor, textureUrl) {
 
             var geoCommonLineGeometry = new THREE.BufferGeometry();
             geoCommonLineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( lineCommonPositionsArray, 3 ) );
+            // geoCommonLineGeometry.center();
             var lines = new THREE.LineSegments(geoCommonLineGeometry, objectElement[0].edgesMaterial);
             modelGroup.add(lines);
             lines.userData.pointsTable = pointsTable;
