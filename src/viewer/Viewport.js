@@ -75,6 +75,8 @@ var Viewport = function (editor) {
     if (editor.options.gridVisible) {
         var grid = new THREEext.GridHelper(500, 25);
         sceneHelpers.add(grid);
+        var axis = new THREE.AxisHelper(10);
+        sceneHelpers.add(axis);
     }
 
     // Uncaught TypeError: grid.hide is not a function
@@ -1215,17 +1217,31 @@ var Viewport = function (editor) {
     });
 
 
-    var controls = new THREE.EditorControls(editor.id, camera, container.dom);
+    var controls = new THREE.ObjectControls(editor.id, container.dom);
     controls.addEventListener('change', function (event) {
         axis.update();
 
-        for (var i = 0; i < unRotatedObjects.length; i++) {
-            unRotatedObjects[i].quaternion.copy(camera.quaternion);
-        }
+        // for (var i = 0; i < unRotatedObjects.length; i++) {
+        //     unRotatedObjects[i].quaternion.copy(camera.quaternion);
+        // }
 
         signals.objectChanged.dispatch(camera);
 
     });
+
+
+
+    // var controls = new THREE.EditorControls(editor.id, camera, container.dom);
+    // controls.addEventListener('change', function (event) {
+    //     axis.update();
+    //
+    //     for (var i = 0; i < unRotatedObjects.length; i++) {
+    //         unRotatedObjects[i].quaternion.copy(camera.quaternion);
+    //     }
+    //
+    //     signals.objectChanged.dispatch(camera);
+    //
+    // });
 
     controls.addEventListener('zoom', function (event) {
         // temp solution
@@ -1508,7 +1524,14 @@ var Viewport = function (editor) {
         addVector.addVectors(boundingBox.min, boundingBox.max);
         var center = addVector.multiplyScalar(0.5);
         camera.fov = result.newFov;
-        controls.setCenter(result.center);
+        controls.setCenter(center);
+
+        var offset = boundingBox.getCenter().negate();
+
+        console.log("signals.scaleChanged", offset);
+        console.log("signals.scaleChangedCenter", center);
+
+        controls.setObject(editor.lastModel);
         var newCameraFar = getFar(boundingBox);
         if (camera.far < newCameraFar) {
             camera.far = newCameraFar;
@@ -2012,6 +2035,7 @@ var Viewport = function (editor) {
         renderer.render(sceneHelpers, camera);
         renderer2.render(sceneAxis, camera2);
         octree.update();
+        controls.update();
         // rendererStats.update(renderer);
         // var endDate   = new Date();
         // var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
