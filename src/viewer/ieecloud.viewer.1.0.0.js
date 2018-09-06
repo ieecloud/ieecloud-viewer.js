@@ -24,7 +24,7 @@ function Viewer(target, options) {
         $this.viewport.mainContainer.setBottom('0px');
         $this.viewport.slaveContainer.setLeft('0px');
         $this.viewport.slaveContainer.setBottom('0px');
-        $this.viewport.slave2Container.setLeft('0px');
+        $this.viewport.slave2Container.setLeft('20px');
         $this.viewport.slave2Container.setTop('60px');
         $this.target.append($this.viewport.mainContainer.dom);
         $this.target.append($this.viewport.slaveContainer.dom);
