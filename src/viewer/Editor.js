@@ -54,6 +54,7 @@ var Editor = function (options) {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(options.sceneBackgroundColor);
     this.sceneAxis = new THREE.Scene();
+    this.sceneResults = new THREE.Scene();
     this.sceneHelpers = new THREE.Scene();
     this.pickingScene = new THREE.Scene();
     this.octree = new THREE.Octree( {
@@ -272,14 +273,25 @@ Editor.prototype = {
 
     },
 
+    getIsolineMaterialIfExist: function () {
+        return this.isolineMaterial ? this.isolineMaterial: null;
+    },
 
-    addTexture: function (texture) {
+    getResultInfo: function () {
+        return this.resultInfo;
+    },
+
+
+    addTexture: function (texture, minResult, maxResult) {
         this.isolineMaterial = new THREE.MeshLambertMaterial({
             map: texture,
             flatShading: true,
             side: THREE.FrontSide
 
         });
+        this.resultInfo = {};
+        this.resultInfo.minResult = minResult;
+        this.resultInfo.maxResult = maxResult;
     },
 
     toggleIsolines: function (showFlag) {

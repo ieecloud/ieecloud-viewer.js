@@ -46,12 +46,16 @@ var Viewport = function (editor) {
     var scene = editor.scene;
     var octree =  editor.octree;
     var sceneAxis = editor.sceneAxis;
+    var sceneResults = editor.sceneResults;
     var sceneHelpers = editor.sceneHelpers;
     var scenePicker = editor.pickingScene;
     var CANVAS_WIDTH = 200;
     var CANVAS_HEIGHT = 200;
     var CAM_DISTANCE = 300;
     var INTERSECTED = {};
+
+    var CANVAS2_WIDTH = 200;
+    var CANVAS2_HEIGHT = 300;
 
     var clearColor = editor.options.backgroundColor;
     var objects = [];
@@ -92,6 +96,11 @@ var Viewport = function (editor) {
     container2.setPosition('absolute');
 
 
+    // dom
+    var container3 = new UI.Panel().setId("slave3" + editor.id);
+    container3.setPosition('absolute');
+
+
     var modal = new UI.Modal();
     container.add(modal);
 
@@ -107,6 +116,12 @@ var Viewport = function (editor) {
     var renderer2 = new THREE.CanvasRenderer({alpha: true});
     renderer2.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
     container2.dom.appendChild(renderer2.domElement);
+
+
+    // renderer
+    var renderer3 = new THREE.CanvasRenderer({alpha: true});
+    renderer3.setSize(CANVAS2_WIDTH, CANVAS2_HEIGHT);
+    container3.dom.appendChild(renderer3.domElement);
 
     var initialCameraPosition = new THREE.Vector3(63, -149, 36);
     var initialCameraUp =  new THREE.Vector3(0, 0, 1);
@@ -134,6 +149,17 @@ var Viewport = function (editor) {
     // camera2
     var camera2 = new THREE.PerspectiveCamera(50, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 2000);
     camera2.up = camera.up; // important!
+
+
+    // camera3
+    var camera3 = new THREE.PerspectiveCamera(50, CANVAS2_WIDTH / CANVAS2_HEIGHT, 1, 2000);
+    camera3.up = camera.up; // important!
+    var q = new THREE.Quaternion(0.7163115160988329, 0.07007036877399155,0.06759001875323373, 0.6909555301819401);
+    camera3.quaternion.copy(q);
+    camera3.position.x= 32.09535616650712;
+    camera3.position.y=-162.48152055744922;
+    camera3.position.z= -5.9702252791992585;
+    camera3.position.setLength(CAM_DISTANCE);
 
     var selectedResultPoints = {};
     var textResults = {};
@@ -395,6 +421,11 @@ var Viewport = function (editor) {
 
     var axis = new THREE.SmallAxisObject3d(camera, container2.dom);
     sceneAxis.add(axis);
+
+    var resultScale = new THREE.SmallScaleObject3d(camera, container3.dom, editor.getIsolineMaterialIfExist());
+    sceneResults.add(resultScale);
+    resultScale.hide();
+
 
     var color = 0xffffff;
     var intensity = 1;
@@ -1647,10 +1678,19 @@ var Viewport = function (editor) {
         highlighter.hide();
         highlighterProtractor.hide();
         ruler.hide();
+        resultScale.hide();
         // editor.setMode(editor.MODE_3D_GEOMETRY);
         if (materialsNeedUpdate === true) {
             updateMaterials();
         }
+
+
+        if(editor.loader.DRAW_RESULTS){
+            resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
+            resultScale.setResultInfo(editor.getResultInfo());
+            resultScale.show();
+        }
+
 
     });
 
@@ -1777,10 +1817,14 @@ var Viewport = function (editor) {
             camera.up = new THREE.Vector3(0, 0, 1);
         }
         camera2.up = camera.up;
+        camera3.up = camera.up;
         camera.lookAt(scene.position);
         camera2.position.copy(camera.position);
         camera2.position.setLength(CAM_DISTANCE);
         camera2.lookAt(sceneAxis.position);
+        camera3.position.copy(camera.position);
+        camera3.position.setLength(CAM_DISTANCE);
+        camera3.lookAt(sceneResults.position);
         controls.setAxisDirection(direction);
         sceneAxis.traverse(function (object) {
             if (object instanceof THREE.Mesh) {
@@ -2021,11 +2065,13 @@ var Viewport = function (editor) {
         sceneHelpers.updateMatrixWorld();
         scene.updateMatrixWorld();
         sceneAxis.updateMatrixWorld();
+        sceneResults.updateMatrixWorld();
         // renderer.clearDepth();
         renderer.clear();
         renderer.render(scene, camera);
         renderer.render(sceneHelpers, camera);
         renderer2.render(sceneAxis, camera2);
+        renderer3.render(sceneResults, camera3);
         octree.update();
         // rendererStats.update(renderer);
         // var endDate   = new Date();
@@ -2040,6 +2086,6 @@ var Viewport = function (editor) {
 
     }
 
-    return {mainContainer: container, slaveContainer: container2, renderer : renderer};
+    return {mainContainer: container, slaveContainer: container2, slave2Container: container3, renderer : renderer};
 
 };

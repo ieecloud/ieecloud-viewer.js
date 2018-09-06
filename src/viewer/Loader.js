@@ -2,7 +2,7 @@ var Loader = function (editor, textureUrl) {
 
     var scope = this;
     var signals = editor.signals;
-    var DRAW_RESULTS = true;
+    this.DRAW_RESULTS = true;
     this.textureUrl = textureUrl;
     this.objectsTree = null;
     this.coordFactor = 1;
@@ -618,7 +618,7 @@ var Loader = function (editor, textureUrl) {
     this.parseModelFaces = function (faceGeometry, faces, vertices, uv, faceColor, results, maxResult, minResult,
                                      faceCommonGeometryData) {
         var offset = 0;
-        var drawResults = (DRAW_RESULTS && results && (results.length != 0));
+        var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
         var drawTexture = (!drawResults) && (uv && uv.length != 0);
 
         var positions = [];
@@ -756,7 +756,7 @@ var Loader = function (editor, textureUrl) {
         var groupSettings = geometryObject.groupSettings;
         var objectSettings = geometryObject.objectSettings;
 
-        var drawResults = (DRAW_RESULTS && results && (results.length != 0));
+        var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
         var transparencyValue = objectSettings.transparancy > 0 ? true : false;
         var opacityValue = objectSettings.transparancy > 0 ? (1 - objectSettings.transparancy) : 1;
         var simpleFacesMaterial = new THREE.MeshLambertMaterial({
@@ -886,7 +886,7 @@ var Loader = function (editor, textureUrl) {
         var pointsNumbers = geometryObject.pointsNumbers;
         var vertices = [];
 
-        var drawResults = (DRAW_RESULTS && results && (results.length != 0));
+        var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
         var offset = 0;
         while (offset < coords.length) { //reading vertices
             var vertex = new THREE.Vector3();
@@ -969,7 +969,7 @@ var Loader = function (editor, textureUrl) {
         var pictureData = json.pictureData; // reading array for all geometry objects
         var minResult = json.minResult;
         var maxResult = json.maxResult;
-        DRAW_RESULTS = (!(/^(false|0)$/i).test(json.drawResults) && !!json.drawResults) || editor.options.drawResults;
+        scope.DRAW_RESULTS = (!(/^(false|0)$/i).test(json.drawResults) && !!json.drawResults) || editor.options.drawResults;
         this.modelRotation = json.modelRotation;
 
         var names = [];
@@ -981,7 +981,7 @@ var Loader = function (editor, textureUrl) {
         pictureInfo.modelRotation = this.modelRotation;
 
         var colorMapTexture;
-        if (DRAW_RESULTS) {
+        if (scope.DRAW_RESULTS) {
             var imageName = scope.textureUrl ? scope.textureUrl + 'color-spectrum.png' : 'color-spectrum.png';
             colorMapTexture = THREE.ImageUtils.loadTexture(imageName, null, function () {
                 editor.reRender();
@@ -1002,7 +1002,7 @@ var Loader = function (editor, textureUrl) {
 
             colorMapTexture.magFilter = THREE.NearestFilter;
             colorMapTexture.minFilter = THREE.LinearFilter;
-            editor.addTexture(colorMapTexture);
+            editor.addTexture(colorMapTexture, minResult, maxResult);
         }
 
         // calculate scaleFactor
