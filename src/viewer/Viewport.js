@@ -1308,7 +1308,7 @@ var Viewport = function (editor) {
 
         for (var key in selectedResultPoints) {
             selectedResultPoints[key].update();
-            textResults[key].update(selectedResultPoints[key]);
+            textResults[key].update(container.dom);
         }
 
         for (var i = 0; i < staticTexts.length; i++) {
