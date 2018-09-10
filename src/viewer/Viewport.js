@@ -1629,7 +1629,20 @@ var Viewport = function (editor) {
     });
 
     signals.printScreen.add(function (toFileName) {
-        var urlRenderer	= renderer.domElement.toDataURL("image/png");
+
+
+        var canvas1 = renderer.domElement;
+        var canvas2 = renderer3.domElement;
+
+        var can3 = document.createElement('canvas');
+        can3.width = canvas1.getContext('webgl').drawingBufferWidth;
+        can3.height = canvas1.getContext('webgl').drawingBufferHeight;
+        var ctx3 = can3.getContext('2d');
+
+        ctx3.drawImage(canvas1, 0, 0);
+        ctx3.drawImage(canvas2, 0, 0);
+
+        var urlRenderer	= can3.toDataURL("image/png");
         editor.onPrintScreenDone(urlRenderer);
         // var element = document.createElement('a');
         // element.setAttribute('href', urlRenderer);
