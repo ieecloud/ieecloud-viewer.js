@@ -49,7 +49,7 @@ var Editor = function (options) {
     this.searchNearestPointMode = options.searchNearestPointMode;
     this.resultDigits = options.resultDigits;
 
-    this.loader = new Loader(this, options.textureUrl);
+    this.loader = new Loader(this, options.textureUrl, options.textureBase64, options.texture, options.textures);
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(options.sceneBackgroundColor);
@@ -82,6 +82,7 @@ var Editor = function (options) {
     this.lastAdded = null;
     this.lastModel = null;
     this.helpers = {};
+    this.mapTextureNameToDetails = {};
 
 };
 
@@ -222,6 +223,9 @@ Editor.prototype = {
         this.searchNearestPointMode = newOptions.searchNearestPointMode;
         this.resultDigits = newOptions.resultDigits;
         this.loader.setTextureUrl(newOptions.textureUrl);
+        this.loader.setTextureBase64(newOptions.textureBase64);
+        this.loader.setTexture(newOptions.texture);
+        this.loader.setTextures(newOptions.textures);
         this.signals.setMode.dispatch();
         this.signals.setSearchNearestPointMode.dispatch();
     },
@@ -294,9 +298,85 @@ Editor.prototype = {
         this.resultInfo.maxResult = maxResult;
     },
 
+    getDefaultTexture: function () {
+        for (var key in this.mapTextureNameToDetails) {
+            if(this.mapTextureNameToDetails[key].default) {
+                return this.mapTextureNameToDetails[key];
+            }
+        }
+    },
+
+    setTexture: function (textureName) {
+
+        var texture = this.mapTextureNameToDetails[textureName] ? this.mapTextureNameToDetails[textureName]: this.getDefaultTexture();
+        if(!texture) {
+            console.log('Texture is not defined: ' + ': ' + texture);
+            throw new Error('Texture is not defined: ' + ': ' + texture);
+        }
+
+        if(!texture.isolineMaterial) {
+
+            var colorMapTexture;
+
+            var self = this;
+            if(texture.type == 'base64') {
+                // Add texture hardcode for offline mode
+                var image = new Image();
+                image.src = texture.data;
+                //image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAP8AAAD/CAIAAACxapedAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xNkRpr/UAAAQqSURBVHhe7dMxiBAEGIbhN8ELlZQUjRQsLDRMsNAwycJCCSGHCxRyMLgoCSEHA4UcFBQMukEJwYYbFAxsuCHBwEAHGwwMMjC4QKGLDAwUMjBQv26/+eDge+GZ3uVfvp+3iNSJN4jUifVE6sQrROrEy0TqxCoideIFInXieSJ14lkidWIJkTrxFJE6MZ9InZhHpE7MIVInHidSJ2YQqRPMmPgAqRIzI5ViVqRSPBGpFE9GKsXCSKVYHKkUSyOVYlmkUiyPVIqVkUqxOlIp1kQqxbpIpXgtUik2RirFpkileDtSKd6JVIrBSKXYFqkU70Uqxc5IpRiKVIoPI5Xi40il+CRSKfZGKsW+SKX4LFIpDkYqxeFIpTgaqRRfRJoWhieVKTVxjmORSvFlpFKcjFSKkUilOBWpFGcileJspFKMRirFt5FKcT5SKS5EKsXFSKW4HKkUVyKV4mqkUvwcqRTXI5ViLFIpbkQqxe+RSvFnpFLcjlSKO5FK8U+kUtyPVIoHkUrx6KFUivwnlSL/SqXIXakU+VsqRf6SSpFxqdIfE+u/KZUiv0mlyK9SKfKLVIr8JJUiP0qlyA9SKXJJKkW+l0qR76RS5JxUioxKpcg3UinytVSKnJZKkRGpFPlKKkVOSKXIcakUGZZKkc+lUuSIVIockkqRA1Ipsl8qRfZKpcgeqRTZLZUiu6RS5AOpFHlfKkV2SKXIdqkUeVcqRbZKpcgWqRTZJJUib0qlyOtSKbJeKkXWSqXIS1IpskoqRVZIpchzUinyjFSKLJFKkUVSKbJAKkXmSaXIHKkUGZBKkRlSqccilWIg0rQwc1KZasyOVIq5kUoxP1IpFkUqxeJIpVgaqRTLIpViRaRSvBipFKsjlWJNpEZrJ9b/aqRSbIhUio2RSrE5Uim2RCrF1kilGIxUiu2RSrEjUil2RirFUKRS7IpUit2RSrEnUik+jVSK/ZFKcSBSKQ5GKsXhSKU4GqkUw5FKcSxSKU5EKsXJSKUYiVSKU5FKcSZSKc5GKsVopFKci1SK85FKcSFSKS5GKsXlSKW4EqkUVyOV4lqkUlyPVIqxSKW4EakU45FKcStSKW5HKsXdSNPCnUllqnEvUinuRyrFw0dSKR49kEqR+1Ipck8qRe5KpchtqRS5JZUi41IpclMqRcakUuS6VIpck0qRq1IpckUqRS5LpcglqRS5IJUi56VS5JxUioxKpchZqRQ5I5Uip6VSZEQqRU5KpcgJqRQ5LpUiw1IpclQqRY5IpcghqRQ5IJUi+6RSZK9UiuyRSpHdUinykVSKDEmlyE6pFNkhlSLbpFJkUCpFtkqlyBapFNkslSIbpVJkg1SKrJNKkTVSKbJaKkVWSqXIcqkUWSaVIkulUuRpqRRZKJUiC6TpYf6kMsXIXKkUmSVVmj2x/gGp0gD/A8JXBneznKjMAAAAAElFTkSuQmCC';
+
+                colorMapTexture = new THREE.Texture();
+                colorMapTexture.image = image;
+                image.onload = function() {
+                    colorMapTexture.needsUpdate = true;
+                    self.reRender();
+                };
+            } else if(texture.type == 'url') {
+                var imageName = texture.data;
+                colorMapTexture = THREE.ImageUtils.loadTexture(imageName, null, function () {
+                    self.reRender();
+                }, function () {
+                    console.log("error")
+                });
+            } else {
+                console.log("selected texture or default is not found");
+                return;
+            }
+
+            colorMapTexture.magFilter = THREE.NearestFilter;
+            colorMapTexture.minFilter = THREE.LinearFilter;
+
+            texture.colorMapTexture = colorMapTexture;
+
+            texture.isolineMaterial = new THREE.MeshLambertMaterial({
+                map: colorMapTexture,
+                flatShading: true,
+                side: THREE.FrontSide
+
+            });
+        }
+
+        this.isolineMaterial = texture.isolineMaterial;
+        this.toggleIsolines(true);
+        return colorMapTexture;
+    },
+
+    addTextures: function (textures) {
+        for (var i = 0; i < textures.length; i++) {
+            var texture = textures[i];
+            this.mapTextureNameToDetails[texture.name] = texture;
+        }
+    },
+
+    setMinMaxResult: function (minResult, maxResult) {
+        this.resultInfo = {};
+        this.resultInfo.minResult = minResult;
+        this.resultInfo.maxResult = maxResult;
+    },
+
     toggleIsolines: function (showFlag) {
 
-        if(!this.options.drawResults){
+        if(!this.options.drawResults || !this.scene.meshes){
             return;
         }
 

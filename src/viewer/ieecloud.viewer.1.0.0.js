@@ -119,6 +119,13 @@ function Viewer(target, options) {
         this.threeEditor.loader.reloadModel(modelJsn);
     };
 
+    Viewer.prototype.changeRotationScale = function (rotationScale) {
+        if(rotationScale) {
+            this.options.rotationScale = rotationScale;
+            this.threeEditor.setOptions(this.options);
+        }
+    };
+
     Viewer.prototype.removeModel = function () {
         this.threeEditor.loader.removeModel();
     };
@@ -191,6 +198,10 @@ function Viewer(target, options) {
         this.threeEditor.toggleIsolines(value);
     };
 
+    Viewer.prototype.setTexture = function (textureName) {
+        this.threeEditor.setTexture(textureName);
+    };
+
     Viewer.prototype.printScreen = function (toFileName) {
         this.threeEditor.printScreen(toFileName);
     };
@@ -236,9 +247,15 @@ function Viewer(target, options) {
 // Default Properties and Events
     $.fn.ieecloudEditor.defaults = {
         textureUrl: undefined,
+        textureBase64: undefined,
+        texture: undefined,
+        textures: undefined,
         id: undefined,
         mode: "3d_point",
         resultDigits: 2,
+        modeInfoVisible: true,
+        rulerInfoVisible: true,
+        nearestPointInfoVisible: true,
         drawResults: true,
         gridVisible: false,
         axisVisible: false,

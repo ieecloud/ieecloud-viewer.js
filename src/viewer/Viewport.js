@@ -19,7 +19,10 @@ var Viewport = function (editor) {
     infoMode.setColor('black');
     // infoMode.setColor(editor.options.infoTextColor);
     infoMode.setValue('mode=' + editor.mode + '; searchMode=' + editor.searchNearestPointMode);
-    container.add(infoMode);
+    // container.add(infoMode);
+    if (editor.options.modeInfoVisible) {
+        container.add(infoMode);
+    }
 
     var info = new UI.Text();
     info.setPosition('absolute');
@@ -30,7 +33,10 @@ var Viewport = function (editor) {
     info.setStyle('-webkit-text-stroke', ['0.7px rgba(0, 0, 0, 0.6)']);
     info.setColor('black');
     // info.setColor(editor.options.infoTextColor);
-    container.add(info);
+    // container.add(info);
+    if (editor.options.nearestPointInfoVisible) {
+        container.add(infoMode);
+    }
 
     var rulerInfo = new UI.Text();
     rulerInfo.setPosition('absolute');
@@ -41,7 +47,10 @@ var Viewport = function (editor) {
     rulerInfo.setStyle('-webkit-text-stroke', ['0.7px rgba(0, 0, 0, 0.6)']);
     rulerInfo.setColor('black');
     // rulerInfo.setColor(editor.options.infoTextColor);
-    container.add(rulerInfo);
+    // container.add(rulerInfo);
+    if (editor.options.rulerInfoVisible) {
+        container.add(rulerInfo);
+    }
 
     var scene = editor.scene;
     var octree =  editor.octree;
@@ -1815,6 +1824,11 @@ var Viewport = function (editor) {
 
 
     signals.materialChanged.add(function (material) {
+        if(editor.loader.DRAW_RESULTS){
+            resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
+            resultScale.setResultInfo(editor.getResultInfo());
+            resultScale.show();
+        }
         render();
 
     });

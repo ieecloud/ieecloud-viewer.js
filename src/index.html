@@ -19,6 +19,8 @@
             margin-top: 0px;
             height: 100%;
             width: 100%;
+            max-width: 100%;
+            max-height: 100%;
             background-color: #fff;
         }
 
@@ -371,7 +373,8 @@
 </head>
 <body id="body" class="full-screen">
 
-
+<!-- Please don't remove it -->
+<!--<script type="text/javascript" src="http://static.ieecloud.com/js/ieecloud-viewer.js-0.0.0.min.js?t=" + Date.now()></script>-->
 
 <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
 <script type="text/javascript" src="<%= file %>"></script>
@@ -381,25 +384,32 @@
     <div id="btn-wrapper-id" class="btn-wrapper" style="position: absolute">
         <div class="buttons">
             <button id="loadModel" class="btn">Load Model</button>
-            <button id="removeModel" class="btn">Remove Model</button>
+            <!--<button id="removeModel" class="btn">Remove Model</button>-->
             <button id="showTree" class="btn">Show Tree</button>
             <button id="hideTree" class="btn">Hide Tree</button>
             <!--<button id="showRulerBtn" class="btn">Ruler</button>-->
             <!--<button id="showProtractorVBtn" class="btn">Protractor V</button>-->
             <!--<button id="showProtractorHBtn" class="btn">Protractor H</button>-->
-            <button id="exitFromFullScreen" class="btn">Exit from full screen</button>
+            <!--<button id="exitFromFullScreen" class="btn">Exit from full screen</button>-->
             <button id="addIsolines" class="btn">Add Isolines </button>
             <button id="removeIsolines" class="btn">Remove Isolines </button>
+            <select id="selectMode" name="selectMode">
+                <option value=""></option>
+                <option value="MESHES" selected='selected'>MESHES</option>
+                <option value="LINES">LINES</option>
+            </select>
+            <select id="selectTexture" name="selectTexture"></select>
             <!--<button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>-->
             <!--<button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>-->
-            <!--<button id="takeScreenShort" class="btn">Take Screen Short</button>-->
+            <!--<button id="takeScreenShort" class="btn">Take Screen Shot</button>-->
+            <button id="saveScreenShot" class="btn">Save Screen Shot</button>
             <!--<button id="returnToImageViewBtn" class="btn">Return to image view</button>-->
             <!--<button id="changeImageBtn" class="btn">Change Image</button>-->
-            <input id="modeInput"/>
+            <!--<input id="modeInput"/>-->
             <!--<button id="setModeBtn" class="btn">Set Mode</button>-->
             <!--<button id="attachToNewDiv" class="btn">Attach to new div</button>-->
-            <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
-            <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
+            <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
+            <button id="saveModelPositionBtn" class="btn">Save Model Position</button>
         </div>
         <div  id="tree-wrapper" style="width:400px;overflow: scroll;
     height: 100vh; position: relative;z-index: 1000;background-color: black;
@@ -425,24 +435,45 @@
 
 <script>
 
+    window.THREE.ImageUtils.crossOrigin = '';
+
     var tree;
     $("#tree-wrapper").hide();
 
+    var textures = [
+        {id:"1" , name: "cs-red-blue", type: "url", default:true, data:"http://static.ieecloud.com/images/cs-red.png"},
+        {id:"2" , name: "cs-blue-red", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-blue.png"},
+        {id:"3" , name: "cs-rainbow1", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-rainbow1.jpg"},
+        {id:"4" , name: "cs-rainbow2", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-rainbow2.jpg"},
+        {id:"5" , name: "cs-rainbow3", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-rainbow3.png"},
+        {id:"6" , name: "cs-rainbow4", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-rainbow4.png"},
+        {id:"7" , name: "cs-coolwarm", type: "url", default:false, data:"http://static.ieecloud.com/images/coolwarm.png"},
+        {id:"8" , name: "cs-warmcool", type: "url", default:false, data:"http://static.ieecloud.com/images/warmcool.png"}
+    ];
+    initDropdownTextures('selectTexture', getParameterValue("texture", undefined));
+
     $("#viewer").ieecloudEditor({
-        textureUrl: "",
-        mode: "3d_point",
-        resultDigits: 3,
-        drawResults: true,
-        gridVisible: false,
-//        rotationScale: {fov:0.35082010187266344, position: {x:
-//            48.22379092090737, y: -38.052186013287574, z: 154.37283345146167}},
-        detailModelView: false,
-        resultColor: "white",
-        backgroundColor: "#d4d4d4",
-        resultTextColor: "white",
-        nearestPointColor: "red",
-        searchNearestPointMode:"MESHES",
-        id: "1",
+        id: getParameterValue("id", "1"),
+        textureUrl: getParameterValue("textureUrl", "http://static.ieecloud.com/images/"),
+        texture: getParameterValue("texture", undefined),
+        textures: textures,
+        mode: getParameterValue("mode", "3d_point"),
+        resultDigits: getParameterValue("resultDigits", 3),
+        drawResults: getParameterValue("drawResults", true),
+        gridVisible: getParameterValue("gridVisible", false),
+        axisVisible: getParameterValue("axisVisible", false),
+        resultColor: getParameterValue("resultColor", "white"),
+        resultTextColor: getParameterValue("resultTextColor", "white"),
+        sceneBackgroundColor: getParameterValue("sceneBackgroundColor", "white"),
+        infoTextColor: getParameterValue("infoTextColor", "black"),
+        backgroundColor: getParameterValue("backgroundColor", "#aaa"),
+        nearestPointColor: getParameterValue("nearestPointColor", "red"),
+        resultPointColor: getParameterValue("resultPointColor", "white"),
+        resultPointSize: getParameterValue("resultPointSize", 0.005),
+        searchNearestPointMode: getParameterValue("searchNearestPointMode", "MESHES"),
+        //rotationScale: {fov:0.35082010187266344, position: {x: 35.06093200951128, y: -87.23789463891883, z: 136.7042316558606}},
+        rotationScale: getRotationScale("rotationScale", {fov:0.35082010187266344, position: {x: 35.06093200951128, y: -87.23789463891883, z: 136.7042316558606}}),
+        detailModelView: getParameterValue("detailModelView", false),
         onTreeLoad:function(treeData){
            var tData = treeData.children;
             if(!tree){
@@ -520,13 +551,36 @@
         },
         onPrintScreenDone: function (urlRenderer) {
             console.log(urlRenderer);
+
+            var dataJson = '{"name":"descript.ion","path":"descript.ion","type":"file","format":"base64","content":"Ny16aXAuY2htIDctWmlwIEhlbHANCjctWmlwLmRsbCA3LVppcCBQbHVnaW4NCjd6LmRsbCA3LVppcCBFbmdpbmUNCjd6LmV4ZSA3LVppcCBDb25zb2xlIA0KN3ouc2Z4IDctWmlwIEdVSSBTRlgNCjd6Q29uLnNmeCA3LVppcCBDb25zb2xlIFNGWA0KN3pGTS5leGUgNy1aaXAgRmlsZSBNYW5hZ2VyDQo3emcuZXhlIDctWmlwIEdVSQ0KZGVzY3JpcHQuaW9uIDctWmlwIEZpbGUgRGVzY3JpcHRpb25zDQpoaXN0b3J5LnR4dCA3LVppcCBIaXN0b3J5DQpMYW5nIDctWmlwIFRyYW5zbGF0aW9ucw0KbGljZW5zZS50eHQgNy1aaXAgTGljZW5zZQ0KcmVhZG1lLnR4dCA3LVppcCBPdmVydmlldw0K"}';
+
+            var dataJson1 = {
+                name:"descript.ion",
+                path:"descript.ion",
+                type:"file",
+                format:"base64",
+                content:urlRenderer
+            };
+
+            $.ajax({
+                url: 'http://notebook.ieecloud.com:8888/api/contents/test3.txt',
+                type: 'PUT',
+                beforeSend: function(request) {
+                    request.setRequestHeader("Cookie", '_xsrf=2|1dd65df0|648aafe1bdf3f416f1110b055dd72588|1522481551; username-notebook-ieecloud-com-8888="2|1:0|10:1522868735|35:username-notebook-ieecloud-com-8888|44:ODY5NDgwNzNhNzIzNGJkNjg3MDk0MDAzODI3ZDRlNjg=|f3503f7310c00807026e40bac979768ebbc6c844ac5c65a74ff6e2cfe61c9018"');
+                    request.setRequestHeader("X-XSRFToken", '2|1dd65df0|648aafe1bdf3f416f1110b055dd72588|1522481551');
+                },
+                data: JSON.stringify(dataJson1),
+                success: function(data) {
+                    alert('Load was performed.');
+                }
+            });
         }
     });
 
     $("#attachToNewDiv").click(function () {
         $("#viewer").ieecloudEditor('removeModel');
         var options = {
-            textureUrl: "",
+            textureUrl: "http://static.ieecloud.com/images/",
             mode: "3d_point",
             resultDigits: 2,
             drawResults: true,
@@ -573,6 +627,10 @@
         $("#viewer").ieecloudEditor('printScreen', "printScreen.png");
     });
 
+    $("#saveScreenShot").click(function () {
+        $("#viewer").ieecloudEditor('printScreen', "printScreen.png");
+    });
+
     $("#addIsolines").click(function () {
         $("#viewer").ieecloudEditor('toggleIsolines', true);
     });
@@ -607,12 +665,24 @@
         tree.nodes().deselectDeep();
     });
 
+    // Not remove it. It's used in Jupyter.
+    $.ajaxSetup({
+        async: false
+    });
+    //$.getJSON('http://static.ieecloud.com/data/test/small_box.json?t=' + Date.now(), function(json) {
+//    $.getJSON(getParameterByName('dataUrl'), function (json) {
+//        $("#viewer").ieecloudEditor('reloadModel', json);
+//    });
+
+    // load_json(getParameterValue("data") + ".js", function(){
+    //     $("#viewer").ieecloudEditor('reloadModel', data);
+    // });
+
     $("#loadModel").click(function () {
         $.getJSON("../resources/results.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
-    });
-
+    }); 
 
     $("#exitFromFullScreen").click(function () {
         $("#viewer-wrapper").removeClass('viewer-full-screen');
@@ -630,6 +700,129 @@
         window.dispatchEvent(new Event('resize'));
     });
 
+    $("#selectMode").change(function () {
+        var e = document.getElementById("selectMode");
+        var value = e.options[e.selectedIndex].value;
+        $("#viewer").ieecloudEditor('setSearchNearestPointMode', value);
+    });
+
+    $("#selectTexture").change(function () {
+        var e = document.getElementById("selectTexture");
+        var value = e.options[e.selectedIndex].value;
+        $("#viewer").ieecloudEditor('setTexture', value);
+    });
+
+    function getCurrentTexture(textures, reqParamTextureName) {
+        var paramTexture;
+        var defaultTexture;
+        for (var i = 0; i < textures.length; i++) {
+            if(reqParamTextureName && reqParamTextureName == textures[i].name) {
+                paramTexture = textures[i];
+            }
+            if(textures[i].default) {
+                defaultTexture = textures[i];
+            }
+        }
+        return paramTexture ? paramTexture : defaultTexture;
+    }
+
+    function initDropdownTextures(id, reqParamTextureName) {
+        var select, option;
+        var currentTexture = getCurrentTexture(textures, reqParamTextureName);
+        select = document.getElementById( id );
+        for (var i = 0; i < textures.length; i++) {
+            option = document.createElement( 'option' );
+            option.value = textures[i].name;
+            option.text = textures[i].name;
+            if(textures[i].name == currentTexture.name) {
+                option.selected = 'selected';
+            }
+            select.add( option );
+        }
+    }
+
+    function getRotationScale() {
+
+        var position = getParameterByName("position");
+        if(position && position != 'None') {
+            return {position: {x:position[0], y: position[1], z: position[2]}};
+        }
+
+//        var rotY = getParameterByName("rotY");
+//        var rotZ = getParameterByName("rotZ");
+//
+//        rotX = rotX && rotX !== "" ? rotX : 48.22379092090737;
+//        rotY = rotY && rotY !== "" ? rotY : -38.052186013287574;
+//        rotZ = rotZ && rotZ !== "" ? rotZ : 154.37283345146167;
+
+//        return {position: {x:rotX, y: rotY, z: rotZ}}
+        return undefined;
+    }
+
+//    textureUrl: undefined,
+//        id: undefined,
+//        mode: "3d_point",
+//        resultDigits: 2,
+//        drawResults: true,
+//        gridVisible: false,
+//        axisVisible: false,
+//        resultTextColor: "black",
+//        sceneBackgroundColor:"white",
+//        infoTextColor:"black",
+//        backgroundColor: "#aaa",
+//        nearestPointColor: "red",
+//        resultPointColor: "white",
+//        resultPointSize: 0.005,
+//        searchNearestPointMode: "MESHES"
+
+    function getParameterValue(name, defaultValue) {
+        var paramValue = getParameterByName(name);
+        if("position" == name) {
+            if(paramValue && paramValue != 'None') {
+                return {position: {x: paramValue[0], y: paramValue[1], z: paramValue[2]}};
+            } else {
+                return defaultValue;
+            }
+        }
+
+        return paramValue ? paramValue : defaultValue;
+    }
+
+    function getParameterByName( name ){
+        var regexS = "[\\?&]"+name+"=([^&#]*)",
+            regex = new RegExp( regexS ),
+            results = regex.exec( window.location.search );
+        if( results == null ){
+            return undefined;
+        } else{
+            return decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+    }
+
+    function load_json(src, onLoadCallback) {
+        var head = document.getElementsByTagName('head')[0];
+
+        //use class, as we can't reference by id
+        var element = head.getElementsByClassName("json")[0];
+
+        try {
+            element.parentNode.removeChild(element);
+        } catch (e) {
+            //
+        }
+
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = src;
+        script.className = "json";
+        script.async = false;
+        //script.onload = myParticularCallback;
+        script.addEventListener('load', onLoadCallback);
+        head.appendChild(script);
+
+        //call the postload function after a slight delay to allow the json to load
+        //window.setTimeout(postloadfunction, 100)
+    }
 
 </script>
 

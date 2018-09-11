@@ -1,9 +1,12 @@
-var Loader = function (editor, textureUrl) {
+var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     var scope = this;
     var signals = editor.signals;
     this.DRAW_RESULTS = true;
     this.textureUrl = textureUrl;
+    this.textureBase64 = textureBase64;
+    this.texture = texture;
+    this.textures = textures;
     this.objectsTree = null;
     this.coordFactor = 1;
     this.modelRotation = null;
@@ -948,6 +951,18 @@ var Loader = function (editor, textureUrl) {
         this.textureUrl = url;
     };
 
+    this.setTextureBase64 = function (base64) {
+        this.textureBase64 = base64;
+    };
+
+    this.setTexture = function (texture) {
+        this.texture = texture;
+    };
+
+    this.setTextures = function (textures) {
+        this.textures = textures;
+    };
+
     this.createJsonModelWithRotation = function (currentModelRotation) {
 
         var modelRotation = this.modelRotation;
@@ -962,8 +977,15 @@ var Loader = function (editor, textureUrl) {
             }
         }
         alert(message)
-    }
+    };
 
+    this.getDefaultTexture = function (textures) {
+        for (var k = 0; k < scope.textures.length; k++) {
+            if(scope.textures[k].default) {
+                return scope.textures[k];
+            }
+        }
+    };
 
     this.parseModel = function (json) {
         var pictureData = json.pictureData; // reading array for all geometry objects
@@ -981,28 +1003,12 @@ var Loader = function (editor, textureUrl) {
         pictureInfo.modelRotation = this.modelRotation;
 
         var colorMapTexture;
-        if (scope.DRAW_RESULTS) {
-            var imageName = scope.textureUrl ? scope.textureUrl + 'color-spectrum.png' : 'color-spectrum.png';
-            colorMapTexture = THREE.ImageUtils.loadTexture(imageName, null, function () {
-                editor.reRender();
-            }, function () {
-                console.log("error")
-            });
-
-            // Add texture hardcode for offline mode
-            // var image = new Image();
-            // image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAP8AAAD/CAIAAACxapedAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xNkRpr/UAAAQqSURBVHhe7dMxiBAEGIbhN8ELlZQUjRQsLDRMsNAwycJCCSGHCxRyMLgoCSEHA4UcFBQMukEJwYYbFAxsuCHBwEAHGwwMMjC4QKGLDAwUMjBQv26/+eDge+GZ3uVfvp+3iNSJN4jUifVE6sQrROrEy0TqxCoideIFInXieSJ14lkidWIJkTrxFJE6MZ9InZhHpE7MIVInHidSJ2YQqRPMmPgAqRIzI5ViVqRSPBGpFE9GKsXCSKVYHKkUSyOVYlmkUiyPVIqVkUqxOlIp1kQqxbpIpXgtUik2RirFpkileDtSKd6JVIrBSKXYFqkU70Uqxc5IpRiKVIoPI5Xi40il+CRSKfZGKsW+SKX4LFIpDkYqxeFIpTgaqRRfRJoWhieVKTVxjmORSvFlpFKcjFSKkUilOBWpFGcileJspFKMRirFt5FKcT5SKS5EKsXFSKW4HKkUVyKV4mqkUvwcqRTXI5ViLFIpbkQqxe+RSvFnpFLcjlSKO5FK8U+kUtyPVIoHkUrx6KFUivwnlSL/SqXIXakU+VsqRf6SSpFxqdIfE+u/KZUiv0mlyK9SKfKLVIr8JJUiP0qlyA9SKXJJKkW+l0qR76RS5JxUioxKpcg3UinytVSKnJZKkRGpFPlKKkVOSKXIcakUGZZKkc+lUuSIVIockkqRA1Ipsl8qRfZKpcgeqRTZLZUiu6RS5AOpFHlfKkV2SKXIdqkUeVcqRbZKpcgWqRTZJJUib0qlyOtSKbJeKkXWSqXIS1IpskoqRVZIpchzUinyjFSKLJFKkUVSKbJAKkXmSaXIHKkUGZBKkRlSqccilWIg0rQwc1KZasyOVIq5kUoxP1IpFkUqxeJIpVgaqRTLIpViRaRSvBipFKsjlWJNpEZrJ9b/aqRSbIhUio2RSrE5Uim2RCrF1kilGIxUiu2RSrEjUil2RirFUKRS7IpUit2RSrEnUik+jVSK/ZFKcSBSKQ5GKsXhSKU4GqkUw5FKcSxSKU5EKsXJSKUYiVSKU5FKcSZSKc5GKsVopFKci1SK85FKcSFSKS5GKsXlSKW4EqkUVyOV4lqkUlyPVIqxSKW4EakU45FKcStSKW5HKsXdSNPCnUllqnEvUinuRyrFw0dSKR49kEqR+1Ipck8qRe5KpchtqRS5JZUi41IpclMqRcakUuS6VIpck0qRq1IpckUqRS5LpcglqRS5IJUi56VS5JxUioxKpchZqRQ5I5Uip6VSZEQqRU5KpcgJqRQ5LpUiw1IpclQqRY5IpcghqRQ5IJUi+6RSZK9UiuyRSpHdUinykVSKDEmlyE6pFNkhlSLbpFJkUCpFtkqlyBapFNkslSIbpVJkg1SKrJNKkTVSKbJaKkVWSqXIcqkUWSaVIkulUuRpqRRZKJUiC6TpYf6kMsXIXKkUmSVVmj2x/gGp0gD/A8JXBneznKjMAAAAAElFTkSuQmCC';
-            //
-            // colorMapTexture = new THREE.Texture();
-            // colorMapTexture.image = image;
-            // image.onload = function() {
-            //     colorMapTexture.needsUpdate = true;
-            //     editor.reRender();
-            // };
-
-            colorMapTexture.magFilter = THREE.NearestFilter;
-            colorMapTexture.minFilter = THREE.LinearFilter;
-            editor.addTexture(colorMapTexture, minResult, maxResult);
+        if (scope.DRAW_RESULTS && scope.textures) {
+            editor.addTextures(scope.textures);
+            var currentTextureName = scope.texture ? scope.texture : this.getDefaultTexture(textures);
+            colorMapTexture = editor.setTexture(currentTextureName);
+            editor.setMinMaxResult(minResult, maxResult);
+            // editor.addTexture(colorMapTexture, minResult, maxResult);
         }
 
         // calculate scaleFactor
