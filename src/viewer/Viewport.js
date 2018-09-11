@@ -1642,14 +1642,19 @@ var Viewport = function (editor) {
 
         var canvas1 = renderer.domElement;
         var canvas2 = renderer3.domElement;
+        var canvas3 = renderer2.domElement; // axis canvas
 
         var can3 = document.createElement('canvas');
+
+        var mainHeight = canvas1.getContext('webgl').drawingBufferHeight;
+
         can3.width = canvas1.getContext('webgl').drawingBufferWidth;
-        can3.height = canvas1.getContext('webgl').drawingBufferHeight;
+        can3.height = mainHeight;
         var ctx3 = can3.getContext('2d');
 
         ctx3.drawImage(canvas1, 0, 0);
         ctx3.drawImage(canvas2, 0, 0);
+        ctx3.drawImage(canvas3, 0, mainHeight - canvas3.height);
 
         var urlRenderer	= can3.toDataURL("image/png");
         editor.onPrintScreenDone(urlRenderer);
