@@ -47,10 +47,17 @@ THREE.ResultTextObject3d = function (camera, params) {
             ctx.fillRect(0, 0, w, h);
         }
 
-
+        ctx.miterLimit = 1;
         ctx.fillStyle = color || 'black';
+        ctx.strokeStyle =  'black';
 
         ctx.fillText(text, 0, Math.ceil(size * 0.8));
+
+
+        ctx.lineWidth = 3;
+        ctx.strokeText(text, 0, Math.ceil(size * 0.8));
+
+
 
         return canvas;
 
