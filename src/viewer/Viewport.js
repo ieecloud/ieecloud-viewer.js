@@ -1710,8 +1710,10 @@ var Viewport = function (editor) {
             updateMaterials();
         }
 
+        var resultInfo = editor.getResultInfo();
 
-        if(editor.loader.DRAW_RESULTS){
+
+        if(editor.loader.DRAW_RESULTS && resultInfo.maxResult > resultInfo.minResult){
             resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
             resultScale.setResultInfo(editor.getResultInfo());
             resultScale.show();
