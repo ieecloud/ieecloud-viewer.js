@@ -40,15 +40,24 @@ THREE.SmallScaleObject3d = function (camera, domElement, isolineMaterial) {
     };
 
     var reBuildText = function (text) {
-        var size = 15;
-        var canvas = createTextCanvas(text,  "black", null, 256);
+        var radius = 30;
 
+        var canvas = document.createElement('canvas');
+        canvas.width = radius * 4;
+        canvas.height= radius * 2;
+        var context = canvas.getContext('2d');
+        context.font = '15px Arial';
 
-        var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
-        var tex = new THREE.Texture(canvas);
+        var metrics = context.measureText(text);
+        var textWidth = metrics.width;
+        context.fillStyle = "black";
+        context.fillText(text, (canvas.width - textWidth) / 2, radius);
+        var texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
 
-        tex.needsUpdate = true;
-        return {tex: tex, plane : plane};
+        var spriteMaterial = new THREE.SpriteMaterial({map: texture});
+
+        return {material: spriteMaterial, canvas : canvas};
     };
 
     this.show = function () {
@@ -67,61 +76,35 @@ THREE.SmallScaleObject3d = function (camera, domElement, isolineMaterial) {
     };
 
     this.addMinMaxResults = function(){
-        var xAxis = new THREE.Vector3(1, 0, 0);
-        var textObject = reBuildText(this.resultInfo.maxResult);
-        var planeMat = new THREE.ResultTextObject3dMaterial({
-            map: textObject.tex,
-            color: 0xffffff
-        });
-        this.maxResultMesh = new THREE.Mesh(textObject.plane, planeMat);
-        rotateAroundObjectAxis(this.maxResultMesh, xAxis, Math.PI / 2);
-        me.add(this.maxResultMesh);
-        this.maxResultMesh.position.copy(new THREE.Vector3(25, 0, 130));
+        var textObject = reBuildText(this.resultInfo.minResult ? this.resultInfo.minResult.round(2) : "0");
+        if (this.minResultMesh) {
+            this.minResultMesh.material = textObject.material;
+        } else {
+            this.minResultMesh = new THREE.Sprite(textObject.material);
+            me.add(this.minResultMesh);
+            this.minResultMesh.position.copy(new THREE.Vector3(25, 0, -135));
+        }
 
-        var textObject = reBuildText(this.resultInfo.minResult.round(2));
-        var planeMat = new THREE.ResultTextObject3dMaterial({
-            map: textObject.tex,
-            color: 0xffffff
-        });
+        this.minResultMesh.scale.set(textObject.canvas.width, textObject.canvas.height, 1);
 
-        this.minResultMesh = new THREE.Mesh(textObject.plane, planeMat);
-        rotateAroundObjectAxis(this.minResultMesh, xAxis, Math.PI / 2);
-        me.add(this.minResultMesh);
-        this.minResultMesh.position.copy(new THREE.Vector3(25, 0, -130));
 
+        textObject = reBuildText(this.resultInfo.maxResult ? this.resultInfo.maxResult.round(2) : "0");
+
+        if (this.maxResultMesh) {
+            this.maxResultMesh.material = textObject.material;
+        } else {
+            this.maxResultMesh = new THREE.Sprite(textObject.material);
+            me.add(this.maxResultMesh);
+            this.maxResultMesh.position.copy(new THREE.Vector3(25, 0, 128));
+        }
+
+        this.maxResultMesh.scale.set(textObject.canvas.width, textObject.canvas.height, 1);
     };
 
 
     this.setResultInfo = function (resultInfo) {
         this.resultInfo = resultInfo;
-
-
-        this.maxResultMesh.parent.remove(this.maxResultMesh);
-        this.maxResultMesh.geometry.dispose();
-
-
-        this.minResultMesh.parent.remove(this.minResultMesh);
-        this.minResultMesh.geometry.dispose();
-
         this.addMinMaxResults();
-
-        // var textObject = reBuildText(this.resultInfo.maxResult.round(2));
-        // var planeMat = new THREE.ResultTextObject3dMaterial({
-        //     map: textObject.tex,
-        //     color: 0xffffff
-        // });
-        // this.maxResultMesh.material = planeMat;
-        //
-        //
-        //
-        //
-        // var textObject = reBuildText(this.resultInfo.minResult.round(2));
-        // var planeMat = new THREE.ResultTextObject3dMaterial({
-        //     map: textObject.tex,
-        //     color: 0xffffff
-        // });
-        // this.minResultMesh.material = planeMat;
-
     };
 
     var rotObjectMatrix;
@@ -153,33 +136,7 @@ THREE.SmallScaleObject3d = function (camera, domElement, isolineMaterial) {
         var xAxis = new THREE.Vector3(1, 0, 0);
         var yAxis = new THREE.Vector3(0, 1, 0);
         rotateAroundObjectAxis(me.rectangleMesh, xAxis, -Math.PI / 2);
-
-
         me.add(me.rectangleMesh);
-
-        // this.addMinMaxResults();
-
-        var textObject = reBuildText(this.resultInfo.maxResult);
-        var planeMat = new THREE.ResultTextObject3dMaterial({
-            map: textObject.tex,
-            color: 0xffffff
-        });
-        this.maxResultMesh = new THREE.Mesh(textObject.plane, planeMat);
-        rotateAroundObjectAxis(this.maxResultMesh, xAxis, Math.PI / 2);
-        me.add(this.maxResultMesh);
-        this.maxResultMesh.position.copy(new THREE.Vector3(25, 0, 130));
-
-        var textObject = reBuildText(this.resultInfo.minResult);
-        var planeMat = new THREE.ResultTextObject3dMaterial({
-            map: textObject.tex,
-            color: 0xffffff
-        });
-
-        this.minResultMesh = new THREE.Mesh(textObject.plane, planeMat);
-        rotateAroundObjectAxis(this.minResultMesh, xAxis, Math.PI / 2);
-        me.add(this.minResultMesh);
-        this.minResultMesh.position.copy(new THREE.Vector3(25, 0, -130));
-
     };
 
     this.update = function () {
