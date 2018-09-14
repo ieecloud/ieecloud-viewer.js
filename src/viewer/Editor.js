@@ -278,7 +278,7 @@ Editor.prototype = {
     },
 
     getIsolineMaterialIfExist: function () {
-        return this.isolineMaterial ? this.isolineMaterial: null;
+        return this.isolineSpriteMaterial ? this.isolineSpriteMaterial: null;
     },
 
     getResultInfo: function () {
@@ -293,6 +293,7 @@ Editor.prototype = {
             side: THREE.FrontSide
 
         });
+        this.isolineSpriteMaterial = new THREE.SpriteMaterial({map: texture});
         this.resultInfo = {};
         this.resultInfo.minResult = minResult;
         this.resultInfo.maxResult = maxResult;
@@ -354,9 +355,12 @@ Editor.prototype = {
                 side: THREE.FrontSide
 
             });
+
+            texture.isolineSpriteMaterial = new THREE.SpriteMaterial({map: colorMapTexture});
         }
 
         this.isolineMaterial = texture.isolineMaterial;
+        this.isolineSpriteMaterial = texture.isolineSpriteMaterial;
         this.toggleIsolines(true);
         return colorMapTexture;
     },

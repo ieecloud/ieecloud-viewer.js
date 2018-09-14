@@ -1,7 +1,7 @@
 "use strict";
 
 
-THREE.SmallScaleObject3d = function (camera, domElement, isolineMaterial) {
+THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
     var me = this;
 
 
@@ -40,18 +40,19 @@ THREE.SmallScaleObject3d = function (camera, domElement, isolineMaterial) {
     };
 
     var reBuildText = function (text) {
-        var radius = 30;
+        var radius = 20;
 
         var canvas = document.createElement('canvas');
         canvas.width = radius * 4;
         canvas.height= radius * 2;
         var context = canvas.getContext('2d');
-        context.font = '15px Arial';
+        context.font = '14px Arial';
 
         var metrics = context.measureText(text);
         var textWidth = metrics.width;
         context.fillStyle = "black";
-        context.fillText(text, (canvas.width - textWidth) / 2, radius);
+        context.fillText(text, 0, Math.ceil(14 * 0.8));
+
         var texture = new THREE.Texture(canvas);
         texture.needsUpdate = true;
 
@@ -72,33 +73,33 @@ THREE.SmallScaleObject3d = function (camera, domElement, isolineMaterial) {
 
     this.setIsolineMaterial = function (material) {
         this.rectangleMesh.material = material;
-        this.rectangleMesh.material.side = THREE.DoubleSide;
+        this.rectangleMesh.material.rotation = - Math.PI;
     };
 
     this.addMinMaxResults = function(){
-        var textObject = reBuildText(this.resultInfo.minResult ? this.resultInfo.minResult.round(2) : "0");
+        var textObject = reBuildText(this.resultInfo.minResult ? this.resultInfo.minResult.round(resultDigits) : "0");
         if (this.minResultMesh) {
             this.minResultMesh.material = textObject.material;
         } else {
             this.minResultMesh = new THREE.Sprite(textObject.material);
             me.add(this.minResultMesh);
-            this.minResultMesh.position.copy(new THREE.Vector3(25, 0, -135));
+            this.minResultMesh.position.copy(new THREE.Vector3(44, 0, -132));
         }
 
-        this.minResultMesh.scale.set(textObject.canvas.width, textObject.canvas.height, 1);
+        this.minResultMesh.scale.set(textObject.canvas.width - 12, textObject.canvas.height -12, 1);
 
 
-        textObject = reBuildText(this.resultInfo.maxResult ? this.resultInfo.maxResult.round(2) : "0");
+        textObject = reBuildText(this.resultInfo.maxResult ? this.resultInfo.maxResult.round(resultDigits) : "0");
 
         if (this.maxResultMesh) {
             this.maxResultMesh.material = textObject.material;
         } else {
             this.maxResultMesh = new THREE.Sprite(textObject.material);
             me.add(this.maxResultMesh);
-            this.maxResultMesh.position.copy(new THREE.Vector3(25, 0, 128));
+            this.maxResultMesh.position.copy(new THREE.Vector3(44, 0, 119));
         }
 
-        this.maxResultMesh.scale.set(textObject.canvas.width, textObject.canvas.height, 1);
+        this.maxResultMesh.scale.set(textObject.canvas.width - 12, textObject.canvas.height -12, 1);
     };
 
 
@@ -125,21 +126,15 @@ THREE.SmallScaleObject3d = function (camera, domElement, isolineMaterial) {
         this.resultInfo.maxResult = 1;
         this.resultInfo.minResult = 0;
 
-
-        var geometry = new THREE.PlaneBufferGeometry(15, 300, 20, 20);
-
-        var material= new THREE.MeshBasicMaterial({color: 0xff0000, opacity: 1, transparent: false});
+        this.rectangleMesh = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
+        this.rectangleMesh.scale.set( 13, 260, 0 );
 
 
-        me.rectangleMesh = new THREE.Mesh(geometry, material);
-
-        var xAxis = new THREE.Vector3(1, 0, 0);
-        var yAxis = new THREE.Vector3(0, 1, 0);
-        rotateAroundObjectAxis(me.rectangleMesh, xAxis, -Math.PI / 2);
         me.add(me.rectangleMesh);
     };
 
     this.update = function () {
+        me.rectangleMesh.quaternion.copy(camera.quaternion);
     };
 
     this.init();

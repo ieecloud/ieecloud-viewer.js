@@ -63,7 +63,7 @@ var Viewport = function (editor) {
     var INTERSECTED = {};
 
     var CANVAS2_WIDTH = 200;
-    var CANVAS2_HEIGHT = 300;
+    var CANVAS2_HEIGHT = 370;
 
     var clearColor = editor.options.backgroundColor;
     var objects = [];
@@ -168,7 +168,6 @@ var Viewport = function (editor) {
     camera3.position.y=-162.48152055744922;
     camera3.position.z= -5.9702252791992585;
     camera3.position.setLength(CAM_DISTANCE);
-
     var selectedResultPoints = {};
     var textResults = {};
     var nearestPoint = new THREE.NearestPointObject3d(camera, container.dom, {material: {color: editor.options.nearestPointColor}});
@@ -430,7 +429,7 @@ var Viewport = function (editor) {
     var axis = new THREE.SmallAxisObject3d(camera, container2.dom);
     sceneAxis.add(axis);
 
-    var resultScale = new THREE.SmallScaleObject3d(camera, container3.dom, editor.getIsolineMaterialIfExist());
+    var resultScale = new THREE.SmallScaleObject3d(camera, container3.dom, editor.resultDigits);
     sceneResults.add(resultScale);
     resultScale.hide();
 
