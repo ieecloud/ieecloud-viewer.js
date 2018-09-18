@@ -73,7 +73,6 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
 
     this.setIsolineMaterial = function (material) {
         this.rectangleMesh.material = material;
-        this.rectangleMesh.material.rotation = - Math.PI;
     };
 
     this.addMinMaxResults = function(){
