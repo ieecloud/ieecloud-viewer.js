@@ -441,14 +441,14 @@
     $("#tree-wrapper").hide();
 
     var textures = [
-        {id:"1" , name: "cs-red-blue", type: "url", default:true, data:"http://static.ieecloud.com/images/cs-red.png"},
-        {id:"2" , name: "cs-blue-red", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-blue.png"},
-        {id:"3" , name: "cs-rainbow1", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-rainbow1.jpg"},
-        {id:"4" , name: "cs-rainbow2", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-rainbow2.jpg"},
-        {id:"5" , name: "cs-rainbow3", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-rainbow3.png"},
-        {id:"6" , name: "cs-rainbow4", type: "url", default:false, data:"http://static.ieecloud.com/images/cs-rainbow4.png"},
-        {id:"7" , name: "cs-coolwarm", type: "url", default:false, data:"http://static.ieecloud.com/images/coolwarm.png"},
-        {id:"8" , name: "cs-warmcool", type: "url", default:false, data:"http://static.ieecloud.com/images/warmcool.png"}
+        {id:"1" , name: "cs-red-blue", type: "url", default:true, nColors:5, data:"http://static.ieecloud.com/images/cs-red.png"},
+        {id:"2" , name: "cs-blue-red", type: "url", default:false, nColors:5, data:"http://static.ieecloud.com/images/cs-blue.png"},
+        {id:"3" , name: "cs-rainbow1", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow1.jpg"},
+        {id:"4" , name: "cs-rainbow2", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow2.jpg"},
+        {id:"5" , name: "cs-rainbow3", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow3.png"},
+        {id:"6" , name: "cs-rainbow4", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow4.png"},
+        {id:"7" , name: "cs-coolwarm", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/coolwarm.png"},
+        {id:"8" , name: "cs-warmcool", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/warmcool.png"}
     ];
     initDropdownTextures('selectTexture', getParameterValue("texture", undefined));
 
