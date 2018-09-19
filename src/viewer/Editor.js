@@ -357,6 +357,7 @@ Editor.prototype = {
             });
 
             texture.isolineSpriteMaterial = new THREE.SpriteMaterial({map: colorMapTexture});
+            texture.isolineSpriteMaterial.nColors = texture.nColors;
         }
 
         this.isolineMaterial = texture.isolineMaterial;

@@ -71,34 +71,45 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         this.visible = false;
     };
 
+    this.createScaleDelimiters = function (maxSizeDelimiters) {
+        var number = -1;
+        var maxZ = 120;
+        var minZ = -132;
+        var minResult = this.resultInfo.minResult;
+        var maxResult = this.resultInfo.maxResult;
+        for (var i = 0; i <= maxSizeDelimiters; i += 1) {
+            var result = minResult + i*(maxResult - minResult)/maxSizeDelimiters;
+            var textObject = reBuildText(result.round(resultDigits));
+            var textResultMesh = new THREE.Sprite(textObject.material);
+            me.add(textResultMesh);
+            textResultMesh.position.copy(new THREE.Vector3(44, 0, minZ + i * (maxZ - minZ)/maxSizeDelimiters));
+            textResultMesh.scale.set(textObject.canvas.width - 12, textObject.canvas.height -12, 1);
+            me.textResults[i] = textResultMesh;
+
+        }
+
+    };
+
+    this.removeAllDelimiters = function () {
+        //TODO: if they realy removed from scene and dont collected
+        for (var key in  this.textResults) {
+            this.textResults[key].parent.remove(this.textResults[key]);
+        }
+        this.textResults = {};
+    };
+
+
     this.setIsolineMaterial = function (material) {
         this.rectangleMesh.material = material;
     };
 
     this.addMinMaxResults = function(){
-        var textObject = reBuildText(this.resultInfo.minResult ? this.resultInfo.minResult.round(resultDigits) : "0");
-        if (this.minResultMesh) {
-            this.minResultMesh.material = textObject.material;
-        } else {
-            this.minResultMesh = new THREE.Sprite(textObject.material);
-            me.add(this.minResultMesh);
-            this.minResultMesh.position.copy(new THREE.Vector3(44, 0, -132));
-        }
-
-        this.minResultMesh.scale.set(textObject.canvas.width - 12, textObject.canvas.height -12, 1);
-
-
-        textObject = reBuildText(this.resultInfo.maxResult ? this.resultInfo.maxResult.round(resultDigits) : "0");
-
-        if (this.maxResultMesh) {
-            this.maxResultMesh.material = textObject.material;
-        } else {
-            this.maxResultMesh = new THREE.Sprite(textObject.material);
-            me.add(this.maxResultMesh);
-            this.maxResultMesh.position.copy(new THREE.Vector3(44, 0, 119));
-        }
-
-        this.maxResultMesh.scale.set(textObject.canvas.width - 12, textObject.canvas.height -12, 1);
+       this.removeAllDelimiters();
+       var nColors = 0;
+       if(this.rectangleMesh.material.nColors){
+           nColors = this.rectangleMesh.material.nColors;
+       }
+       this.createScaleDelimiters(nColors);
     };
 
 
@@ -122,6 +133,7 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         THREE.Object3D.call(this);
 
         this.resultInfo  = {};
+        this.textResults = {};
         this.resultInfo.maxResult = 1;
         this.resultInfo.minResult = 0;
 
