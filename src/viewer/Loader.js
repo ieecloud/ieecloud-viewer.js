@@ -9,6 +9,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     this.textures = textures;
     this.objectsTree = null;
     this.coordFactor = 1;
+    this.pretenderMins = [];
+    this.pretenderMaxs = [];
     this.modelRotation = null;
     this.camera = null;
 
@@ -265,22 +267,28 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             }
 
             meshesData[key] = [];
+            var geometryElement = new THREE.Object3D();
             var totalObjectDataElement = value;
             var objectElement = totalObjectDataElement.objectPartsArray;
             var pointsTable = totalObjectDataElement.pointsTable;
             var vertices = totalObjectDataElement.totalObjVertices;
             var results = totalObjectDataElement.totalObjResults;
+            var maxGeometryResult = totalObjectDataElement.maxGeometryResult;
+            var minGeometryResult = totalObjectDataElement.minGeometryResult;
             var objectNames = totalObjectDataElement.objectNames;
             var pointsNumbers = totalObjectDataElement.pointsNumbers;
             var lineCommonPositionsArray = totalObjectDataElement.lineCommonPositionsArray;
             var faceCommonGeometryData = totalObjectDataElement.faceCommonGeometryData;
+            var groups = totalObjectDataElement.groups;
+            var faces = totalObjectDataElement.faces;
+
+
 
             var geoCommonMeshGeometry = new THREE.BufferGeometry();
             geoCommonMeshGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( faceCommonGeometryData.positions, 3 ));
             geoCommonMeshGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( faceCommonGeometryData.colors, 3 ) );
             geoCommonMeshGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( faceCommonGeometryData.normals, 3 ));
             geoCommonMeshGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( faceCommonGeometryData.uvs, 2 ));
-            // geoCommonMeshGeometry.center();
 
 
             var mesh = new THREE.Mesh(geoCommonMeshGeometry, objectElement[0].drawResultsMaterial  ?
@@ -288,8 +296,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             mesh.userData.pointsTable = pointsTable;
             mesh.userData.totalObjVertices = vertices;
             mesh.userData.totalObjResults = results;
+            mesh.userData.maxGeometryResult = maxGeometryResult;
+            mesh.userData.minGeometryResult = minGeometryResult;
             mesh.userData.objectNames = objectNames;
             mesh.userData.pointsNumbers = pointsNumbers;
+            mesh.userData.groups = groups;
+            mesh.userData.faces = faces;
 
             mesh.name = totalObjectDataElement.name;
             mesh.uniqueId = mesh.uuid;
@@ -298,7 +310,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             mesh.facesMaterial = objectElement[0].facesMaterial;
             mesh.drawResults = objectElement[0].drawResults;
 
-            modelGroup.add(mesh);
+            geometryElement.add(mesh);
 
             if(!editor.scene.meshes) {
                 editor.scene.meshes = [];
@@ -335,21 +347,25 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                 shapes.name = simpleShapesGeometry.name;
                 meshesData[key].push(shapes);
-                modelGroup.add(shapes);
+
+                // modelGroup.add(shapes);
+                geometryElement.add(shapes);
 
             });
 
 
             var geoCommonLineGeometry = new THREE.BufferGeometry();
             geoCommonLineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( lineCommonPositionsArray, 3 ) );
-            // geoCommonLineGeometry.center();
             var lines = new THREE.LineSegments(geoCommonLineGeometry, objectElement[0].edgesMaterial);
-            modelGroup.add(lines);
+            geometryElement.add(lines);
+            // modelGroup.add(lines);
             lines.userData.pointsTable = pointsTable;
             lines.parentName = totalObjectDataElement.name;
             lines.defaultColor = objectElement[0].edgesMaterial.color.clone();
             lines.userData.totalObjVertices = vertices;
             lines.userData.totalObjResults = results;
+            lines.userData.maxGeometryResult = maxGeometryResult;
+            lines.userData.minGeometryResult = minGeometryResult;
             lines.userData.objectNames = objectNames;
             lines.userData.pointsNumbers = pointsNumbers;
             editor.octree.add(lines);
@@ -375,6 +391,15 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 }
                 meshesData[key].push(mesh);
             }
+
+            geometryElement.name = totalObjectDataElement.name;
+
+
+            geometryElement.userData.extremumResultData = {};
+            geometryElement.userData.extremumResultData.minGeometryResult = minGeometryResult;
+            geometryElement.userData.extremumResultData.maxGeometryResult = maxGeometryResult;
+
+            modelGroup.add(geometryElement)
         });
 
         var textData = pictureInfo.textData;
@@ -932,14 +957,17 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.pointsNumbers = pointsNumbers;
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
+        totalGeometryObj.maxGeometryResult = _.max(results) === "NaN" ? 0 : _.max(results);
+        totalGeometryObj.minGeometryResult = _.min(results) === "NaN" ? 0 : _.min(results);
         totalGeometryObj.lineCommonPositionsArray = lineCommonPositionsArray;
         totalGeometryObj.faceCommonGeometryData = faceCommonGeometryData;
+        totalGeometryObj.groups = geometryObject.groups;
+        totalGeometryObj.faces = geometryObject.faces;
         totalGeometryObj.name = name;
 
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
 
         pictureInfo.textData[index] = textPositionsData;
-
 
     }
 
@@ -1001,6 +1029,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         pictureInfo.textData = {}
         pictureInfo.scaleFactor = 0;
         pictureInfo.modelRotation = this.modelRotation;
+        pictureInfo.minResult = minResult;
+        pictureInfo.maxResult = maxResult;
+
+        scope.pretenderMins = [];
+        scope.pretenderMaxs = [];
 
         var colorMapTexture;
         if (scope.DRAW_RESULTS && scope.textures) {
@@ -1023,7 +1056,17 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
+            scope.pretenderMins.push(pictureInfo.geometryObjectData[i].minGeometryResult);
+            scope.pretenderMaxs.push(pictureInfo.geometryObjectData[i].maxGeometryResult);
         }
+
+
+        scope.pretenderMins = _.orderBy(scope.pretenderMins, null, 'desc');
+        scope.pretenderMaxs = _.orderBy(scope.pretenderMaxs, null, 'asc');
+
+        scope.pretenderMins.pop();
+        scope.pretenderMaxs.pop();
+
         return pictureInfo;
     }
 };

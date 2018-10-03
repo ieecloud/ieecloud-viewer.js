@@ -57,7 +57,7 @@ var Editor = function (options) {
     this.sceneResults = new THREE.Scene();
     this.sceneHelpers = new THREE.Scene();
     this.pickingScene = new THREE.Scene();
-    this.octree = new THREE.Octree( {
+    this.octree = new THREE.Octree({
         // uncomment below to see the octree (may kill the fps)
         //scene: scene,
         // when undeferred = true, objects are inserted immediately
@@ -71,7 +71,7 @@ var Editor = function (options) {
         // percent between 0 and 1 that nodes will overlap each other
         // helps insert objects that lie over more than one node
         overlapPct: 0.15
-    } );
+    });
 
     this.object = {};
     this.geometries = {};
@@ -110,7 +110,45 @@ Editor.prototype = {
 
 
     showObject: function (object) {
-        this.signals.objectShow.dispatch(object);
+        var me = this;
+        if (object !== null) {
+            object.visible = true;
+            if (object.parent && object.parent.children && object.parent.children.length > 0) {
+                var visibleRelative = _.find(object.parent.children, function (item) {
+                    return item.uuid !== object.uuid && !item.visible;
+                });
+                if (!visibleRelative) {
+                    var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
+                    var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
+                    var resultInfo = me.getResultInfo();
+
+                    var maxResult = resultInfo.maxResult;
+                    var minResult = resultInfo.minResult;
+
+                    var maxChanged = maxGeometryResult >= maxResult;
+                    var minChanged = minGeometryResult <= minResult;
+
+                    if(maxChanged) {
+                        me.loader.pretenderMaxs.push(maxResult);
+                        maxResult = maxGeometryResult;
+                    }
+
+                    if(minChanged){
+                        me.loader.pretenderMins.push(minResult);
+                        minResult = minGeometryResult;
+                    }
+
+                    if (maxChanged || minChanged) {
+                        me.recalculateUvs(this.loader.objectsTree, maxResult,  minResult, function (oNode) {
+                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                        });
+                    }
+
+                }
+
+            }
+            this.signals.objectChanged.dispatch(object);
+        }
     },
 
     selectTree: function (object) {
@@ -129,9 +167,101 @@ Editor.prototype = {
         this.signals.objectColorUnSelected.dispatch(object);
     },
 
-    hideObject: function (object) {
-        this.signals.objectHide.dispatch(object);
+    recalculateUvs: function (aTree, newMaxResult, newMinResult, fCompair) {
+        var me = this;
+        var aInnerTree = [];
+        var oNode;
+        for (var keysTree in aTree) {
+            aInnerTree.push(aTree[keysTree]);
+        }
+        while (aInnerTree.length > 0) {
+            oNode = aInnerTree.pop();
+            if (fCompair(oNode)) {
+                var groups = oNode.object.userData.groups;
+                var faceGroups = oNode.object.userData.faces;
+                var results = oNode.object.userData.totalObjResults;
+
+                var uvs = [];
+
+                for (var j = 0; j < groups.length; j++) {
+                    var faces = faceGroups[j];
+                    var offset = 0;
+                    while (offset < faces.length) {
+                        uvs.push(
+                            0.0,
+                            me.loader.getV(results[faces[offset]], newMaxResult, newMinResult),
+                            0.0,
+                            me.loader.getV(results[faces[offset + 1]], newMaxResult, newMinResult),
+                            0.0,
+                            me.loader.getV(results[faces[offset + 2]], newMaxResult, newMinResult));
+
+
+                        uvs.push(
+                            0.0,
+                            me.loader.getV(results[faces[offset]], newMaxResult, newMinResult),
+                            0.0,
+                            me.loader.getV(results[faces[offset + 2]], newMaxResult, newMinResult),
+                            0.0,
+                            me.loader.getV(results[faces[offset + 1]], newMaxResult, newMinResult));
+                        offset = offset + 3;
+                    }
+                }
+                me.setMinMaxResult(newMinResult, newMaxResult);
+                oNode.object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            } else {
+                for (var keysNode in oNode) {
+                    if (oNode[keysNode] instanceof Array) {
+                        for (var i = 0; i < oNode[keysNode].length; i++) {
+                            aInnerTree.push(oNode[keysNode][i]);
+                        }
+                    }
+                }
+            }
+        }
     },
+
+
+    hideObject: function (object) {
+        var me = this;
+        if (object !== null) {
+            object.visible = false;
+            if (object.parent && object.parent.children && object.parent.children.length > 0) {
+                var visibleRelative = _.find(object.parent.children, function (item) {
+                    return item.uuid !== object.uuid && item.visible;
+                });
+                if (!visibleRelative) {
+                    var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
+                    var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
+
+                    var resultInfo = me.getResultInfo();
+
+                    var maxResult = resultInfo.maxResult;
+                    var minResult = resultInfo.minResult;
+
+                    me.getResultInfo();
+
+                    var maxChanged = maxGeometryResult === maxResult;
+                    var minChanged = minGeometryResult === minResult;
+
+                    if(maxChanged) {
+                        maxResult = me.loader.pretenderMaxs.pop();
+                    }
+
+                    if(minChanged){
+                        minResult = me.loader.pretenderMins.pop();
+                    }
+
+                    if (maxChanged || minChanged) {
+                        me.recalculateUvs(this.loader.objectsTree, maxResult,  minResult, function (oNode) {
+                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                        });
+                    }
+                }
+            }
+            this.signals.objectChanged.dispatch(object);
+        }
+    },
+
 
     unSelectTree: function (object) {
         this.signals.selectTree.dispatch(object, false);
@@ -278,7 +408,7 @@ Editor.prototype = {
     },
 
     getIsolineMaterialIfExist: function () {
-        return this.isolineSpriteMaterial ? this.isolineSpriteMaterial: null;
+        return this.isolineSpriteMaterial ? this.isolineSpriteMaterial : null;
     },
 
     getResultInfo: function () {
@@ -301,7 +431,7 @@ Editor.prototype = {
 
     getDefaultTexture: function () {
         for (var key in this.mapTextureNameToDetails) {
-            if(this.mapTextureNameToDetails[key].default) {
+            if (this.mapTextureNameToDetails[key].default) {
                 return this.mapTextureNameToDetails[key];
             }
         }
@@ -309,18 +439,18 @@ Editor.prototype = {
 
     setTexture: function (textureName) {
 
-        var texture = this.mapTextureNameToDetails[textureName] ? this.mapTextureNameToDetails[textureName]: this.getDefaultTexture();
-        if(!texture) {
+        var texture = this.mapTextureNameToDetails[textureName] ? this.mapTextureNameToDetails[textureName] : this.getDefaultTexture();
+        if (!texture) {
             console.log('Texture is not defined: ' + ': ' + texture);
             throw new Error('Texture is not defined: ' + ': ' + texture);
         }
 
-        if(!texture.isolineMaterial) {
+        if (!texture.isolineMaterial) {
 
             var colorMapTexture;
 
             var self = this;
-            if(texture.type == 'base64') {
+            if (texture.type == 'base64') {
                 // Add texture hardcode for offline mode
                 var image = new Image();
                 image.src = texture.data;
@@ -328,11 +458,11 @@ Editor.prototype = {
 
                 colorMapTexture = new THREE.Texture();
                 colorMapTexture.image = image;
-                image.onload = function() {
+                image.onload = function () {
                     colorMapTexture.needsUpdate = true;
                     self.reRender();
                 };
-            } else if(texture.type == 'url') {
+            } else if (texture.type == 'url') {
                 var imageName = texture.data;
                 colorMapTexture = THREE.ImageUtils.loadTexture(imageName, null, function () {
                     self.reRender();
@@ -381,13 +511,13 @@ Editor.prototype = {
 
     toggleIsolines: function (showFlag) {
 
-        if(!this.options.drawResults || !this.scene.meshes){
+        if (!this.options.drawResults || !this.scene.meshes) {
             return;
         }
 
-        for(var i=0; i <  this.scene.meshes.length; i++) {
-            if(this.scene.meshes[i].drawResults){
-                this.scene.meshes[i].material = showFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial ;
+        for (var i = 0; i < this.scene.meshes.length; i++) {
+            if (this.scene.meshes[i].drawResults) {
+                this.scene.meshes[i].material = showFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
             }
         }
 

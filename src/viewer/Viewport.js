@@ -1367,27 +1367,6 @@ var Viewport = function (editor) {
 
     });
 
-
-
-    signals.objectShow.add(function (object) {
-        if (object !== null) {
-            object.visible = true;
-        }
-
-        render();
-
-    });
-
-    signals.objectHide.add(function (object) {
-        if (object !== null) {
-            object.visible = false;
-        }
-
-        render();
-
-    });
-
-
     signals.setMode.add(function () {
         nearestPoint.hide();
         highlighter.hide();
@@ -1733,6 +1712,12 @@ var Viewport = function (editor) {
 
             // updateInfo();
 
+        }
+
+        var resultInfo = editor.getResultInfo();
+
+        if(editor.loader.DRAW_RESULTS && resultInfo.maxResult > resultInfo.minResult){
+            resultScale.setResultInfo(editor.getResultInfo());
         }
 
         render();
