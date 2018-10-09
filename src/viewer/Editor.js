@@ -238,8 +238,6 @@ Editor.prototype = {
                     var maxResult = resultInfo.maxResult;
                     var minResult = resultInfo.minResult;
 
-                    me.getResultInfo();
-
                     var maxChanged = maxGeometryResult === maxResult;
                     var minChanged = minGeometryResult === minResult;
 

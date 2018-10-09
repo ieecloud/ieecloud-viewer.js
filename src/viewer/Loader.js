@@ -695,6 +695,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
 
             if (drawResults) { // if results exist generating vertex coordinates according to results.
+                console.log("SDSDSDSDSD")
                 uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
                     0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
 
@@ -957,8 +958,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.pointsNumbers = pointsNumbers;
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
-        totalGeometryObj.maxGeometryResult = _.max(results) === "NaN" ? 0 : _.max(results);
-        totalGeometryObj.minGeometryResult = _.min(results) === "NaN" ? 0 : _.min(results);
+
+        var goMaxResult = _.max(results);
+        var goMinResult = _.min(results);
+
+        totalGeometryObj.maxGeometryResult = goMaxResult === "NaN" || _.isUndefined(goMaxResult) ? 0 : goMaxResult;
+        totalGeometryObj.minGeometryResult = goMinResult === "NaN" || _.isUndefined(goMinResult) ? 0 : goMinResult;
         totalGeometryObj.lineCommonPositionsArray = lineCommonPositionsArray;
         totalGeometryObj.faceCommonGeometryData = faceCommonGeometryData;
         totalGeometryObj.groups = geometryObject.groups;
