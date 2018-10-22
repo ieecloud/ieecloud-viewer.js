@@ -9,8 +9,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     this.textures = textures;
     this.objectsTree = null;
     this.coordFactor = 1;
-    this.pretenderMins = [];
-    this.pretenderMaxs = [];
+    this.pretenderMins = new Set();
+    this.pretenderMaxs = new Set();
     this.modelRotation = null;
     this.camera = null;
 
@@ -695,7 +695,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
 
             if (drawResults) { // if results exist generating vertex coordinates according to results.
-                console.log("SDSDSDSDSD")
                 uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
                     0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
 
@@ -1037,8 +1036,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         pictureInfo.minResult = minResult;
         pictureInfo.maxResult = maxResult;
 
-        scope.pretenderMins = [];
-        scope.pretenderMaxs = [];
+        scope.pretenderMins = new Set();
+        scope.pretenderMaxs = new Set();
 
         var colorMapTexture;
         if (scope.DRAW_RESULTS && scope.textures) {
@@ -1061,16 +1060,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
-            scope.pretenderMins.push(pictureInfo.geometryObjectData[i].minGeometryResult);
-            scope.pretenderMaxs.push(pictureInfo.geometryObjectData[i].maxGeometryResult);
+            scope.pretenderMins.add(pictureInfo.geometryObjectData[i].minGeometryResult);
+            scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].maxGeometryResult);
         }
 
-
-        scope.pretenderMins = _.orderBy(scope.pretenderMins, null, 'desc');
-        scope.pretenderMaxs = _.orderBy(scope.pretenderMaxs, null, 'asc');
-
-        scope.pretenderMins.pop();
-        scope.pretenderMaxs.pop();
+        scope.pretenderMins = new Set(_.orderBy( Array.from(scope.pretenderMins), null, 'desc'));
+        scope.pretenderMaxs = new Set(_.orderBy( Array.from(scope.pretenderMaxs), null, 'asc'));
 
         return pictureInfo;
     }
