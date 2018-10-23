@@ -113,13 +113,14 @@ Editor.prototype = {
         var me = this;
         if (object !== null) {
             object.visible = true;
-            var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
-            var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
-            var resultInfo = me.getResultInfo();
+            if (me.loader.DRAW_RESULTS) {
+                var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
+                var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
+                var resultInfo = me.getResultInfo();
 
-            var maxResult = resultInfo.maxResult;
-            var minResult = resultInfo.minResult;
-            if (!_.isUndefined(maxResult) && !_.isUndefined(minResult) && me.loader.DRAW_RESULTS && maxResult > minResult) {
+                var maxResult = resultInfo.maxResult;
+                var minResult = resultInfo.minResult;
+
                 var maxChanged = maxGeometryResult >= maxResult || !maxResult;
                 var minChanged = minGeometryResult <= minResult || !minResult;
                 me.loader.pretenderMaxs.add(maxGeometryResult);
@@ -159,13 +160,16 @@ Editor.prototype = {
 
     recalculateUvs: function (aTree, newMaxResult, newMinResult, fCompair) {
 
-        if(_.isUndefined(newMaxResult) || _.isUndefined(newMaxResult)){
-            return;
-        }
 
         var me = this;
         var aInnerTree = [];
         var oNode;
+
+        me.setMinMaxResult(newMinResult, newMaxResult);
+        if(_.isUndefined(newMaxResult) || _.isUndefined(newMaxResult)){
+            return;
+        }
+
         for (var keysTree in aTree) {
             aInnerTree.push(aTree[keysTree]);
         }
@@ -201,7 +205,6 @@ Editor.prototype = {
                         offset = offset + 3;
                     }
                 }
-                me.setMinMaxResult(newMinResult, newMaxResult);
                 oNode.object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             } else {
                 for (var keysNode in oNode) {
@@ -221,14 +224,13 @@ Editor.prototype = {
         if (object !== null) {
             object.visible = false;
 
+            if (me.loader.DRAW_RESULTS) {
+                var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
+                var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
+                var resultInfo = me.getResultInfo();
 
-            var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
-            var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
-            var resultInfo = me.getResultInfo();
-
-            var maxResult = resultInfo.maxResult;
-            var minResult = resultInfo.minResult;
-            if (!_.isUndefined(maxResult) && !_.isUndefined(minResult) && me.loader.DRAW_RESULTS && maxResult > minResult) {
+                var maxResult = resultInfo.maxResult;
+                var minResult = resultInfo.minResult;
 
                 var maxChanged = maxGeometryResult === maxResult;
                 var minChanged = minGeometryResult === minResult;

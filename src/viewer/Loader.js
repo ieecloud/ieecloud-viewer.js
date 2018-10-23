@@ -1023,7 +1023,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var pictureData = json.pictureData; // reading array for all geometry objects
         var minResult = json.minResult;
         var maxResult = json.maxResult;
-        scope.DRAW_RESULTS = (!(/^(false|0)$/i).test(json.drawResults) && !!json.drawResults) || editor.options.drawResults;
+        scope.DRAW_RESULTS = (!(/^(false|0)$/i).test(json.drawResults) && !!json.drawResults) || editor.options.drawResults
+        && maxResult > minResult;
         this.modelRotation = json.modelRotation;
 
         var names = [];
