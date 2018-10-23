@@ -119,25 +119,24 @@ Editor.prototype = {
 
             var maxResult = resultInfo.maxResult;
             var minResult = resultInfo.minResult;
+            if (!_.isUndefined(maxResult) && !_.isUndefined(minResult) && me.loader.DRAW_RESULTS && maxResult > minResult) {
+                var maxChanged = maxGeometryResult >= maxResult || !maxResult;
+                var minChanged = minGeometryResult <= minResult || !minResult;
+                me.loader.pretenderMaxs.add(maxGeometryResult);
+                if (maxChanged) {
+                    maxResult = maxGeometryResult;
+                }
+                me.loader.pretenderMins.add(minGeometryResult);
+                if (minChanged) {
+                    minResult = minGeometryResult;
+                }
 
-            var maxChanged = maxGeometryResult >= maxResult || !maxResult;
-            var minChanged = minGeometryResult <= minResult || !minResult;
-            me.loader.pretenderMaxs.add(maxGeometryResult);
-            if (maxChanged) {
-
-                maxResult = maxGeometryResult;
+                if (maxChanged || minChanged) {
+                    me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                        if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                    });
+                }
             }
-            me.loader.pretenderMins.add(minGeometryResult);
-            if (minChanged) {
-                minResult = minGeometryResult;
-            }
-
-            if (maxChanged || minChanged) {
-                me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                    if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
-                });
-            }
-
             this.signals.objectChanged.dispatch(object);
         }
     },
@@ -159,6 +158,11 @@ Editor.prototype = {
     },
 
     recalculateUvs: function (aTree, newMaxResult, newMinResult, fCompair) {
+
+        if(_.isUndefined(newMaxResult) || _.isUndefined(newMaxResult)){
+            return;
+        }
+
         var me = this;
         var aInnerTree = [];
         var oNode;
@@ -216,38 +220,41 @@ Editor.prototype = {
         var me = this;
         if (object !== null) {
             object.visible = false;
+
+
             var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
             var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
-
             var resultInfo = me.getResultInfo();
 
             var maxResult = resultInfo.maxResult;
             var minResult = resultInfo.minResult;
+            if (!_.isUndefined(maxResult) && !_.isUndefined(minResult) && me.loader.DRAW_RESULTS && maxResult > minResult) {
 
-            var maxChanged = maxGeometryResult === maxResult;
-            var minChanged = minGeometryResult === minResult;
-            if (me.loader.pretenderMaxs.has(maxGeometryResult)) {
-                me.loader.pretenderMaxs.delete(maxGeometryResult);
-            }
-            me.loader.pretenderMaxs = new Set(_.orderBy(Array.from(me.loader.pretenderMaxs), null, 'asc'));
+                var maxChanged = maxGeometryResult === maxResult;
+                var minChanged = minGeometryResult === minResult;
+                if (me.loader.pretenderMaxs.has(maxGeometryResult)) {
+                    me.loader.pretenderMaxs.delete(maxGeometryResult);
+                }
+                me.loader.pretenderMaxs = new Set(_.orderBy(Array.from(me.loader.pretenderMaxs), null, 'asc'));
 
-            if (maxChanged) {
-                maxResult = _.last(Array.from(me.loader.pretenderMaxs));
-            }
+                if (maxChanged) {
+                    maxResult = _.last(Array.from(me.loader.pretenderMaxs));
+                }
 
-            if (me.loader.pretenderMins.has(minGeometryResult)) {
-                me.loader.pretenderMins.delete(minGeometryResult);
-            }
-            me.loader.pretenderMins = new Set(_.orderBy(Array.from(me.loader.pretenderMins), null, 'desc'));
+                if (me.loader.pretenderMins.has(minGeometryResult)) {
+                    me.loader.pretenderMins.delete(minGeometryResult);
+                }
+                me.loader.pretenderMins = new Set(_.orderBy(Array.from(me.loader.pretenderMins), null, 'desc'));
 
-            if (minChanged) {
-                minResult = _.last(Array.from(me.loader.pretenderMins));
-            }
+                if (minChanged) {
+                    minResult = _.last(Array.from(me.loader.pretenderMins));
+                }
 
-            if (maxChanged || minChanged) {
-                me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                    if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
-                });
+                if (maxChanged || minChanged) {
+                    me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                        if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                    });
+                }
             }
             this.signals.objectChanged.dispatch(object);
         }
