@@ -26,16 +26,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     };
 
     this.showObject = function (branch) {
-        scope.traverseTree(branch, function (child) {
-            scope.showViewerObjects(child);
-        });
+        editor.showObject(branch);
     };
 
 
-    this.hideObject = function (branch) {
-        scope.traverseTree(branch, function (child) {
-            scope.hideViewerObjects(child);
-        });
+    this.hideObject = function (object) {
+        editor.hideObject(object);
     };
 
     // TODO:refactor

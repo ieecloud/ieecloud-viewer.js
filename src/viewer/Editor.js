@@ -49,6 +49,8 @@ var Editor = function (options) {
     this.searchNearestPointMode = options.searchNearestPointMode;
     this.resultDigits = options.resultDigits;
 
+    this.modeAllVisible = false;
+
     this.loader = new Loader(this, options.textureUrl, options.textureBase64, options.texture, options.textures);
 
     this.scene = new THREE.Scene();
@@ -108,11 +110,13 @@ Editor.prototype = {
         this.signals.objectColorSelected.dispatch(object);
     },
 
-
-    showObject: function (object) {
+    preShowObject: function (object) {
         var me = this;
-        if (object !== null) {
+        if (object !== null && !object.visible) {
             object.visible = true;
+            if(!me.lastModel.visible){
+                me.lastModel.visible = true;
+            }
             if (me.loader.DRAW_RESULTS) {
                 var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                 var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
@@ -133,11 +137,23 @@ Editor.prototype = {
                 }
 
                 if (maxChanged || minChanged) {
-                    me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                        if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
-                    });
+                    me.setMinMaxResult(minResult, maxResult);
+                    if (!me.modeAllVisible) {
+                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                        });
+                    }
                 }
             }
+        }
+    },
+
+
+    showObject: function (object) {
+        var me = this;
+        me.modeAllVisible = false;
+        if (object !== null) {
+            me.preShowObject(object);
             this.signals.objectChanged.dispatch(object);
         }
     },
@@ -165,8 +181,7 @@ Editor.prototype = {
         var aInnerTree = [];
         var oNode;
 
-        me.setMinMaxResult(newMinResult, newMaxResult);
-        if(_.isUndefined(newMaxResult) || _.isUndefined(newMaxResult)){
+        if(_.isUndefined(newMinResult) || _.isUndefined(newMaxResult)){
             return;
         }
 
@@ -218,10 +233,34 @@ Editor.prototype = {
         }
     },
 
+    setAllSelectableMode: function(){
+        this.modeAllVisible = true;
 
-    hideObject: function (object) {
+    },
+
+    toggleWholeModel: function(visible){
         var me = this;
-        if (object !== null) {
+        this.modeAllVisible = true;
+        this.lastModel.visible = visible;
+
+        // recalculate for Whole model not for every geometry object
+        if (visible && me.loader.DRAW_RESULTS) {
+            var resultInfo = me.getResultInfo();
+
+            var maxResult = resultInfo.maxResult;
+            var minResult = resultInfo.minResult;
+            me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+            });
+        }
+
+        this.signals.sceneGraphChanged.dispatch();
+
+    },
+
+    preHideObject: function (object) {
+        var me = this;
+        if (object !== null && object.visible) {
             object.visible = false;
 
             if (me.loader.DRAW_RESULTS) {
@@ -253,11 +292,23 @@ Editor.prototype = {
                 }
 
                 if (maxChanged || minChanged) {
-                    me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                        if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
-                    });
+                    me.setMinMaxResult(minResult, maxResult);
+                    if(!me.modeAllVisible){
+                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                        });
+                    }
+
                 }
             }
+        }
+    },
+
+    hideObject: function (object) {
+        var me = this;
+        me.modeAllVisible = false;
+        if (object !== null) {
+            me.preHideObject(object);
             this.signals.objectChanged.dispatch(object);
         }
     },

@@ -658,11 +658,36 @@
 
 
     $("#selectAllTree").click(function () {
-        tree.nodes().selectDeep();
+        $("#viewer").ieecloudEditor('turnAllMode');
+        tree['recurseDown'](function (node) {
+            node._tree.batch();
+            node.state("checked", true);
+            if(node.object){
+                $("#viewer").ieecloudEditor("preShowObject", node.object);
+            }
+            node.markDirty();
+            node._tree.end();
+
+        });
+
+        $("#viewer").ieecloudEditor('toggleWholeModel', true);
     });
 
+
     $("#deselectAllTree").click(function () {
-        tree.nodes().deselectDeep();
+        $("#viewer").ieecloudEditor('turnAllMode');
+        tree['recurseDown'](function (node) {
+                node._tree.batch();
+                node.state("checked", false);
+                if(node.object){
+                    $("#viewer").ieecloudEditor("preHideObject", node.object);
+                }
+                node.markDirty();
+                node._tree.end();
+
+        });
+
+        $("#viewer").ieecloudEditor('toggleWholeModel', false);
     });
 
     // Not remove it. It's used in Jupyter.
@@ -679,10 +704,10 @@
     // });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/results.json", function (json) {
+        $.getJSON("../resources/lahta_all.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
-    }); 
+    });
 
     $("#exitFromFullScreen").click(function () {
         $("#viewer-wrapper").removeClass('viewer-full-screen');
