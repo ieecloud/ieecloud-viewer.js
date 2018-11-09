@@ -85,6 +85,8 @@ var Editor = function (options) {
     this.lastModel = null;
     this.helpers = {};
     this.mapTextureNameToDetails = {};
+    // this.sumTime = 0;
+    // this.startDate = new Date();
 
 };
 
@@ -117,7 +119,7 @@ Editor.prototype = {
             if(!me.lastModel.visible){
                 me.lastModel.visible = true;
             }
-            if (me.loader.DRAW_RESULTS) {
+            if (me.loader.DRAW_RESULTS && !object.isModelContainerObj) {
                 var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                 var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
                 var resultInfo = me.getResultInfo();
@@ -154,7 +156,9 @@ Editor.prototype = {
         me.modeAllVisible = false;
         if (object !== null) {
             me.preShowObject(object);
-            this.signals.objectChanged.dispatch(object);
+            if(object.parent && !object.parent.isModelContainerObj){
+                this.signals.objectChanged.dispatch(object);
+            }
         }
     },
 
@@ -263,7 +267,7 @@ Editor.prototype = {
         if (object !== null && object.visible) {
             object.visible = false;
 
-            if (me.loader.DRAW_RESULTS) {
+            if (me.loader.DRAW_RESULTS && !object.isModelContainerObj) {
                 var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                 var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
                 var resultInfo = me.getResultInfo();
@@ -306,11 +310,20 @@ Editor.prototype = {
 
     hideObject: function (object) {
         var me = this;
+        // var startDate = new Date();
         me.modeAllVisible = false;
         if (object !== null) {
             me.preHideObject(object);
-            this.signals.objectChanged.dispatch(object);
+            if(object.parent && !object.parent.isModelContainerObj){
+                this.signals.objectChanged.dispatch(object);
+            }
+
         }
+        // var endDate = new Date();
+        //
+        // var diff  = endDate - startDate;
+        // me.sumTime = me.sumTime  + diff;
+        // console.log("sumTime TIME", me.sumTime )
     },
 
 

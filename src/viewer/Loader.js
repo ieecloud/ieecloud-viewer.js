@@ -473,7 +473,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var traverse = function (obj) {
             if (obj instanceof Array) {
                 for (var i = 0; i < obj.length; i++) {
-                    if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREE.LineSegments)) {
+                    if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREE.LineSegments)
+                        && !(obj[i] instanceof THREE.Object3D)) {
                         var node = obj[i];
                         if (node.index != -1) {
                             if (result[node.index]) {
@@ -485,6 +486,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                 node.children = treeNodes;
                                 node.uniqueId = THREE.Math.generateUUID();
                                 node.text = node.name;
+                                node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
+                                node.object.isModelContainerObj = true;
                             }
 
                         }else{
@@ -496,7 +499,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 }
             } else {
                 for (var prop in obj) {
-                    if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREE.LineSegments)) {
+                    if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREE.LineSegments)
+                        && !(obj[prop] instanceof THREE.Object3D)) {
                         var node = obj[prop];
                         if (node.index != -1) {
                             if (result[node.index]) {
@@ -509,6 +513,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                                 node.children = treeNodes;
                                 node.text = node.name;
+                                node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
+                                node.object.isModelContainerObj = true;
                                 node.uniqueId = THREE.Math.generateUUID();
                             }
                         }else{
