@@ -383,37 +383,62 @@
 <div id="viewer-wrapper" class="viewer-full-screen">
     <div id="btn-wrapper-id" class="btn-wrapper" style="position: absolute">
         <div class="buttons">
-            <button id="loadModel" class="btn">Load Model</button>
+
+
+            <button id="toggleMenu" class="btn">Menu</button>
+
+
+            <!--<button id="showTree" class="btn">Show Tree</button>-->
+            <!--<button id="hideTree" class="btn">Hide Tree</button>-->
+
+
+            <!--<button id="loadModel" class="btn">Load Model</button>-->
             <!--<button id="removeModel" class="btn">Remove Model</button>-->
-            <button id="showTree" class="btn">Show Tree</button>
-            <button id="hideTree" class="btn">Hide Tree</button>
+
             <!--<button id="showRulerBtn" class="btn">Ruler</button>-->
             <!--<button id="showProtractorVBtn" class="btn">Protractor V</button>-->
             <!--<button id="showProtractorHBtn" class="btn">Protractor H</button>-->
             <!--<button id="exitFromFullScreen" class="btn">Exit from full screen</button>-->
-            <button id="addIsolines" class="btn">Add Isolines </button>
-            <button id="removeIsolines" class="btn">Remove Isolines </button>
+            <!--<button id="addIsolines" class="btn">Add Isolines </button>-->
+            <!--<button id="removeIsolines" class="btn">Remove Isolines </button>-->
+            <!--<select id="selectMode" name="selectMode">-->
+                <!--<option value=""></option>-->
+                <!--<option value="MESHES" selected='selected'>MESHES</option>-->
+                <!--<option value="LINES">LINES</option>-->
+            <!--</select>-->
+            <!--<select id="selectTexture" name="selectTexture"></select>-->
+            <!--<button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>-->
+            <!--<button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>-->
+            <!--<button id="takeScreenShort" class="btn">Take Screen Shot</button>-->
+            <!--<button id="saveScreenShot" class="btn">Save Screen Shot</button>-->
+            <!--<button id="returnToImageViewBtn" class="btn">Return to image view</button>-->
+            <!--<button id="changeImageBtn" class="btn">Change Image</button>-->
+            <!--<input id="modeInput"/>-->
+            <!--<button id="setModeBtn" class="btn">Set Mode</button>-->
+            <!--<button id="attachToNewDiv" class="btn">Attach to new div</button>-->
+            <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
+            <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
+        </div>
+        <div  id="tree-wrapper" style="width:400px;overflow: scroll;
+    height: 100vh; position: relative;z-index: 1000;background-color: black;
+            opacity: 0.5; color:white;">
+            <div>
+            <button id="loadModel" class="btn">Load Model</button>
+            <button id="toggleIsolines" class="btn">Toggle Isolines </button>
+            </div>
+
             <select id="selectMode" name="selectMode">
                 <option value=""></option>
                 <option value="MESHES" selected='selected'>MESHES</option>
                 <option value="LINES">LINES</option>
             </select>
             <select id="selectTexture" name="selectTexture"></select>
-            <!--<button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>-->
-            <!--<button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>-->
-            <!--<button id="takeScreenShort" class="btn">Take Screen Shot</button>-->
+            <br/>
             <button id="saveScreenShot" class="btn">Save Screen Shot</button>
-            <!--<button id="returnToImageViewBtn" class="btn">Return to image view</button>-->
-            <!--<button id="changeImageBtn" class="btn">Change Image</button>-->
-            <!--<input id="modeInput"/>-->
-            <!--<button id="setModeBtn" class="btn">Set Mode</button>-->
-            <!--<button id="attachToNewDiv" class="btn">Attach to new div</button>-->
+            <br/>
             <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
             <button id="saveModelPositionBtn" class="btn">Save Model Position</button>
-        </div>
-        <div  id="tree-wrapper" style="width:400px;overflow: scroll;
-    height: 100vh; position: relative;z-index: 1000;background-color: black;
-            opacity: 0.5; color:white;">
+
             <button id="selectAllTree" class="btn">Select All</button>
             <button id="deselectAllTree" class="btn">Deselect All</button>
             <input style="width:60%" id="search-input"/>
@@ -631,12 +656,9 @@
         $("#viewer").ieecloudEditor('printScreen', "printScreen.png");
     });
 
-    $("#addIsolines").click(function () {
-        $("#viewer").ieecloudEditor('toggleIsolines', true);
-    });
 
-    $("#removeIsolines").click(function () {
-        $("#viewer").ieecloudEditor('toggleIsolines', false);
+    $("#toggleIsolines").click(function () {
+        $("#viewer").ieecloudEditor('toggleIsolines');
     });
 
 
@@ -654,6 +676,10 @@
 
     $("#hideTree").click(function () {
         $("#tree-wrapper").hide();
+    });
+
+    $("#toggleMenu").click(function () {
+        $("#tree-wrapper").toggle();
     });
 
 

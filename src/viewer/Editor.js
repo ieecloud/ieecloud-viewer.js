@@ -84,6 +84,7 @@ var Editor = function (options) {
     this.lastAdded = null;
     this.lastModel = null;
     this.helpers = {};
+    this.showIsolinesFlag = false;
     this.mapTextureNameToDetails = {};
     // this.sumTime = 0;
     // this.startDate = new Date();
@@ -156,9 +157,9 @@ Editor.prototype = {
         me.modeAllVisible = false;
         if (object !== null) {
             me.preShowObject(object);
-            if(object.parent && !object.parent.isModelContainerObj){
+            // if(object.parent && !object.parent.isModelContainerObj){
                 this.signals.objectChanged.dispatch(object);
-            }
+            // }
         }
     },
 
@@ -575,13 +576,20 @@ Editor.prototype = {
 
     toggleIsolines: function (showFlag) {
 
+
+        if(!_.isUndefined(showFlag)){
+            this.showIsolinesFlag = showFlag;
+        } else{
+            this.showIsolinesFlag = !this.showIsolinesFlag ;
+        }
+
         if (!this.options.drawResults || !this.scene.meshes) {
             return;
         }
 
         for (var i = 0; i < this.scene.meshes.length; i++) {
             if (this.scene.meshes[i].drawResults) {
-                this.scene.meshes[i].material = showFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
+                this.scene.meshes[i].material = this.showIsolinesFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
             }
         }
 
