@@ -487,8 +487,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                 node.uniqueId = THREE.Math.generateUUID();
                                 node.text = node.name;
                                 node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
-                                node.object.isModelContainerObj = true;
-                            }
+                                if(node.object){
+                                    node.object.isModelContainerObj = true;
+                                }
 
                         }else{
                             node.text = node.name;
