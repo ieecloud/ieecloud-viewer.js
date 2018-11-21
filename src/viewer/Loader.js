@@ -490,6 +490,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                 if(node.object){
                                     node.object.isModelContainerObj = true;
                                 }
+                            }
 
                         }else{
                             node.text = node.name;
