@@ -419,8 +419,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 }
             });
         });
-        editor.addModelGroup(modelGroup);
-        return meshesData;
+        // editor.addModelGroup(modelGroup);
+        // return meshesData;
+        return {meshesData: meshesData, modelGroup: modelGroup};
     };
 
     this.createText2D = function (text, color, font, size, camera) {
@@ -464,11 +465,15 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
         var pictureInfo = this.parseModel(data);
         var result;
+        var resultCommon;
         if (editor.options.detailModelView) {
             result = scope.createAndAddAllObjects(pictureInfo);
         } else {
-            result = scope.createAndAddCommonObjects(pictureInfo);
+            resultCommon = scope.createAndAddCommonObjects(pictureInfo);
         }
+
+        result = resultCommon.meshesData;
+        var newModelGroup = new THREE.Object3D();
 
         var traverse = function (obj) {
             if (obj instanceof Array) {
@@ -494,6 +499,23 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                         }else{
                             node.text = node.name;
+
+                            if (i > 0) {
+                                var prevNode = obj[i - 1];
+                                if (prevNode.children && prevNode.children.length > 0) {
+                                    var upperNodeContainer = new THREE.Object3D();
+                                    for (var k = 0; k < prevNode.children.length; k++) {
+                                        upperNodeContainer.add(prevNode.children[k].object ? prevNode.children[k].object : undefined);
+                                    }
+                                    prevNode.object = upperNodeContainer;
+                                    if(prevNode.object){
+                                        prevNode.object.isModelContainerObj = true;
+                                    }
+                                }
+
+                                newModelGroup.add(prevNode.object);
+                            }
+
                         }
                         traverse(obj[i]);
                     } else {
@@ -530,6 +552,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         };
 
         traverse(data.tree);
+
+
+        editor.addModelGroup(newModelGroup);
+        // editor.addModelGroup(modelGroup);
 
         data.tree.uniqueId = THREE.Math.generateUUID();
 
