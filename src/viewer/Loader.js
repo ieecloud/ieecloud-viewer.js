@@ -494,6 +494,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                 node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
                                 if(node.object){
                                     node.object.isModelContainerObj = true;
+                                    newModelGroup.add(node.object);
                                 }
                             }
 
