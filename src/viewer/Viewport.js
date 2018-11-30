@@ -1295,7 +1295,7 @@ var Viewport = function (editor) {
         //     FIRST_LIMIT_FOV = SECOND_LIMIT_FOV;
         // }
 
-        var step = 2;
+        var step = 1.1;
         var approaching = event.distance > 0 ? 1/step : step;
 
         var oldCameraFov = camera.fov;
