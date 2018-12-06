@@ -298,7 +298,7 @@ Editor.prototype = {
 
                 if (maxChanged || minChanged) {
                     me.setMinMaxResult(minResult, maxResult);
-                    if(!me.modeAllVisible){
+                    if (!me.modeAllVisible) {
                         me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
                             if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
                         });
