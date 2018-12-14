@@ -145,8 +145,6 @@ function baseStateChange(prop, value, verb, node, deep) {
 
         node.state(prop, value);
 
-        node._tree.emit('node.' + verb, node, false);
-
         if (deep && node.hasChildren()) {
             node.children.recurseDown(function (child) {
                 baseStateChange(prop, value, verb, child);
@@ -156,6 +154,8 @@ function baseStateChange(prop, value, verb, node, deep) {
         node.markDirty();
         node._tree.end();
     }
+
+    node._tree.emit('node.' + verb, node, false);
 
     return node;
 }
@@ -3948,21 +3948,23 @@ var TreeNode = function () {
                         indeterminate++;
                     }
                 });
-
+                var indeterminateValue = indeterminate > 0 || childrenCount > 0 && checked > 0 && checked < childrenCount;
                 // Set selected if all children are
                 if (checked === childrenCount) {
+                    if (this.object) {
+                        this.object.isIndeterminate = indeterminateValue
+                    }
                     baseStateChange('checked', true, 'checked', this);
                 } else {
+                    if (this.object) {
+                        this.object.isIndeterminate = indeterminateValue
+                    }
                     baseStateChange('checked', false, 'unchecked', this);
                 }
 
                 // Set indeterminate if any children are, or some children are selected
                 if (!this.checked()) {
-                    var indeterminateValue = indeterminate > 0 || childrenCount > 0 && checked > 0 && checked < childrenCount;
                     this.state('indeterminate', indeterminateValue);
-                    if(indeterminateValue){
-                        baseStateChange('checked', true, 'checked', this);
-                    }
                 }
             }
 

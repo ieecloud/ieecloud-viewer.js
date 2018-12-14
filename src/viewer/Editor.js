@@ -143,7 +143,7 @@ Editor.prototype = {
                     me.setMinMaxResult(minResult, maxResult);
                     if (!me.modeAllVisible) {
                         me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible) return true;
                         });
                     }
                 }
@@ -157,9 +157,9 @@ Editor.prototype = {
         me.modeAllVisible = false;
         if (object !== null) {
             me.preShowObject(object);
-            // if(object.parent && !object.parent.isModelContainerObj){
+            if(object.parent && !object.parent.isModelContainerObj){
                 this.signals.objectChanged.dispatch(object);
-            // }
+            }
         }
     },
 
@@ -266,8 +266,10 @@ Editor.prototype = {
     preHideObject: function (object) {
         var me = this;
         if (object !== null && object.visible) {
-            object.visible = false;
 
+            if(!object.isIndeterminate){
+                object.visible = false;
+            }
             if (me.loader.DRAW_RESULTS && !object.isModelContainerObj) {
                 var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                 var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
