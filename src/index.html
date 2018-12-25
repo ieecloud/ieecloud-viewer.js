@@ -12,7 +12,11 @@
 
         }
 
-
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+        }
 
         .viewer-full-screen {
             position: absolute;
@@ -422,22 +426,31 @@
         <div  id="tree-wrapper" style="width:400px;overflow: scroll;
     height: 100vh; position: relative;z-index: 1000;background-color: black;
             opacity: 0.5; color:white;">
-            <div>
-            <button id="loadModel" class="btn">Load Model</button>
-            <button id="toggleIsolines" class="btn">Toggle Isolines </button>
+            <div class="btn-container">
+                <button id="loadModel" class="btn">Load Model</button>
             </div>
 
-            <select id="selectMode" name="selectMode">
-                <option value=""></option>
-                <option value="MESHES" selected='selected'>MESHES</option>
-                <option value="LINES">LINES</option>
-            </select>
-            <select id="selectTexture" name="selectTexture"></select>
-            <br/>
-            <button id="saveScreenShot" class="btn">Save Screen Shot</button>
-            <br/>
-            <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
-            <button id="saveModelPositionBtn" class="btn">Save Model Position</button>
+            <div class="btn-container">
+                <select id="selectMode" name="selectMode">
+                    <option value=""></option>
+                    <option value="MESHES" selected='selected'>MESHES</option>
+                    <option value="LINES">LINES</option>
+                </select>
+            </div>
+
+            <div class="btn-container">
+                <button id="toggleIsolines" class="btn">Toggle Isolines</button>
+                <select id="selectTexture" name="selectTexture"></select>
+            </div>
+            <div class="btn-container">
+                <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
+            </div>
+            <div class="btn-container">
+                <button id="saveScreenShot" class="btn">Save Screen Shot</button>
+            </div>
+            <div class="btn-container">
+                <button id="saveModelPositionBtn" class="btn">Save Model Position</button>
+            </div>
 
             <button id="selectAllTree" class="btn">Select All</button>
             <button id="deselectAllTree" class="btn">Deselect All</button>
@@ -730,7 +743,7 @@
     // });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/error_with_tree.json", function (json) {
+        $.getJSON("../resources/lahta_all_3.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
     });
