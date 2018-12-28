@@ -39,6 +39,22 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
 
     };
 
+
+    var decimalAdjust = function(type, value, exp) {
+        if (typeof exp === 'undefined' || +exp === 0) {
+            return Math[type](value);
+        }
+        value = +value;
+        exp = +exp;
+        if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+            return NaN;
+        }
+        value = value.toString().split('e');
+        value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+        value = value.toString().split('e');
+        return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+    }
+
     var reBuildText = function (text) {
         var radius = 20;
 
@@ -71,6 +87,10 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         this.visible = false;
     };
 
+    Number.prototype.round = function (places) {
+        return +(Math.round(this + "e+" + places) + "e-" + places);
+    };
+
     this.createScaleDelimiters = function (maxSizeDelimiters) {
         var number = -1;
         var maxZ = 120;
@@ -79,7 +99,16 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         var maxResult = this.resultInfo.maxResult;
         for (var i = 0; i <= maxSizeDelimiters; i += 1) {
             var result = minResult + i*(maxResult - minResult)/maxSizeDelimiters;
-            var textObject = reBuildText(result.round(resultDigits));
+            var valueWithoutE = result.toString().split('e');
+            var expPartStr = valueWithoutE[1];
+            var expPartNum = Number(expPartStr);
+            var toShow = 'unknown'
+            if (_.isNaN(expPartNum)) {
+                toShow = result.round(resultDigits)
+            } else {
+                toShow = decimalAdjust('round', result, expPartNum)
+            }
+            var textObject = reBuildText(toShow);
             var textResultMesh = new THREE.Sprite(textObject.material);
             me.add(textResultMesh);
             textResultMesh.position.copy(new THREE.Vector3(44, 0, minZ + i * (maxZ - minZ)/maxSizeDelimiters));
