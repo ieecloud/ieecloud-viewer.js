@@ -14,7 +14,7 @@
 
         .btn-container {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             padding: 10px;
         }
 
@@ -428,6 +428,8 @@
             opacity: 0.5; color:white;">
             <div class="btn-container">
                 <button id="loadModel" class="btn">Load Model</button>
+                <button id="saveScreenShot" class="btn">Save Screen Shot</button>
+                <button id="saveModelPositionBtn" class="btn">Save Model Position</button>
             </div>
 
             <div class="btn-container">
@@ -436,20 +438,12 @@
                     <option value="MESHES" selected='selected'>MESHES</option>
                     <option value="LINES">LINES</option>
                 </select>
+                <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
             </div>
 
             <div class="btn-container">
                 <button id="toggleIsolines" class="btn">Toggle Isolines</button>
                 <select id="selectTexture" name="selectTexture"></select>
-            </div>
-            <div class="btn-container">
-                <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
-            </div>
-            <div class="btn-container">
-                <button id="saveScreenShot" class="btn">Save Screen Shot</button>
-            </div>
-            <div class="btn-container">
-                <button id="saveModelPositionBtn" class="btn">Save Model Position</button>
             </div>
 
             <button id="selectAllTree" class="btn">Select All</button>
