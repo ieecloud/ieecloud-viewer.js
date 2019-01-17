@@ -395,7 +395,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             geometryElement.userData.extremumResultData.minGeometryResult = minGeometryResult;
             geometryElement.userData.extremumResultData.maxGeometryResult = maxGeometryResult;
 
-            modelGroup.add(geometryElement)
         });
 
         var textData = pictureInfo.textData;
@@ -466,6 +465,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var pictureInfo = this.parseModel(data);
         var result;
         var resultCommon;
+        var modelGroup;
         if (editor.options.detailModelView) {
             result = scope.createAndAddAllObjects(pictureInfo);
         } else {
@@ -473,7 +473,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         }
 
         result = resultCommon.meshesData;
+        modelGroup = resultCommon.modelGroup;
         var newModelGroup = new THREE.Object3D();
+
+        newModelGroup.add(modelGroup);
 
         var traverse = function (obj) {
             if (obj instanceof Array) {
