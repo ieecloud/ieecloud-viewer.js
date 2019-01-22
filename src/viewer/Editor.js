@@ -116,11 +116,22 @@ Editor.prototype = {
     preShowObject: function (object) {
         var me = this;
         if (object !== null && !object.visible) {
+            var parentToHideObject = object.parent;
             object.visible = true;
+
+            if (!parentToHideObject.visible) {
+                 parentToHideObject.visible = true;
+            }
+
             if(!me.lastModel.visible){
                 me.lastModel.visible = true;
             }
             if (me.loader.DRAW_RESULTS && !object.isModelContainerObj) {
+
+                if (!(object instanceof THREE.Mesh)) {
+                    return;
+                }
+
                 var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                 var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
                 var resultInfo = me.getResultInfo();
@@ -271,6 +282,19 @@ Editor.prototype = {
                 object.visible = false;
             }
             if (me.loader.DRAW_RESULTS && !object.isModelContainerObj) {
+
+                var parentToHideObject = object.parent;
+
+                var parentObjectAllChildren = parentToHideObject.children;
+
+                var hasSomeVisibleChild = _.some(parentObjectAllChildren, function(child) {
+                    return child.visible === true;
+                });
+
+                if(hasSomeVisibleChild){
+                    return;
+                }
+
                 var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                 var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
                 var resultInfo = me.getResultInfo();
@@ -313,20 +337,13 @@ Editor.prototype = {
 
     hideObject: function (object) {
         var me = this;
-        // var startDate = new Date();
         me.modeAllVisible = false;
         if (object !== null) {
             me.preHideObject(object);
             if(object.parent && !object.parent.isModelContainerObj){
                 this.signals.objectChanged.dispatch(object);
             }
-
         }
-        // var endDate = new Date();
-        //
-        // var diff  = endDate - startDate;
-        // me.sumTime = me.sumTime  + diff;
-        // console.log("sumTime TIME", me.sumTime )
     },
 
 

@@ -1007,11 +1007,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
         pictureInfo.textData[index] = textPositionsData;
 
-    }
+    };
 
     this.getV = function (result, maxResult, minResult) {
-        return (result - minResult) / (maxResult - minResult);
-    }
+        var normalizedResult = result === "NaN" || _.isUndefined(result) ? 0 : result;
+        return (normalizedResult - minResult) / (maxResult - minResult);
+    };
 
     this.setTextureUrl = function (url) {
         this.textureUrl = url;
