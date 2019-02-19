@@ -992,8 +992,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
 
-        var goMaxResult = _.max(results);
-        var goMinResult = _.min(results);
+        // TODO: get this extremums from model
+        var goMaxResult = scope.maxInArray(results);
+        var goMinResult = scope.minInArray(results);
 
         totalGeometryObj.maxGeometryResult = goMaxResult === "NaN" || _.isUndefined(goMaxResult) ? 0 : goMaxResult;
         totalGeometryObj.minGeometryResult = goMinResult === "NaN" || _.isUndefined(goMinResult) ? 0 : goMinResult;
@@ -1012,6 +1013,50 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     this.getV = function (result, maxResult, minResult) {
         var normalizedResult = result === "NaN" || _.isUndefined(result) ? 0 : result;
         return (normalizedResult - minResult) / (maxResult - minResult);
+    };
+
+    // TODO: get this extremums from model
+    this.maxInArray = function(array) {
+
+        var gt =  function(value, other) {
+            return value > other;
+        };
+
+        return (array && array.length)
+            ? scope.baseExtremum(array, gt)
+            : undefined;
+    };
+
+    // TODO: get this extremums from model
+    this.minInArray = function(array) {
+
+        var lt = function (value, other) {
+            return value < other;
+        };
+
+        return (array && array.length)
+            ? scope.baseExtremum(array, lt)
+            : undefined;
+    };
+
+    // TODO: get this extremums from model
+    this.baseExtremum  = function(array, comparator) {
+        var index = -1,
+            length = array.length;
+
+        while (++index < length) {
+            var value = array[index],
+                current = value;
+
+            if (current != null && (computed === undefined || computed === "NaN"
+                        ? current === current
+                        : comparator(current, computed)
+                )) {
+                var computed = current,
+                    result = value;
+            }
+        }
+        return result;
     };
 
     this.setTextureUrl = function (url) {
