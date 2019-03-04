@@ -32,15 +32,85 @@
             position: absolute;
         }
 
-        .viewer-full-screen .btn-wrapper .buttons{
+        .tree-wrapper{
+            width: 400px;
+            position: relative;
+            z-index: 20;
+            background-color: black;
+            opacity: 0.7;
+            color: white;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner{
+            padding-top: 25px;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel{
+            padding: 5px;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel input[type=text]{
+            width: 55%;
+            color: #222;
+            background-color: white;
+            font-size: .875rem;
+            margin: 0;
+            outline: none;
+            padding: 4px 1px 4px 2px;
+            resize: none;
+        }
+
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel .btn{
+            text-rendering: optimizeLegibility;
+            border: none;
+            display: inline-block;
+            font-family: "Google Sans",Roboto,Arial,Helvetica,sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            height: 20px;
+            line-height: 1;
+            letter-spacing: .75px;
+            padding: 15px 24px;
+            transition: color .15s linear,background-color .15s linear;
+            vertical-align: middle;
+            font-size: 14px;
+            letter-spacing: .5px;
+            line-height: .2;
+            padding: 12px 15px;
+            background-color: #0000FF;
+            color: #fff;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel .btn:hover{
+            box-shadow: 0 1px 2px 0 rgba(26,115,232,0.451), 0 1px 3px 1px rgba(26,115,232,0.302);
+            background-color: #0000FF;
+            border: none;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel .btn:active {
+            box-shadow: 0 1px 2px 0 rgba(26, 115, 232, 0.451), 0 2px 6px 2px rgba(26, 115, 232, 0.302);
+            background-color: #0000FF;
+            border: none;
+            user-select: none;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree {
+            overflow-y: auto;
+            height: calc(100vh - 145px);
+        }
+
+        .viewer-full-screen .btn-wrapper .buttons, .viewer-full-screen .tree-wrapper .buttons{
             position: relative;
             z-index: 1000;
         }
 
-        .viewer-full-screen .tree-wrapper .tree{
-            position: relative;
-            z-index: 1000;
-        }
+        /*.viewer-full-screen .tree-wrapper .tree{*/
+            /*position: relative;*/
+            /*z-index: 1000;*/
+        /*}*/
 
         .viewer-small-screen {
             position: relative;
@@ -113,6 +183,8 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            /*overflow-y: auto;*/
+            /*height: calc(100vh - 145px);*/
             /* ~~@@@~~~~~ Lists ~~~~~@@@~~ */
             /* ~~@@@~~~~~ Node Content ~~~~~@@@~~ */ }
         .inspire-tree:focus {
@@ -371,6 +443,144 @@
         .inspire-tree .matched > .title-wrap:hover + .wholerow {
             background: rgba(247, 255, 170, 0.5); }
 
+        .main {
+            width: 100%;
+            background: #eee;
+        }
+
+
+
+
+
+
+
+
+        /*General Menu Styling*/
+        .mainnav {
+            margin: 0 auto;
+            font-family: sans-serif;
+            font-size: 14px;
+            padding-inline-start: 0px;
+            opacity: 0.7;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        li a {
+            text-decoration: none;
+        }
+
+        .dropdown {
+            position: absolute;
+            width: 50px;
+            top: 30px;
+            opacity: 0;
+            visibility: hidden;
+            transition: ease-out .35s;
+            -moz-transition: ease-out .35s;
+            -webkit-transition: ease-out .35s;
+            z-index: 1001;
+        }
+
+        .mainnav li {
+            float: left;
+            padding: 5px;
+            border-left: 1px dotted #fff;
+            background-color: black;
+            /*opacity: 0.7;*/
+            color: #fff;
+        }
+
+        .mainnav li:first-child {
+            border: none;
+        }
+
+        .mainnav li a {
+            display: block;
+            padding: 2px 20px;
+            color: #fff;
+            font-family: arial;
+        }
+
+        .mainnav li:hover {
+            background: #0000FF;
+            color: #fff;
+            opacity: 1;
+            transition: ease-in .35s;
+            -moz-transition: ease-in .35s;
+            -webkit-transition: ease-in .35s;
+        }
+
+        .mainnav li:hover a {
+            color: white;
+            transition: ease-in .35s;
+            -moz-transition: ease-in .35s;
+            -webkit-transition: ease-in .35s;
+        }
+        /*First Level*/
+        .subs {
+            left: -45px;
+            position: relative;
+            top: 0px;
+            /*width: 175px;*/
+            width: 125px;
+            border-left: none !important;
+            border-bottom: 1px dotted #fff !important;
+        }
+
+        .subs:last-child {
+            border: none !important;
+        }
+
+        .hassubs:hover .dropdown, .hassubs .hassubs:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transition: ease-in .35s;
+            -moz-transition: ease-in .35s;
+            -webkit-transition: ease-in .35s;
+        }
+
+        .mainnav li:hover ul a, .mainnav li:hover ul li ul li a {
+            color: white;
+        }
+
+        .mainnav li ul li:hover, .mainnav li ul li ul li:hover {
+            /*background: #fff;*/
+            transition: ease-in-out .35s;
+            -moz-transition: ease-in-out .35s;
+            -webkit-transition: ease-in-out .35s;
+        }
+
+        .mainnav li ul li:hover a, .mainnav li ul li ul li:hover a {
+            color: white;
+            transition: ease-in-out .35s;
+            -moz-transition: ease-in-out .35s;
+            -webkit-transition: ease-in-out .35s;
+        }
+
+        /*Second Level*/
+        .hassubs .hassubs .dropdown .subs {
+            left: -25px;
+            position: relative;
+            width: 115px;
+            top: 0px;
+        }
+
+        .hassubs .hassubs .dropdown {
+            position: absolute;
+            width: 150px;
+            left: 120px;
+            top: 0px;
+            opacity: 0;
+            visibility: hidden;
+            transition: ease-out .35s;
+            -moz-transition: ease-out .35s;
+            -webkit-transition: ease-out .35s;
+        }
+
+
 
 
     </style>
@@ -385,11 +595,54 @@
 <% }); %>
 
 <div id="viewer-wrapper" class="viewer-full-screen">
-    <div id="btn-wrapper-id" class="btn-wrapper" style="position: absolute">
-        <div class="buttons">
+        <div style="position: relative;
+    z-index: 1000;
+    background-color: black;
+    opacity: 0.7;border-bottom: 1px dotted #fff">
+                <ul class="mainnav">
+                    <li class="hassubs"><a href="#">File</a>
+                        <ul class="dropdown">
+                            <li class="subs"><a href="#" id="loadModel">Load model</a></li>
+                        </ul>
+                    </li>
+                    <!--<li class="hassubs"><a href="#">Edit</a>-->
+                        <!--<ul class="dropdown">-->
+                            <!--<li class="subs"><a href="#">Undo</a></li>-->
+                            <!--<li class="subs"><a href="#">Redo</a></li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                    <li class="hassubs"><a href="#">View</a>
+                        <ul class="dropdown">
+                            <li class="subs"><a href="#" id="toggleMenu">Tree</a></li>
+                        </ul>
+                    </li>
+                    <li class="hassubs"><a href="#">Result</a>
+                        <ul class="dropdown">
+                            <li class="subs hassubs"><a href="#">Isolines</a>
+                                <ul class="dropdown">
+                                    <li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>
+                                    <li class="subs"> <select id="selectTexture" name="selectTexture"></select></li>
+                                </ul>
+                            </li>
+                            <li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>
+                        </ul>
+                    </li>
+                    <li class="hassubs"><a href="#">Nearest</a>
+                        <ul class="dropdown">
+                            <li class="subs hassubs"><a href="#">Mode</a>
+                                <ul class="dropdown">
+                                    <li class="subs"><a href="#" id="meshesMode">Meshes</a></li>
+                                    <li class="subs"><a href="#" id="linesMode">Lines</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <br style="clear: both;">
 
 
-            <button id="toggleMenu" class="btn">Menu</button>
+
+
 
 
             <!--<button id="showTree" class="btn">Show Tree</button>-->
@@ -422,41 +675,32 @@
             <!--<button id="attachToNewDiv" class="btn">Attach to new div</button>-->
             <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
             <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
-        </div>
-        <div  id="tree-wrapper" style="width:400px;overflow: scroll;
-    height: 100vh; position: relative;z-index: 1000;background-color: black;
-            opacity: 0.5; color:white;">
-            <div class="btn-container">
-                <button id="loadModel" class="btn">Load Model</button>
-                <button id="saveScreenShot" class="btn">Save Screen Shot</button>
-                <button id="saveModelPositionBtn" class="btn">Save Model Position</button>
-            </div>
 
-            <div class="btn-container">
-                <select id="selectMode" name="selectMode">
-                    <option value=""></option>
-                    <option value="MESHES" selected='selected'>MESHES</option>
-                    <option value="LINES">LINES</option>
-                </select>
-                <button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>
-            </div>
 
-            <div class="btn-container">
-                <button id="toggleIsolines" class="btn">Toggle Isolines</button>
-                <select id="selectTexture" name="selectTexture"></select>
-            </div>
+    </div>
 
-            <button id="selectAllTree" class="btn">Select All</button>
-            <button id="deselectAllTree" class="btn">Deselect All</button>
-            <input style="width:60%" id="search-input"/>
-            <button id="select-btn" class="btn">Select</button>
-            <button id="deselect-btn" class="btn">Deselect</button>
-            <input type="radio"  name="filterBy" id="all-filter" checked value="ALL"/> All
-            <input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges
-            <input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces
+
+    <div id="tree-wrapper" class="tree-wrapper">
+        <div class="tree-wrapper-inner">
+            <div class="tree-menu">
+                <div class="tree-menu-panel">
+                    <button id="selectAllTree" class="btn">Select All</button>
+                    <button id="deselectAllTree" class="btn">Deselect All</button>
+                </div>
+
+                <div class="tree-menu-panel">
+                    <input style="width:50%" type="text" id="search-input"/>
+                    <button id="select-btn" class="btn">Select</button>
+                    <button id="deselect-btn" class="btn">Deselect</button>
+                </div>
+                <div class="tree-menu-panel">
+                    <input type="radio" name="filterBy" id="all-filter" checked value="ALL"/> All
+                    <input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges
+                    <input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces
+                </div>
+            </div>
             <div class="tree"></div>
         </div>
-
     </div>
 
     <div id="viewer" class="viewer"></div>
@@ -737,7 +981,7 @@
     // });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/lahta_all_3.json", function (json) {
+        $.getJSON("../resources/11.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
     });
