@@ -42,11 +42,46 @@
         }
 
         .tree-wrapper  .tree-wrapper-inner{
-            padding-top: 25px;
+            padding-top: 50px;
         }
 
         .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel{
-            padding: 5px;
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .action-panel{
+            margin-top: 10px;
+        }
+
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .action-panel-inner{
+            padding-left: 37px;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .action-panel-inner h4{
+            display: inline-block;
+            padding-right: 20px;
+            margin-block-start: 1em;
+            margin-block-end: 1em;
+        }
+
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .action-panel-inner select{
+            padding: .375rem .75rem;
+            line-height: 1.5;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel h3{
+            font-weight: 700;
+            font-style: normal;
+            text-decoration: none;
+            border-bottom: 3px solid #fff;
         }
 
         .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel input[type=text]{
@@ -56,7 +91,7 @@
             font-size: .875rem;
             margin: 0;
             outline: none;
-            padding: 4px 1px 4px 2px;
+            padding: 6px 1px 5px 2px;
             resize: none;
         }
 
@@ -99,7 +134,7 @@
 
         .tree-wrapper  .tree-wrapper-inner  .tree {
             overflow-y: auto;
-            height: calc(100vh - 145px);
+            height: calc(100vh - 470px);
         }
 
         .viewer-full-screen .btn-wrapper .buttons, .viewer-full-screen .tree-wrapper .buttons{
@@ -580,7 +615,90 @@
             -webkit-transition: ease-out .35s;
         }
 
+        button:focus {
+            outline: 0 !important;
+        }
 
+        .hamburger {
+            padding: 15px 15px;
+            display: inline-block;
+            cursor: pointer;
+            transition-property: opacity, filter;
+            transition-duration: 0.15s;
+            transition-timing-function: linear;
+            font: inherit;
+            color: inherit;
+            text-transform: none;
+            background-color: transparent;
+            border: 0;
+            margin: 0;
+            overflow: visible;
+            position: absolute;
+        }
+        .hamburger:hover {
+            opacity: 0.7; }
+        .hamburger.is-active:hover {
+            opacity: 0.7; }
+        .hamburger.is-active .hamburger-inner,
+        .hamburger.is-active .hamburger-inner::before,
+        .hamburger.is-active .hamburger-inner::after {
+            background-color: #fff; }
+
+        .hamburger-box {
+            width: 40px;
+            height: 24px;
+            display: inline-block;
+            position: relative; }
+
+        .hamburger-inner {
+            display: block;
+            top: 50%;
+            margin-top: -2px;
+            margin-left: -2px; }
+        .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+            width: 30px;
+            height: 4px;
+            background-color: #000;
+            border-radius: 4px;
+            position: absolute;
+            transition-property: transform;
+            transition-duration: 0.15s;
+            transition-timing-function: ease; }
+        .hamburger-inner::before, .hamburger-inner::after {
+            content: "";
+            display: block; }
+        .hamburger-inner::before {
+            top: -10px; }
+        .hamburger-inner::after {
+            bottom: -10px; }
+
+        /*
+           * 3DX
+           */
+        .hamburger--3dx .hamburger-box {
+            perspective: 80px;
+        }
+
+        .hamburger--3dx .hamburger-inner {
+            transition: transform 0.15s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .hamburger--3dx .hamburger-inner::before, .hamburger--3dx .hamburger-inner::after {
+            transition: transform 0s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .hamburger--3dx.is-active .hamburger-inner {
+            background-color: transparent !important;
+            transform: rotateY(180deg);
+        }
+
+        .hamburger--3dx.is-active .hamburger-inner::before {
+            transform: translate3d(0, 10px, 0) rotate(45deg);
+        }
+
+        .hamburger--3dx.is-active .hamburger-inner::after {
+            transform: translate3d(0, -10px, 0) rotate(-45deg);
+        }
 
 
     </style>
@@ -597,48 +715,60 @@
 <div id="viewer-wrapper" class="viewer-full-screen">
         <div style="position: relative;
     z-index: 1000;
-    background-color: black;
-    opacity: 0.7;border-bottom: 1px dotted #fff">
-                <ul class="mainnav">
-                    <li class="hassubs"><a href="#">File</a>
-                        <ul class="dropdown">
-                            <li class="subs"><a href="#" id="loadModel">Load model</a></li>
-                        </ul>
-                    </li>
-                    <!--<li class="hassubs"><a href="#">Edit</a>-->
+    /*background-color: black;*/
+    opacity: 0.7;
+    /*border-bottom: 1px dotted #fff*/
+    ">
+
+
+
+            <button class="hamburger hamburger--3dx" type="button">
+                 <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                 </span>
+            </button>
+
+
+                <!--<ul class="mainnav">-->
+                    <!--<li class="hassubs"><a href="#">File</a>-->
                         <!--<ul class="dropdown">-->
-                            <!--<li class="subs"><a href="#">Undo</a></li>-->
-                            <!--<li class="subs"><a href="#">Redo</a></li>-->
+                            <!--<li class="subs"><a href="#" id="loadModel">Load model</a></li>-->
                         <!--</ul>-->
                     <!--</li>-->
-                    <li class="hassubs"><a href="#">View</a>
-                        <ul class="dropdown">
-                            <li class="subs"><a href="#" id="toggleMenu">Tree</a></li>
-                        </ul>
-                    </li>
-                    <li class="hassubs"><a href="#">Result</a>
-                        <ul class="dropdown">
-                            <li class="subs hassubs"><a href="#">Isolines</a>
-                                <ul class="dropdown">
-                                    <li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>
-                                    <li class="subs"> <select id="selectTexture" name="selectTexture"></select></li>
-                                </ul>
-                            </li>
-                            <li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>
-                        </ul>
-                    </li>
-                    <li class="hassubs"><a href="#">Nearest</a>
-                        <ul class="dropdown">
-                            <li class="subs hassubs"><a href="#">Mode</a>
-                                <ul class="dropdown">
-                                    <li class="subs"><a href="#" id="meshesMode">Meshes</a></li>
-                                    <li class="subs"><a href="#" id="linesMode">Lines</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <br style="clear: both;">
+                    <!--&lt;!&ndash;<li class="hassubs"><a href="#">Edit</a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<ul class="dropdown">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<li class="subs"><a href="#">Undo</a></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<li class="subs"><a href="#">Redo</a></li>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</ul>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</li>&ndash;&gt;-->
+                    <!--<li class="hassubs"><a href="#">View</a>-->
+                        <!--<ul class="dropdown">-->
+                            <!--<li class="subs"><a href="#" id="toggleMenu">Tree</a></li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                    <!--<li class="hassubs"><a href="#">Result</a>-->
+                        <!--<ul class="dropdown">-->
+                            <!--<li class="subs hassubs"><a href="#">Isolines</a>-->
+                                <!--<ul class="dropdown">-->
+                                    <!--<li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>-->
+                                    <!--<li class="subs"> <select id="selectTexture" name="selectTexture"></select></li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                            <!--<li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                    <!--<li class="hassubs"><a href="#">Nearest</a>-->
+                        <!--<ul class="dropdown">-->
+                            <!--<li class="subs hassubs"><a href="#">Mode</a>-->
+                                <!--<ul class="dropdown">-->
+                                    <!--<li class="subs"><a href="#" id="meshesMode">Meshes</a></li>-->
+                                    <!--<li class="subs"><a href="#" id="linesMode">Lines</a></li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                <!--</ul>-->
+                <!--<br style="clear: both;">-->
 
 
 
@@ -684,14 +814,47 @@
         <div class="tree-wrapper-inner">
             <div class="tree-menu">
                 <div class="tree-menu-panel">
-                    <button id="selectAllTree" class="btn">Select All</button>
-                    <button id="deselectAllTree" class="btn">Deselect All</button>
+                    <h3>Model</h3>
+                    <button id="loadModel" class="btn">Load</button>
+                    <button id="saveScreenShot" class="btn">ScreenShot</button>
+                    <button id="saveModelPositionBtn" class="btn">Save Position</button>
                 </div>
 
                 <div class="tree-menu-panel">
-                    <input style="width:50%" type="text" id="search-input"/>
-                    <button id="select-btn" class="btn">Select</button>
-                    <button id="deselect-btn" class="btn">Deselect</button>
+                    <h3>Results</h3>
+                    <div class="action-panel">
+                        <button id="removeAllResultsBtn" class="btn" style="width:100%">Remove</button>
+                    </div>
+                    <div class="action-panel-inner">
+                        <h4>Nearest search mode</h4>
+                        <select id="selectMode" name="selectMode">
+                            <option value=""></option>
+                            <option value="MESHES" selected='selected'>MESHES</option>
+                            <option value="LINES">LINES</option>
+                        </select>
+                    </div>
+                    <div class="action-panel-inner">
+                        <h4>Isolines</h4>
+                        <select id="toggleIsolines" name="toggleIsolines">
+                            <option value="ON" selected='selected'>ON</option>
+                            <option value="OFF">OFF</option>
+                        </select>
+                        <select id="selectTexture" name="selectTexture"></select>
+                    </div>
+
+                </div>
+
+                <div class="tree-menu-panel">
+                    <h3>Tree</h3>
+                    <div class="action-panel">
+                        <button id="selectAllTree" class="btn">Select All</button>
+                        <button id="deselectAllTree" class="btn">Deselect All</button>
+                    </div>
+                    <div class="action-panel">
+                        <input style="width:50%" type="text" id="search-input"/>
+                        <button id="select-btn" class="btn">Select</button>
+                        <button id="deselect-btn" class="btn">Deselect</button>
+                    </div>
                 </div>
                 <div class="tree-menu-panel">
                     <input type="radio" name="filterBy" id="all-filter" checked value="ALL"/> All
@@ -715,6 +878,12 @@
 
     var tree;
     $("#tree-wrapper").hide();
+
+    var $hamburger = $(".hamburger");
+    $hamburger.on("click", function(e) {
+        $hamburger.toggleClass("is-active");
+        $("#tree-wrapper").toggle();
+    });
 
     var textures = [
         {id:"1" , name: "cs-red-blue", type: "url", default:true, nColors:5, data:"http://static.ieecloud.com/images/cs-red.png"},
@@ -908,8 +1077,16 @@
     });
 
 
-    $("#toggleIsolines").click(function () {
-        $("#viewer").ieecloudEditor('toggleIsolines');
+    $("#toggleIsolines").change(function () {
+
+        var e = document.getElementById("toggleIsolines");
+        var value = e.options[e.selectedIndex].value;
+        var bValue = false;
+        if(value === "ON"){
+            bValue = true;
+        }
+
+        $("#viewer").ieecloudEditor('toggleIsolines', bValue);
     });
 
 
@@ -981,7 +1158,7 @@
     // });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/11.json", function (json) {
+        $.getJSON("../resources/lahta_all.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
     });

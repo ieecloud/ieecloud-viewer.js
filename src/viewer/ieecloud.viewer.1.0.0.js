@@ -210,8 +210,8 @@ function Viewer(target, options) {
         this.threeEditor.saveModelPosition();
     };
 
-    Viewer.prototype.toggleIsolines = function () {
-        this.threeEditor.toggleIsolines();
+    Viewer.prototype.toggleIsolines = function (value) {
+        this.threeEditor.toggleIsolines(value);
     };
 
     Viewer.prototype.setTexture = function (textureName) {
