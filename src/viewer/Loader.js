@@ -279,7 +279,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var faces = totalObjectDataElement.faces;
 
 
-
             var geoCommonMeshGeometry = new THREE.BufferGeometry();
             geoCommonMeshGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( faceCommonGeometryData.positions, 3 ));
             geoCommonMeshGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( faceCommonGeometryData.colors, 3 ) );
@@ -463,16 +462,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
         var pictureInfo = this.parseModel(data);
-        var result;
-        var resultCommon;
         var modelGroup;
-        if (editor.options.detailModelView) {
-            result = scope.createAndAddAllObjects(pictureInfo);
-        } else {
-            resultCommon = scope.createAndAddCommonObjects(pictureInfo);
-        }
+        var resultCommon = scope.createAndAddCommonObjects(pictureInfo);
 
-        result = resultCommon.meshesData;
+        var result = resultCommon.meshesData;
         modelGroup = resultCommon.modelGroup;
         var newModelGroup = new THREE.Object3D();
 
@@ -677,8 +670,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     }
 
-    this.parseModelFaces = function (faceGeometry, faces, vertices, uv, faceColor, results, maxResult, minResult,
-                                     faceCommonGeometryData) {
+    this.parseModelFaces = function (faceGeometry, faces, vertices, uv, faceColor, results, maxResult, minResult){
+
         var offset = 0;
         var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
         var drawTexture = (!drawResults) && (uv && uv.length != 0);
@@ -693,17 +686,14 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var vA = vertices[faces[offset]];
             var array1 = vA.toArray();
             positions.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
 
             var vB = vertices[faces[offset + 1]];
             array1 = vertices[faces[offset + 1]].toArray();
             positions.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
 
             var vC = vertices[faces[offset + 2]];
             array1 = vertices[faces[offset + 2]].toArray();
             positions.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
 
             cb.subVectors(vC, vB);
             ab.subVectors(vA, vB);
@@ -716,29 +706,18 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             normals.push( array1[0], array1[1], array1[2] );
 
 
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
-
             colors.push(faceColor, faceColor, faceColor);
             colors.push(faceColor, faceColor, faceColor);
             colors.push(faceColor, faceColor, faceColor);
-
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
 
             if (drawResults) { // if results exist generating vertex coordinates according to results.
                 uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
                     0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
 
-                faceCommonGeometryData.uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
-                    0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
             }
 
             if (drawTexture) {
                 uvs.push(uv[offset * 2], uv[offset * 2 + 1], uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
-                faceCommonGeometryData.uvs.push(uv[offset * 2], uv[offset * 2 + 1], uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
             }
 
             // mirror faces
@@ -747,17 +726,14 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             vA = vertices[faces[offset]];
             array1 = vA.toArray();
             positions.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
 
             vB = vertices[faces[offset + 2]];
             array1 = vertices[faces[offset + 2]].toArray();
             positions.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
 
             vC = vertices[faces[offset + 1]];
             array1 = vertices[faces[offset + 1]].toArray();
             positions.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
 
             cb.subVectors(vC, vB);
             ab.subVectors(vA, vB);
@@ -769,31 +745,18 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             normals.push( array1[0], array1[1], array1[2]);
             normals.push( array1[0], array1[1], array1[2]);
 
-
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
-
             colors.push(faceColor, faceColor, faceColor);
             colors.push(faceColor, faceColor, faceColor);
             colors.push(faceColor, faceColor, faceColor);
 
-
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
 
             if (drawResults) { // if results exist generating vertex coordinates according to results.
                 uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult),
-                    0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult));
-
-                faceCommonGeometryData.uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult),
                     0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult));
             }
 
             if (drawTexture) {
                 uvs.push(1 - uv[offset * 2], uv[offset * 2 + 1], 1 - uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], 1 - uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
-                faceCommonGeometryData.uvs.push(1 - uv[offset * 2], uv[offset * 2 + 1], 1 - uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], 1 - uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
             }
             offset = offset + 3;
 
@@ -805,7 +768,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     };
 
     this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices, maxResult, minResult,
-                                                 objectPartsArray, lineCommonPositionsArray, faceCommonGeometryData) {
+                                                 objectPartsArray, lineCommonPositionsArray) {
 
         var groups = geometryObject.groups; // group names
         var results = geometryObject.results; // group names
@@ -872,7 +835,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var drawTexture = (!drawResults) && (uv && uv.length != 0)
 
                 scope.parseModelFaces(faceGeometry, faces, vertices, uv, settings.faceColor, results,
-                    maxResult, minResult, faceCommonGeometryData);
+                    maxResult, minResult);
 
 
                 if (faceGeometry.attributes.position.count > 0) {
@@ -977,13 +940,14 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var lineCommonPositionsArray = [];
         var faceCommonGeometryData = {};
 
-        faceCommonGeometryData.positions = [];
-        faceCommonGeometryData.colors = [];
-        faceCommonGeometryData.normals = [];
-        faceCommonGeometryData.uvs = [];
 
-        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray, lineCommonPositionsArray,
-            faceCommonGeometryData);
+        faceCommonGeometryData.positions = geometryObject.faceGeometryData.positions;
+        faceCommonGeometryData.colors = geometryObject.faceGeometryData.colors;
+        faceCommonGeometryData.normals = geometryObject.faceGeometryData.normals;
+        faceCommonGeometryData.uvs = geometryObject.faceGeometryData.uvs;
+
+        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray, lineCommonPositionsArray);
+
         var totalGeometryObj = {};
         totalGeometryObj.objectPartsArray = objectPartsArray;
         totalGeometryObj.pointsTable = pointsTable;
