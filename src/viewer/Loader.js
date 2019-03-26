@@ -768,7 +768,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     };
 
     this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices, maxResult, minResult,
-                                                 objectPartsArray, lineCommonPositionsArray) {
+                                                 objectPartsArray) {
 
         var groups = geometryObject.groups; // group names
         var results = geometryObject.results; // group names
@@ -820,10 +820,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 while (offset < edges.length) {
                     var array1 = vertices[edges[offset]].toArray();
                     positions.push(array1[0], array1[1], array1[2]);
-                    lineCommonPositionsArray.push(array1[0], array1[1], array1[2]);
                     var array2 = vertices[edges[offset + 1]].toArray();
                     positions.push(array2[0], array2[1], array2[2]);
-                    lineCommonPositionsArray.push(array2[0], array2[1], array2[2]);
                     offset += 2;
                 }
                 lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -937,7 +935,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             textPositionsData[ind].color = objectSettings.textColor;
         }
         var objectPartsArray = [];
-        var lineCommonPositionsArray = [];
+        var lineCommonPositionsArray = geometryObject.lineGeometryData.positions;
+
         var faceCommonGeometryData = {};
 
 
@@ -946,7 +945,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         faceCommonGeometryData.normals = geometryObject.faceGeometryData.normals;
         faceCommonGeometryData.uvs = geometryObject.faceGeometryData.uvs;
 
-        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray, lineCommonPositionsArray);
+        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray);
 
         var totalGeometryObj = {};
         totalGeometryObj.objectPartsArray = objectPartsArray;
