@@ -955,12 +955,19 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
 
-        // TODO: get this extremums from model
-        var goMaxResult = scope.maxInArray(results);
-        var goMinResult = scope.minInArray(results);
+        // // TODO: get this extremums from model
+        // var goMaxResult = scope.maxInArray(results);
+        // var goMinResult = scope.minInArray(results);
+        //
+        // totalGeometryObj.maxGeometryResult = goMaxResult === "NaN" || _.isUndefined(goMaxResult) ? 0 : goMaxResult;
+        // totalGeometryObj.minGeometryResult = goMinResult === "NaN" || _.isUndefined(goMinResult) ? 0 : goMinResult;
 
-        totalGeometryObj.maxGeometryResult = goMaxResult === "NaN" || _.isUndefined(goMaxResult) ? 0 : goMaxResult;
-        totalGeometryObj.minGeometryResult = goMinResult === "NaN" || _.isUndefined(goMinResult) ? 0 : goMinResult;
+
+
+
+        totalGeometryObj.maxGeometryResult = geometryObject.maxResult;
+        totalGeometryObj.minGeometryResult = geometryObject.maxResult;
+
         totalGeometryObj.lineCommonPositionsArray = lineCommonPositionsArray;
         totalGeometryObj.faceCommonGeometryData = faceCommonGeometryData;
         totalGeometryObj.groups = geometryObject.groups;

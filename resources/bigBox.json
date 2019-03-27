@@ -12,7 +12,8 @@
     {
       "name": "box",
       "type": 3,
-
+      "maxResult" : 0,
+      "minResult" : 0,
       "lineGeometryData" : {
           "positions" : [
             0,
