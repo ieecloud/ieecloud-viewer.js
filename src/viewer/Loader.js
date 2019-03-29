@@ -151,33 +151,57 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             meshesData[key] = [];
             var totalObjectDataElement = value;
+
+
+            //TODO: move materials to groups. this is duplicate array
             var objectElement = totalObjectDataElement.objectPartsArray;
+
+
+            var objectGroupElements = totalObjectDataElement.groups;
             var pointsTable = totalObjectDataElement.pointsTable;
             var vertices = totalObjectDataElement.totalObjVertices;
             var results = totalObjectDataElement.totalObjResults;
             var objectNames = totalObjectDataElement.objectNames;
             var pointsNumbers = totalObjectDataElement.pointsNumbers;
 
-            for (var j = 0; j < objectElement.length; j++) {
-                var objectGeometry = objectElement[j].objectGeometry;
-                var facesMaterial = objectElement[j].facesMaterial;
-                var drawResultsMaterial = objectElement[j].drawResultsMaterial;
-                var edgesGeometry = objectElement[j].edgesGeometry;
-                var edgesMaterial = objectElement[j].edgesMaterial;
-                var drawResults = objectElement[j].drawResults;
+
+            var facesMaterial = objectElement[0].facesMaterial;
+            var edgesMaterial = objectElement[0].edgesMaterial;
+            var drawResults = objectElement[0].drawResults;
+
+            for (var j = 0; j < objectGroupElements.length; j++) {
+                // var objectGeometry = objectElement[j].objectGeometry;
+                // var facesMaterial = objectElement[j].facesMaterial;
+                // var drawResultsMaterial = objectElement[j].drawResultsMaterial;
+                // var edgesGeometry = objectElement[j].edgesGeometry;
+                // var edgesMaterial = objectElement[j].edgesMaterial;
+                // var drawResults = objectElement[j].drawResults;
+
+
+
+
+                var objectGroupElement  = objectGroupElements[j];
+
+                var objectGeometry = new THREE.BufferGeometry();
+                objectGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( objectGroupElement.faceGeometryData.positions, 3 ));
+                objectGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( objectGroupElement.faceGeometryData.colors, 3 ) );
+                objectGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( objectGroupElement.faceGeometryData.normals, 3 ));
+                objectGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( objectGroupElement.faceGeometryData.uvs, 2 ));
+
+
 
                 if (objectGeometry) {
-                    var mesh = new THREE.Mesh(objectGeometry, drawResultsMaterial ? drawResultsMaterial: facesMaterial);
+                    var mesh = new THREE.Mesh(objectGeometry, facesMaterial);
                     mesh.userData.pointsTable = pointsTable;
-                    mesh.userData.name = objectElement[j].name;
+                    // mesh.userData.name = objectElement[j].name;
                     mesh.userData.totalObjVertices = vertices;
                     mesh.userData.totalObjResults = results;
                     mesh.userData.objectNames = objectNames;
                     mesh.userData.pointsNumbers = pointsNumbers;
 
-                    mesh.name = objectElement[j].name;
+                    // mesh.name = objectElement[j].name;
                     mesh.uniqueId = mesh.uuid;
-                    mesh.parentName = objectElement[j].parentName;
+                    // mesh.parentName = objectElement[j].parentName;
                     mesh.defaultColor = facesMaterial.color.clone();
                     mesh.facesMaterial = facesMaterial;
                     mesh.drawResults = drawResults;
@@ -185,6 +209,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     modelGroup.add(mesh);
                     editor.octree.add(mesh);
                 }
+
+
+                var edgesGeometry = new THREE.BufferGeometry();
+                edgesGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( objectGroupElement.lineGeometryData.positions, 3 ) );
+
+
                 var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
                 lines.userData.pointsTable = pointsTable;
                 lines.userData.name = objectElement[j].name;
@@ -196,13 +226,13 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 modelGroup.add(lines);
                 editor.octree.add(lines);
 
-                lines.name = objectElement[j].name;
+                // lines.name = objectElement[j].name;
                 lines.uniqueId = lines.uuid;
-                lines.parentName = objectElement[j].parentName;
+                // lines.parentName = objectElement[j].parentName;
                 lines.defaultColor = edgesMaterial.color.clone();
                 if (objectGeometry && objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count > 0) {
-                    lines.name = objectElement[j].name + ".EDGE";
-                    mesh.name = objectElement[j].name + ".FACE";
+                    // lines.name = objectElement[j].name + ".EDGE";
+                    // mesh.name = objectElement[j].name + ".FACE";
                     meshesData[key].push(lines);
                     meshesData[key].push(mesh);
                 } else if ((objectGeometry || (objectGeometry && objectGeometry.attributes.position.count === 0)) && edgesGeometry.attributes.position.count > 0) {
@@ -248,8 +278,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 }
             });
         });
-        editor.addModelGroup(modelGroup);
-        return meshesData;
+        // editor.addModelGroup(modelGroup);
+        // return meshesData;
+        return {meshesData: meshesData, modelGroup: modelGroup};
     };
 
     this.createAndAddCommonObjects = function (pictureInfo) {
@@ -462,93 +493,100 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
         var pictureInfo = this.parseModel(data);
-        var modelGroup;
-        var resultCommon = scope.createAndAddCommonObjects(pictureInfo);
 
-        var result = resultCommon.meshesData;
+        var result;
+        var resultCommon;
+        var modelGroup;
+        if (editor.options.detailModelView) {
+            resultCommon = scope.createAndAddAllObjects(pictureInfo);
+        } else {
+            resultCommon = scope.createAndAddCommonObjects(pictureInfo);
+        }
+
+        result = resultCommon.meshesData;
         modelGroup = resultCommon.modelGroup;
         var newModelGroup = new THREE.Object3D();
 
         newModelGroup.add(modelGroup);
 
-        var traverse = function (obj) {
-            if (obj instanceof Array) {
-                for (var i = 0; i < obj.length; i++) {
-                    if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREE.LineSegments)
-                        && !(obj[i] instanceof THREE.Object3D)) {
-                        var node = obj[i];
-                        if (node.index != -1) {
-                            if (result[node.index]) {
-                                var treejsNodes = result[node.index];
-                                var treeNodes = [];
-                                _.forEach(treejsNodes, function(value, key) {
-                                    treeNodes.push({text:  value.name, object: value})
-                                });
-                                node.children = treeNodes;
-                                node.uniqueId = THREE.Math.generateUUID();
-                                node.text = node.name;
-                                node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
-                                if(node.object){
-                                    node.object.isModelContainerObj = true;
-                                    newModelGroup.add(node.object);
-                                }
-                            }
-
-                        }else{
-                            node.text = node.name;
-
-                            if (i > 0) {
-                                var prevNode = obj[i - 1];
-                                if (prevNode.children && prevNode.children.length > 0) {
-                                    var upperNodeContainer = new THREE.Object3D();
-                                    for (var k = 0; k < prevNode.children.length; k++) {
-                                        upperNodeContainer.add(prevNode.children[k].object ? prevNode.children[k].object : undefined);
-                                    }
-                                    prevNode.object = upperNodeContainer;
-                                    if(prevNode.object){
-                                        prevNode.object.isModelContainerObj = true;
-                                    }
-                                }
-
-                                newModelGroup.add(prevNode.object);
-                            }
-
-                        }
-                        traverse(obj[i]);
-                    } else {
-                    }
-                }
-            } else {
-                for (var prop in obj) {
-                    if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREE.LineSegments)
-                        && !(obj[prop] instanceof THREE.Object3D)) {
-                        var node = obj[prop];
-                        if (node.index != -1) {
-                            if (result[node.index]) {
-
-                                var treejsNodes = result[node.index];
-                                var treeNodes = [];
-                                _.forEach(treejsNodes, function(value, key) {
-                                    treeNodes.push({text:  value.name, object: value})
-                                });
-
-                                node.children = treeNodes;
-                                node.text = node.name;
-                                node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
-                                node.object.isModelContainerObj = true;
-                                node.uniqueId = THREE.Math.generateUUID();
-                            }
-                        }else{
-                            node.text = node.name;
-                        }
-                        traverse(obj[prop]);
-                    } else {
-                    }
-                }
-            }
-        };
-
-        traverse(data.tree);
+        // var traverse = function (obj) {
+        //     if (obj instanceof Array) {
+        //         for (var i = 0; i < obj.length; i++) {
+        //             if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREE.LineSegments)
+        //                 && !(obj[i] instanceof THREE.Object3D)) {
+        //                 var node = obj[i];
+        //                 if (node.index != -1) {
+        //                     if (result[node.index]) {
+        //                         var treejsNodes = result[node.index];
+        //                         var treeNodes = [];
+        //                         _.forEach(treejsNodes, function(value, key) {
+        //                             treeNodes.push({text:  value.name, object: value})
+        //                         });
+        //                         node.children = treeNodes;
+        //                         node.uniqueId = THREE.Math.generateUUID();
+        //                         node.text = node.name;
+        //                         node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
+        //                         if(node.object){
+        //                             node.object.isModelContainerObj = true;
+        //                             newModelGroup.add(node.object);
+        //                         }
+        //                     }
+        //
+        //                 }else{
+        //                     node.text = node.name;
+        //
+        //                     if (i > 0) {
+        //                         var prevNode = obj[i - 1];
+        //                         if (prevNode.children && prevNode.children.length > 0) {
+        //                             var upperNodeContainer = new THREE.Object3D();
+        //                             for (var k = 0; k < prevNode.children.length; k++) {
+        //                                 upperNodeContainer.add(prevNode.children[k].object ? prevNode.children[k].object : undefined);
+        //                             }
+        //                             prevNode.object = upperNodeContainer;
+        //                             if(prevNode.object){
+        //                                 prevNode.object.isModelContainerObj = true;
+        //                             }
+        //                         }
+        //
+        //                         newModelGroup.add(prevNode.object);
+        //                     }
+        //
+        //                 }
+        //                 traverse(obj[i]);
+        //             } else {
+        //             }
+        //         }
+        //     } else {
+        //         for (var prop in obj) {
+        //             if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREE.LineSegments)
+        //                 && !(obj[prop] instanceof THREE.Object3D)) {
+        //                 var node = obj[prop];
+        //                 if (node.index != -1) {
+        //                     if (result[node.index]) {
+        //
+        //                         var treejsNodes = result[node.index];
+        //                         var treeNodes = [];
+        //                         _.forEach(treejsNodes, function(value, key) {
+        //                             treeNodes.push({text:  value.name, object: value})
+        //                         });
+        //
+        //                         node.children = treeNodes;
+        //                         node.text = node.name;
+        //                         node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
+        //                         node.object.isModelContainerObj = true;
+        //                         node.uniqueId = THREE.Math.generateUUID();
+        //                     }
+        //                 }else{
+        //                     node.text = node.name;
+        //                 }
+        //                 traverse(obj[prop]);
+        //             } else {
+        //             }
+        //         }
+        //     }
+        // };
+        //
+        // traverse(data.tree);
 
 
         editor.addModelGroup(newModelGroup);
@@ -761,14 +799,27 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             offset = offset + 3;
 
         }
+
+
+        faceGeometry.dataForJSON = {};
+
+        faceGeometry.dataForJSON.positions = positions;
+        faceGeometry.dataForJSON.colors = colors;
+        faceGeometry.dataForJSON.normals = normals;
+        faceGeometry.dataForJSON.uvs = uvs;
+
+
         faceGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ));
         faceGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
         faceGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ));
         faceGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ));
+
+
+
     };
 
     this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices, maxResult, minResult,
-                                                 objectPartsArray) {
+                                                geometryObjectGroupsArray) {
 
         var groups = geometryObject.groups; // group names
         var results = geometryObject.results; // group names
@@ -840,6 +891,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     pictureGeometryElement.objectGeometry = faceGeometry;
                 }
                 pictureGeometryElement.edgesGeometry = lineGeometry;
+                pictureGeometryElement.edgesGeometryData = positions;
                 pictureGeometryElement.objectGeometryName = name + '.' + groups[j];
                 pictureGeometryElement.name = groups[j];
                 pictureGeometryElement.parentName = name;
@@ -889,7 +941,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 scope.parseSimpleShapes(geometryObject.simpleShapes, j, pictureGeometryElement, vertices);
 
             }
-            objectPartsArray.push(pictureGeometryElement)
+            geometryObjectGroupsArray.push(pictureGeometryElement)
 
         }
 
@@ -934,7 +986,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             textPositionsData[ind].size = objectSettings.textSize;
             textPositionsData[ind].color = objectSettings.textColor;
         }
-        var objectPartsArray = [];
+        var geometryObjectGroupsArray = [];
         var lineCommonPositionsArray = geometryObject.lineGeometryData.positions;
 
         var faceCommonGeometryData = {};
@@ -945,10 +997,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         faceCommonGeometryData.normals = geometryObject.faceGeometryData.normals;
         faceCommonGeometryData.uvs = geometryObject.faceGeometryData.uvs;
 
-        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray);
+        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, geometryObjectGroupsArray);
 
         var totalGeometryObj = {};
-        totalGeometryObj.objectPartsArray = objectPartsArray;
+        totalGeometryObj.objectPartsArray = geometryObjectGroupsArray;
         totalGeometryObj.pointsTable = pointsTable;
         totalGeometryObj.objectNames = objectNames;
         totalGeometryObj.pointsNumbers = pointsNumbers;
