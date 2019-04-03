@@ -1064,26 +1064,6 @@
       ],
       "results": [],
       "groups": [
-        "EDGE0",
-        "EDGE1",
-        "EDGE2",
-        "EDGE3",
-        "EDGE4",
-        "EDGE5",
-        "EDGE6",
-        "EDGE7",
-        "EDGE8",
-        "EDGE9",
-        "EDGE10",
-        "EDGE11",
-        "FACE0",
-        "FACE1",
-        "FACE2",
-        "FACE3",
-        "FACE4",
-        "FACE5"
-      ],
-      "groups": [
         {
           "name": "EDGE0",
           "lineGeometryData": {
