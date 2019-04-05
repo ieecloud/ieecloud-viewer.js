@@ -173,7 +173,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                 var objectGeometry = new THREE.BufferGeometry();
                 objectGeometry.addAttribute('position', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.positions, 3));
-                objectGeometry.addAttribute('color', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.colors, 3));
+                // objectGeometry.addAttribute('color', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.colors, 3));
                 objectGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.normals, 3));
                 objectGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.uvs, 2));
 
@@ -190,7 +190,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     mesh.name = objectGroupElement.name;
                     mesh.uniqueId = mesh.uuid;
                     mesh.parentName = objectGroupElement.parentName;
-                    mesh.defaultColor = facesMaterial.color.clone();
+                    // mesh.defaultColor = facesMaterial.color.clone();
                     mesh.facesMaterial = facesMaterial;
                     mesh.drawResults = drawResults;
 
@@ -314,7 +314,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             var geoCommonMeshGeometry = new THREE.BufferGeometry();
             geoCommonMeshGeometry.addAttribute('position', new THREE.Float32BufferAttribute(faceCommonGeometryData.positions, 3));
-            geoCommonMeshGeometry.addAttribute('color', new THREE.Float32BufferAttribute(faceCommonGeometryData.colors, 3));
+            // geoCommonMeshGeometry.addAttribute('color', new THREE.Float32BufferAttribute(faceCommonGeometryData.colors, 3));
             geoCommonMeshGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(faceCommonGeometryData.normals, 3));
             geoCommonMeshGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(faceCommonGeometryData.uvs, 2));
 
@@ -334,7 +334,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             mesh.name = totalObjectDataElement.name;
             mesh.uniqueId = mesh.uuid;
             mesh.parentName = totalObjectDataElement.name;
-            mesh.defaultColor = objectGroupElements[0].facesMaterial.color.clone();
+            // mesh.defaultColor = objectGroupElements[0].facesMaterial.color.clone();
             mesh.facesMaterial = objectGroupElements[0].facesMaterial;
             mesh.drawResults = objectGroupElements[0].drawResults;
 
@@ -389,7 +389,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             // modelGroup.add(lines);
             lines.userData.pointsTable = pointsTable;
             lines.parentName = totalObjectDataElement.name;
-            lines.defaultColor = objectGroupElements[0].edgesMaterial.color.clone();
+            // lines.defaultColor = objectGroupElements[0].edgesMaterial.color.clone();
             lines.userData.totalObjVertices = vertices;
             lines.userData.totalObjResults = results;
             lines.userData.maxGeometryResult = maxGeometryResult;
@@ -710,7 +710,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     };
 
-    this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices, maxResult, minResult) {
+    this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices) {
 
         var results = geometryObject.results; // results
 
@@ -856,11 +856,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
         faceCommonGeometryData.positions = geometryObject.faceGeometryData.positions;
-        faceCommonGeometryData.colors = geometryObject.faceGeometryData.colors;
+        // faceCommonGeometryData.colors = geometryObject.faceGeometryData.colors;
         faceCommonGeometryData.normals = geometryObject.faceGeometryData.normals;
         faceCommonGeometryData.uvs = geometryObject.faceGeometryData.uvs;
 
-        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult);
+        scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices);
 
         var totalGeometryObj = {};
         totalGeometryObj.pointsTable = pointsTable;
