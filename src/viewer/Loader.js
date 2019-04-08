@@ -306,21 +306,21 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var minGeometryResult = totalObjectDataElement.minGeometryResult;
             var objectNames = totalObjectDataElement.objectNames;
             var pointsNumbers = totalObjectDataElement.pointsNumbers;
-            var lineCommonPositionsArray = totalObjectDataElement.lineCommonPositionsArray;
-            var faceCommonGeometryData = totalObjectDataElement.faceCommonGeometryData;
+            var lineCommonDataForLine = totalObjectDataElement.lineCommonDataForLine;
+            var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
             var groups = totalObjectDataElement.groups;
             var faces = totalObjectDataElement.faces;
 
 
             var geoCommonMeshGeometry = new THREE.BufferGeometry();
-            geoCommonMeshGeometry.addAttribute('position', new THREE.Float32BufferAttribute(faceCommonGeometryData.positions, 3));
-            // geoCommonMeshGeometry.addAttribute('color', new THREE.Float32BufferAttribute(faceCommonGeometryData.colors, 3));
-            geoCommonMeshGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(faceCommonGeometryData.normals, 3));
-            geoCommonMeshGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(faceCommonGeometryData.uvs, 2));
+            geoCommonMeshGeometry.addAttribute('position', new THREE.Float32BufferAttribute(faceCommonDataForMesh.positions, 3));
+            // geoCommonMeshGeometry.addAttribute('color', new THREE.Float32BufferAttribute(faceCommonDataForMesh.colors, 3));
+            geoCommonMeshGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(faceCommonDataForMesh.normals, 3));
+            geoCommonMeshGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(faceCommonDataForMesh.uvs, 2));
 
 
-            var mesh = new THREE.Mesh(geoCommonMeshGeometry, objectGroupElements[0].drawResultsMaterial ?
-                objectGroupElements[0].drawResultsMaterial : objectGroupElements[0].facesMaterial);
+            var mesh = new THREE.Mesh(geoCommonMeshGeometry, faceCommonDataForMesh.drawResultsMaterial ?
+                faceCommonDataForMesh.drawResultsMaterial : faceCommonDataForMesh.facesMaterial);
             mesh.userData.pointsTable = pointsTable;
             mesh.userData.totalObjVertices = vertices;
             mesh.userData.totalObjResults = results;
@@ -334,9 +334,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             mesh.name = totalObjectDataElement.name;
             mesh.uniqueId = mesh.uuid;
             mesh.parentName = totalObjectDataElement.name;
-            // mesh.defaultColor = objectGroupElements[0].facesMaterial.color.clone();
-            mesh.facesMaterial = objectGroupElements[0].facesMaterial;
-            mesh.drawResults = objectGroupElements[0].drawResults;
+            mesh.defaultColor = faceCommonDataForMesh.facesMaterial.color.clone();
+            mesh.facesMaterial = faceCommonDataForMesh.facesMaterial;
+            mesh.drawResults = faceCommonDataForMesh.drawResults;
 
             geometryElement.add(mesh);
 
@@ -383,13 +383,13 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
             var geoCommonLineGeometry = new THREE.BufferGeometry();
-            geoCommonLineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(lineCommonPositionsArray, 3));
-            var lines = new THREE.LineSegments(geoCommonLineGeometry, objectGroupElements[0].edgesMaterial);
+            geoCommonLineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(lineCommonDataForLine.positions, 3));
+            var lines = new THREE.LineSegments(geoCommonLineGeometry, lineCommonDataForLine.edgesMaterial);
             geometryElement.add(lines);
             // modelGroup.add(lines);
             lines.userData.pointsTable = pointsTable;
             lines.parentName = totalObjectDataElement.name;
-            // lines.defaultColor = objectGroupElements[0].edgesMaterial.color.clone();
+            lines.defaultColor = lineCommonDataForLine.edgesMaterial.color.clone();
             lines.userData.totalObjVertices = vertices;
             lines.userData.totalObjResults = results;
             lines.userData.maxGeometryResult = maxGeometryResult;
@@ -740,77 +740,89 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             linewidth: objectSettings.lineWidth
         });
 
-        for (var j = 0; j < geometryObject.groups.length; j++) {  //reading edges and faces by groups
 
-            var settings = groupSettings[j];
-            var text3d = settings.text3d;
-            if (settings.lineColor == undefined) {
-                settings = objectSettings;
+        var drawResultsMaterial = drawResults ? new THREE.MeshLambertMaterial({
+            map: colorMapTexture,
+            flatShading: true,
+            side: THREE.FrontSide
+
+        }) : null;
+
+
+        if (!editor.options.detailModelView) {
+
+            geometryObject.facesMaterial = simpleFacesMaterial;
+            if (drawResults) {
+                geometryObject.drawResultsMaterial = drawResultsMaterial;
             }
 
-            var edges = edgeGroups[j];
-            var offset = 0;
+            geometryObject.edgesMaterial = simpleLinesMaterial;
 
-            if (edges) {
+        } else {
 
-                var uv = uvGroups[j];
+            for (var j = 0; j < geometryObject.groups.length; j++) {  //reading edges and faces by groups
 
-                var drawTexture = (!drawResults) && (uv && uv.length != 0);
+                var settings = groupSettings[j];
+                var text3d = settings.text3d;
+                if (settings.lineColor == undefined) {
+                    settings = objectSettings;
+                }
 
-                // pictureGeometryElement.edgesGeometry = lineGeometry;
-                // pictureGeometryElement.edgesGeometryData = positions;
-                // pictureGeometryElement.objectGeometryName = name + '.' + geometryObject.groups[j];
-                // pictureGeometryElement.name = geometryObject.groups[j];
-                // pictureGeometryElement.parentName = name;
-                // pictureGeometryElement.drawResults = drawResults;
-                if (drawResults) { // Draw face with spectral texture according to results
-                    geometryObject.groups[j].drawResultsMaterial = new THREE.MeshLambertMaterial({
-                        map: colorMapTexture,
-                        flatShading: true,
-                        side: THREE.FrontSide
+                var edges = edgeGroups[j];
 
-                    });
-                    geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
-                } else {
-                    if (drawTexture && settings.texture.name != undefined) {
-                        // Draw face with texture
-                        scope.createTexture(settings, geometryObject.groups[j])
+                if (edges) {
+                    var uv = uvGroups[j];
+                    var drawTexture = (!drawResults) && (uv && uv.length != 0);
+
+                    // pictureGeometryElement.edgesGeometry = lineGeometry;
+                    // pictureGeometryElement.edgesGeometryData = positions;
+                    // pictureGeometryElement.objectGeometryName = name + '.' + geometryObject.groups[j];
+                    // pictureGeometryElement.name = geometryObject.groups[j];
+                    // pictureGeometryElement.parentName = name;
+                    // pictureGeometryElement.drawResults = drawResults;
+                    if (drawResults) { // Draw face with spectral texture according to results
+                        geometryObject.groups[j].drawResultsMaterial = drawResultsMaterial;
+                        geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
                     } else {
+                        if (drawTexture && settings.texture.name != undefined) {
+                            // Draw face with texture
+                            scope.createTexture(settings, geometryObject.groups[j])
+                        } else {
+                            if (text3d != undefined) {  // face without texture with 3dText
+                                var texture = new THREE.Texture(scope.createTextCanvas(text3d, settings.textColor, null, 256, settings.faceColor));
+                                texture.flipY = true;
+                                texture.needsUpdate = true;
 
-                        if (text3d != undefined) {  // face without texture with 3dText
-                            var texture = new THREE.Texture(scope.createTextCanvas(text3d, settings.textColor, null, 256, settings.faceColor));
-                            texture.flipY = true;
-                            texture.needsUpdate = true;
 
+                                geometryObject.groups[j].facesMaterial = new THREE.MeshLambertMaterial({
+                                    map: texture,
+                                    flatShading: true,
+                                    side: THREE.FrontSide,
+                                    transparent: settings.transparancy > 0 ? true : false,
+                                    opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
+                                });
+                            }
+                            else { // face without texture & 3dText
+                                geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
 
-                            geometryObject.groups[j].facesMaterial = new THREE.MeshLambertMaterial({
-                                map: texture,
-                                flatShading: true,
-                                side: THREE.FrontSide,
-                                transparent: settings.transparancy > 0 ? true : false,
-                                opacity: settings.transparancy > 0 ? (1 - settings.transparancy) : 1
-                            });
+                            }
                         }
-                        else { // face without texture & 3dText
-                            geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
-
-                        }
-
                     }
+                }
 
+                geometryObject.groups[j].edgesMaterial = simpleLinesMaterial;
+                geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
+
+
+                // TODO : fix it for common geometry
+                geometryObject.groups[j].simpleShapes = [];  //Simple shapes
+                if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
+                    scope.parseSimpleShapes(geometryObject.simpleShapes, j, geometryObject.groups[j], vertices);
                 }
             }
-
-            geometryObject.groups[j].edgesMaterial = simpleLinesMaterial;
-            geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
-            geometryObject.groups[j].simpleShapes = [];  //Simple shapes
-            if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
-                scope.parseSimpleShapes(geometryObject.simpleShapes, j, geometryObject.groups[j], vertices);
-
-            }
         }
-    };
 
+    };
 
     this.parseModelPart = function (geometryObject, names, pictureInfo, colorMapTexture, index, maxResult, minResult) {
         var name = geometryObject.name;
@@ -850,17 +862,24 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             textPositionsData[ind].size = objectSettings.textSize;
             textPositionsData[ind].color = objectSettings.textColor;
         }
-        var lineCommonPositionsArray = geometryObject.lineGeometryData.positions;
-
-        var faceCommonGeometryData = {};
 
 
-        faceCommonGeometryData.positions = geometryObject.faceGeometryData.positions;
-        // faceCommonGeometryData.colors = geometryObject.faceGeometryData.colors;
-        faceCommonGeometryData.normals = geometryObject.faceGeometryData.normals;
-        faceCommonGeometryData.uvs = geometryObject.faceGeometryData.uvs;
+        var lineCommonDataForLine = {};
+        lineCommonDataForLine.positions = geometryObject.lineGeometryData.positions;
+
+        var faceCommonDataForMesh = {};
+
+        faceCommonDataForMesh.positions = geometryObject.faceGeometryData.positions;
+        faceCommonDataForMesh.normals = geometryObject.faceGeometryData.normals;
+        faceCommonDataForMesh.uvs = geometryObject.faceGeometryData.uvs;
 
         scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices);
+
+        faceCommonDataForMesh.facesMaterial = geometryObject.facesMaterial;
+        faceCommonDataForMesh.drawResultsMaterial = geometryObject.drawResultsMaterial;
+
+        lineCommonDataForLine.edgesMaterial = geometryObject.edgesMaterial;
+
 
         var totalGeometryObj = {};
         totalGeometryObj.pointsTable = pointsTable;
@@ -871,10 +890,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
         totalGeometryObj.maxGeometryResult = geometryObject.maxResult;
-        totalGeometryObj.minGeometryResult = geometryObject.maxResult;
+        totalGeometryObj.minGeometryResult = geometryObject.minResult;
 
-        totalGeometryObj.lineCommonPositionsArray = lineCommonPositionsArray;
-        totalGeometryObj.faceCommonGeometryData = faceCommonGeometryData;
+        totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;
+        totalGeometryObj.faceCommonDataForMesh = faceCommonDataForMesh;
         totalGeometryObj.groups = geometryObject.groups;
         totalGeometryObj.faces = geometryObject.faces;
         totalGeometryObj.name = name;
