@@ -156,30 +156,28 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var pointsNumbers = totalObjectDataElement.pointsNumbers;
 
 
-            var facesMaterial = objectGroupElements[0].facesMaterial;
-            var edgesMaterial = objectGroupElements[0].edgesMaterial;
-            var drawResults = objectGroupElements[0].drawResults;
-
             for (var j = 0; j < objectGroupElements.length; j++) {
-                // var objectGeometry = objectElement[j].objectGeometry;
-                // var facesMaterial = objectElement[j].facesMaterial;
-                // var drawResultsMaterial = objectElement[j].drawResultsMaterial;
-                // var edgesGeometry = objectElement[j].edgesGeometry;
-                // var edgesMaterial = objectElement[j].edgesMaterial;
-                // var drawResults = objectElement[j].drawResults;
+                var facesMaterial = objectGroupElements[j].facesMaterial;
+                var drawResultsMaterial = objectGroupElements[j].drawResultsMaterial;
+                var edgesMaterial = objectGroupElements[j].edgesMaterial;
+                var drawResults = objectGroupElements[j].drawResults;
 
 
                 var objectGroupElement = objectGroupElements[j];
 
-                var objectGeometry = new THREE.BufferGeometry();
-                objectGeometry.addAttribute('position', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.positions, 3));
-                // objectGeometry.addAttribute('color', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.colors, 3));
-                objectGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.normals, 3));
-                objectGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.uvs, 2));
+                var objectGeometry;
+                var edgesGeometry;
+
+                if (objectGroupElement.faceGeometryData && objectGroupElement.faceGeometryData.positions.length > 0) {
 
 
-                if (objectGeometry) {
-                    var mesh = new THREE.Mesh(objectGeometry, facesMaterial);
+                    objectGeometry = new THREE.BufferGeometry();
+                    objectGeometry.addAttribute('position', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.positions, 3));
+                    // objectGeometry.addAttribute('color', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.colors, 3));
+                    objectGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.normals, 3));
+                    objectGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(objectGroupElement.faceGeometryData.uvs, 2));
+
+                    var mesh = new THREE.Mesh(objectGeometry, drawResultsMaterial ? drawResultsMaterial :  facesMaterial);
                     mesh.userData.pointsTable = pointsTable;
                     mesh.userData.name = objectGroupElement.name;
                     mesh.userData.totalObjVertices = vertices;
@@ -206,35 +204,37 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     editor.octree.add(mesh);
                 }
 
-
-                var edgesGeometry = new THREE.BufferGeometry();
-                edgesGeometry.addAttribute('position', new THREE.Float32BufferAttribute(objectGroupElement.lineGeometryData.positions, 3));
-
-
-                var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
-                lines.userData.pointsTable = pointsTable;
-                lines.userData.name = objectGroupElement.name;
-                lines.userData.totalObjVertices = vertices;
-                lines.userData.totalObjResults = results;
-                lines.userData.objectNames = objectNames;
-                lines.userData.pointsNumbers = pointsNumbers;
-
-                geometryElement.add(lines);
+                if (objectGroupElement.lineGeometryData && objectGroupElement.lineGeometryData.positions.length > 0) {
+                    edgesGeometry = new THREE.BufferGeometry();
+                    edgesGeometry.addAttribute('position', new THREE.Float32BufferAttribute(objectGroupElement.lineGeometryData.positions, 3));
 
 
-                if (!editor.scene.lines) {
-                    editor.scene.lines = [];
+                    var lines = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+                    lines.userData.pointsTable = pointsTable;
+                    lines.userData.name = objectGroupElement.name;
+                    lines.userData.totalObjVertices = vertices;
+                    lines.userData.totalObjResults = results;
+                    lines.userData.objectNames = objectNames;
+                    lines.userData.pointsNumbers = pointsNumbers;
+
+                    geometryElement.add(lines);
+
+
+                    if (!editor.scene.lines) {
+                        editor.scene.lines = [];
+                    }
+                    editor.scene.lines.push(lines);
+
+
+                    // modelGroup.add(lines);
+                    editor.octree.add(lines);
+
+                    lines.name = objectGroupElement.name;
+                    lines.uniqueId = lines.uuid;
+                    lines.parentName = objectGroupElement.parentName;
+                    lines.defaultColor = edgesMaterial.color.clone();
                 }
-                editor.scene.lines.push(lines);
 
-
-                // modelGroup.add(lines);
-                editor.octree.add(lines);
-
-                lines.name = objectGroupElement.name;
-                lines.uniqueId = lines.uuid;
-                lines.parentName = objectGroupElement.parentName;
-                lines.defaultColor = edgesMaterial.color.clone();
                 if (objectGeometry && objectGeometry.attributes.position.count > 0 && edgesGeometry.attributes.position.count > 0) {
                     lines.name = objectGroupElement.name + ".EDGE";
                     mesh.name = objectGroupElement.name + ".FACE";
