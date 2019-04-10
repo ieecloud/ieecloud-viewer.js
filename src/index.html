@@ -1158,9 +1158,27 @@
     // });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/bigBox.json", function (json) {
-            $("#viewer").ieecloudEditor('reloadModel', json);
-        });
+//        $.getJSON("../resources/virtual_3D_objects.json", function (json) {
+//            $("#viewer").ieecloudEditor('reloadModel', json);
+//        });
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = function(){
+            if(this.readyState === 4 && this.status === 200){
+                var data = JSON.parse(this.responseText);
+                $("#viewer").ieecloudEditor('reloadModel', data);
+            }
+        };
+
+        xhr.onerror = function(){
+            console.log('there was an error:', this);
+        };
+
+        xhr.open('GET', "../resources/virtual_3D_objects.json", true);
+        xhr.send();
+
+
     });
 
     $("#exitFromFullScreen").click(function () {
