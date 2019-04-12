@@ -1161,23 +1161,49 @@
 //        $.getJSON("../resources/virtual_3D_objects.json", function (json) {
 //            $("#viewer").ieecloudEditor('reloadModel', json);
 //        });
+//
+//        var xhr = new XMLHttpRequest();
+//
+//        xhr.onreadystatechange = function(){
+//            if(this.readyState === 4 && this.status === 200){
+//                var data = JSON.parse(this.responseText);
+//                $("#viewer").ieecloudEditor('reloadModel', data);
+//            }
+//        };
+//
+//        xhr.onerror = function(){
+//            console.log('there was an error:', this);
+//        };
+//
+//        xhr.open('GET', "../resources/view-1.json", true);
+//        xhr.send();
 
-        var xhr = new XMLHttpRequest();
+        var byteArray = [];
+        var req = new XMLHttpRequest();
+        req.open('GET', "../resources/positions-bf.iee", false);
+        req.overrideMimeType('text\/plain; charset=x-user-defined');
+        req.send(null);
+        if (req.status != 200) return byteArray;
+        for (var i = 0; i < req.responseText.length; ++i) {
+            byteArray.push(req.responseText.charCodeAt(i) & 0xff)
+        }
 
-        xhr.onreadystatechange = function(){
-            if(this.readyState === 4 && this.status === 200){
-                var data = JSON.parse(this.responseText);
-                $("#viewer").ieecloudEditor('reloadModel', data);
-            }
-        };
+        function getFloat(array) {
+            var view = new DataView(new ArrayBuffer(8));
+            array.forEach(function (b, i) {
+                view.setUint8(i, b);
+            });
+            return view.getFloat64(0);
+        }
+        i = 0,
+        result = [];
 
-        xhr.onerror = function(){
-            console.log('there was an error:', this);
-        };
+        while (i < byteArray.length) {
+            result.push(getFloat(byteArray.slice(i, i + 8)));
+            i += 8;
+        }
 
-        xhr.open('GET', "../resources/virtual_3D_objects.json", true);
-        xhr.send();
-
+        console.log(result);
 
     });
 
