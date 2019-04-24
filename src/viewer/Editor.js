@@ -128,9 +128,11 @@ Editor.prototype = {
             }
             if (me.loader.DRAW_RESULTS && !object.isModelContainerObj) {
 
-                if (!(object instanceof THREE.Mesh)) {
-                    return;
-                }
+
+                // TODO: improve (this is wrong check. container may include only EDGES with supremum)
+                // if (!(object instanceof THREE.Mesh)) {
+                //     return;
+                // }
 
                 var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                 var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
@@ -154,7 +156,7 @@ Editor.prototype = {
                     me.setMinMaxResult(minResult, maxResult);
                     if (!me.modeAllVisible) {
                         me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible) return true;
+                            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible && oNode.object.isSimpleShape === false) return true;
                         });
                     }
                 }
@@ -213,6 +215,10 @@ Editor.prototype = {
 
                 var uvs = [];
 
+                if(_.isUndefined(groups)){
+                    continue;
+                }
+
                 for (var j = 0; j < groups.length; j++) {
                     var faces = faceGroups[j];
                     var offset = 0;
@@ -266,7 +272,7 @@ Editor.prototype = {
             var maxResult = resultInfo.maxResult;
             var minResult = resultInfo.minResult;
             me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.isSimpleShape === false) return true;
             });
         }
 
@@ -326,7 +332,7 @@ Editor.prototype = {
                     me.setMinMaxResult(minResult, maxResult);
                     if (!me.modeAllVisible) {
                         me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.isSimpleShape === false) return true;
                         });
                     }
 

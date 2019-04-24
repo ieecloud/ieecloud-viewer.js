@@ -181,6 +181,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     mesh.defaultColor = facesMaterial.color.clone();
                     mesh.facesMaterial = facesMaterial;
                     mesh.drawResults = drawResults;
+                    mesh.isSimpleShape = false;
 
                     modelGroup.add(mesh);
                     editor.octree.add(mesh);
@@ -305,9 +306,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             mesh.defaultColor = objectElement[0].facesMaterial.color.clone();
             mesh.facesMaterial = objectElement[0].facesMaterial;
             mesh.drawResults = objectElement[0].drawResults;
-
-            geometryElement.add(mesh);
-
+            mesh.isSimpleShape = false;
             if(!editor.scene.meshes) {
                 editor.scene.meshes = [];
             }
@@ -342,6 +341,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var shapes = new THREE.Mesh(simpleShapesGeometry, objElement.facesMaterial);
 
                 shapes.name = simpleShapesGeometry.name;
+                shapes.isSimpleShape = true;
                 meshesData[key].push(shapes);
 
                 // modelGroup.add(shapes);
@@ -353,8 +353,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var geoCommonLineGeometry = new THREE.BufferGeometry();
             geoCommonLineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( lineCommonPositionsArray, 3 ) );
             var lines = new THREE.LineSegments(geoCommonLineGeometry, objectElement[0].edgesMaterial);
-            geometryElement.add(lines);
-            // modelGroup.add(lines);
             lines.userData.pointsTable = pointsTable;
             lines.parentName = totalObjectDataElement.name;
             lines.defaultColor = objectElement[0].edgesMaterial.color.clone();
@@ -376,16 +374,22 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 mesh.name = totalObjectDataElement.name + ".FACE";
                 meshesData[key].push(lines);
                 meshesData[key].push(mesh);
+
+                geometryElement.add(lines);
+                geometryElement.add(mesh);
+
             } else if (geoCommonMeshGeometry.attributes.position.count === 0 && geoCommonLineGeometry.attributes.position.count > 0) {
                 if(_.trim(lines.name).length === 0){
                     lines.name = totalObjectDataElement.name + ".EDGE";
                 }
                 meshesData[key].push(lines);
+                geometryElement.add(lines);
             } else if (geoCommonMeshGeometry.attributes.position.count > 0 && geoCommonLineGeometry.attributes.position.count === 0) {
                 if(_.trim(mesh.name).length === 0){
                     mesh.name = totalObjectDataElement.name + ".FACE";
                 }
                 meshesData[key].push(mesh);
+                geometryElement.add(mesh);
             }
 
             geometryElement.name = totalObjectDataElement.name;
@@ -440,6 +444,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         });
 
         var mesh = new THREE.Mesh(plane, planeMat);
+        mesh.isSimpleShape = false;
 
         return mesh;
 

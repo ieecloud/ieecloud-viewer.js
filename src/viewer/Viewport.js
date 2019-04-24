@@ -1349,6 +1349,15 @@ var Viewport = function (editor) {
 
     signals.sceneGraphChanged.add(function () {
 
+
+
+        var resultInfo = editor.getResultInfo();
+
+        if(editor.loader.DRAW_RESULTS && !_.isUndefined(resultInfo) && resultInfo.maxResult > resultInfo.minResult){
+            resultScale.setResultInfo(editor.getResultInfo());
+        }
+
+
         render();
         // updateInfo();
 
@@ -1691,7 +1700,7 @@ var Viewport = function (editor) {
         var resultInfo = editor.getResultInfo();
 
 
-        if(editor.loader.DRAW_RESULTS && resultInfo.maxResult > resultInfo.minResult){
+        if(editor.loader.DRAW_RESULTS &&  !_.isUndefined(resultInfo) &&  resultInfo.maxResult > resultInfo.minResult){
             resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
             resultScale.setResultInfo(editor.getResultInfo());
             resultScale.show();
@@ -1716,7 +1725,7 @@ var Viewport = function (editor) {
 
         var resultInfo = editor.getResultInfo();
 
-        if(editor.loader.DRAW_RESULTS && resultInfo.maxResult > resultInfo.minResult){
+        if(editor.loader.DRAW_RESULTS && !_.isUndefined(resultInfo) && resultInfo.maxResult > resultInfo.minResult){
             resultScale.setResultInfo(editor.getResultInfo());
         }
 
