@@ -1028,7 +1028,7 @@ var Viewport = function (editor) {
                 }
                 resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : 0;
                 var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
-                info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal + ', objectName = ' + objectName);
+                info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal + ', Material Name = ' + getMaterialName(intersect.object.name));
                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
                 nearestPoint.position.copy(position);
                 nearestPoint.userData.result = resultVal;
@@ -1037,6 +1037,14 @@ var Viewport = function (editor) {
             }
         }
     };
+
+    var getMaterialName = function (materialName) {
+        if(materialName && materialName.indexOf('}')) {
+            return materialName.substring(0, materialName.indexOf('}') + 1);
+        }
+        return materialName;
+    };
+
     var lastMove = Date.now();
     var thread;
     scope.onMouseMoveViewerHandler = function (event) {
