@@ -353,6 +353,10 @@ Editor.prototype = {
     },
 
 
+    reRender: function () {
+        this.signals.sceneGraphChanged.dispatch();
+    },
+
     unSelectTree: function (object) {
         this.signals.selectTree.dispatch(object, false);
     },

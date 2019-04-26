@@ -948,6 +948,12 @@
 
                 });
 
+                tree.on('node.render', function(node, event) {
+                    if(node.object){
+                        $("#viewer").ieecloudEditor("reRender");
+                    }
+                });
+
                 let toggleNodes = (funcBeforeDoName , funcDoName) => {
                     var queryString = $("#search-input").val();
                     var filterValue = $('input[name="filterBy"]').filter(':checked').val();
@@ -1158,7 +1164,7 @@
     // });
 
     $("#loadModel").click(function () {
-        $.getJSON("../resources/zenit.json", function (json) {
+        $.getJSON("../resources/z_arena.json", function (json) {
             $("#viewer").ieecloudEditor('reloadModel', json);
         });
     });

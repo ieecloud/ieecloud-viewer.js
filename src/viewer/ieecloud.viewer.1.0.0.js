@@ -164,6 +164,10 @@ function Viewer(target, options) {
     };
 
 
+    Viewer.prototype.reRender = function () {
+        this.threeEditor.reRender();
+    };
+
     Viewer.prototype.getTreeModel = function () {
         return this.threeEditor.loader.getObjectsTreeModel();
     };

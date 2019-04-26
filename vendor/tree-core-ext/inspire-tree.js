@@ -3949,17 +3949,18 @@ var TreeNode = function () {
                     }
                 });
                 var indeterminateValue = indeterminate > 0 || childrenCount > 0 && checked > 0 && checked < childrenCount;
+                if (this.object) {
+                    this.object.isIndeterminate = indeterminateValue
+                }
                 // Set selected if all children are
                 if (checked === childrenCount) {
-                    if (this.object) {
-                        this.object.isIndeterminate = indeterminateValue
-                    }
                     baseStateChange('checked', true, 'checked', this);
+                } else if (childrenCount > 0 && checked > 0 && checked < childrenCount && !this.checked()) {
+                    baseStateChange('checked', true, 'checked', this);
+                } else if (childrenCount > 0 && checked === 0 && this.checked()) {
+                    baseStateChange('checked', false, 'unchecked', this)
                 } else {
-                    if (this.object) {
-                        this.object.isIndeterminate = indeterminateValue
-                    }
-                    baseStateChange('checked', false, 'unchecked', this);
+                    this._tree.emit('node.render', this, false);
                 }
 
                 // Set indeterminate if any children are, or some children are selected
