@@ -952,6 +952,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var pictureData = json.pictureData; // reading array for all geometry objects
         var minResult = json.minResult;
         var maxResult = json.maxResult;
+        this.coordFactor  = json.coordFactor;
         scope.DRAW_RESULTS = (!(/^(false|0)$/i).test(json.drawResults) && !!json.drawResults) || editor.options.drawResults
             && maxResult > minResult;
         this.modelRotation = json.modelRotation;
@@ -978,14 +979,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             // editor.addTexture(colorMapTexture, minResult, maxResult);
         }
 
-        // calculate scaleFactor
-        for (var i = 0; i < pictureData.length; i++) {
-            var coords = pictureData[i].coords;
-            var maxCoordinate = _.max(coords);
-            if (this.coordFactor < maxCoordinate) {
-                this.coordFactor = maxCoordinate;
-            }
-        }
         for (var i = 0; i < pictureData.length; i++) {
 
             var geometryObject = pictureData[i];
