@@ -329,7 +329,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             mesh.userData.objectNames = objectNames;
             mesh.userData.pointsNumbers = pointsNumbers;
             mesh.userData.groups = groups;
-            mesh.userData.faces = faces;
 
             mesh.name = totalObjectDataElement.name;
             mesh.uniqueId = mesh.uuid;
