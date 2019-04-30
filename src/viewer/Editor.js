@@ -151,12 +151,14 @@ Editor.prototype = {
                 }
 
                 if (maxChanged || minChanged) {
-                    me.setMinMaxResult(minResult, maxResult);
+
                     if (!me.modeAllVisible) {
                         me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
                             if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible) return true;
                         });
                     }
+
+                    me.setMinMaxResult(minResult, maxResult);
                 }
             }
         }
@@ -190,6 +192,16 @@ Editor.prototype = {
         this.signals.objectColorUnSelected.dispatch(object);
     },
 
+
+    getNewUv: function (prevUv, newMaxResult, newMinResult) {
+        var me = this;
+        var resultInfo = me.getResultInfo();
+        var prevMaxResult = resultInfo.maxResult;
+        var prevMinResult = resultInfo.minResult;
+        var result = prevUv * (prevMaxResult - prevMinResult) + prevMinResult;
+        return me.loader.getV(result, newMaxResult, newMinResult);
+    },
+
     recalculateUvs: function (aTree, newMaxResult, newMinResult, fCompair) {
 
 
@@ -207,36 +219,21 @@ Editor.prototype = {
         while (aInnerTree.length > 0) {
             oNode = aInnerTree.pop();
             if (fCompair(oNode)) {
-                var groups = oNode.object.userData.groups;
-                var faceGroups = oNode.object.userData.faces;
-                var results = oNode.object.userData.totalObjResults;
+                var currentUvs = oNode.object.geometry.attributes.uv.array;
+                var newUvs = [];
 
-                var uvs = [];
+                for (var k = 0; k < currentUvs.length; k+=6) {
+                    newUvs.push(
+                        0.0,
+                        me.getNewUv(currentUvs[k + 1], newMaxResult, newMinResult),
+                        0.0,
+                        me.getNewUv(currentUvs[k + 3], newMaxResult, newMinResult),
+                        0.0,
+                        me.getNewUv(currentUvs[k + 5], newMaxResult, newMinResult));
 
-                for (var j = 0; j < groups.length; j++) {
-                    var faces = faceGroups[j];
-                    var offset = 0;
-                    while (offset < faces.length) {
-                        uvs.push(
-                            0.0,
-                            me.loader.getV(results[faces[offset]], newMaxResult, newMinResult),
-                            0.0,
-                            me.loader.getV(results[faces[offset + 1]], newMaxResult, newMinResult),
-                            0.0,
-                            me.loader.getV(results[faces[offset + 2]], newMaxResult, newMinResult));
-
-
-                        uvs.push(
-                            0.0,
-                            me.loader.getV(results[faces[offset]], newMaxResult, newMinResult),
-                            0.0,
-                            me.loader.getV(results[faces[offset + 2]], newMaxResult, newMinResult),
-                            0.0,
-                            me.loader.getV(results[faces[offset + 1]], newMaxResult, newMinResult));
-                        offset = offset + 3;
-                    }
                 }
-                oNode.object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+                oNode.object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(newUvs, 2));
+
             } else {
                 for (var keysNode in oNode) {
                     if (oNode[keysNode] instanceof Array) {
@@ -323,12 +320,14 @@ Editor.prototype = {
                 }
 
                 if (maxChanged || minChanged) {
-                    me.setMinMaxResult(minResult, maxResult);
+
                     if (!me.modeAllVisible) {
                         me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
                             if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
                         });
                     }
+
+                    me.setMinMaxResult(minResult, maxResult);
 
                 }
             }

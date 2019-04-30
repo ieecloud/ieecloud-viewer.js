@@ -717,7 +717,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var name = geometryObject.name;
 
         var edgeGroups = geometryObject.edges;
-        var faceGroups = geometryObject.faces;
         var uvGroups = geometryObject.uvCoords;
         var groupSettings = geometryObject.groupSettings;
         var objectSettings = geometryObject.objectSettings;
@@ -824,7 +823,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     };
 
-    this.parseModelPart = function (geometryObject, names, pictureInfo, colorMapTexture, index, maxResult, minResult) {
+    this.parseModelPart = function (geometryObject, names, pictureInfo, colorMapTexture, index) {
         var name = geometryObject.name;
         var scale = 1;
         names.push(name);
@@ -873,6 +872,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         faceCommonDataForMesh.normals = geometryObject.faceGeometryData.normals;
         faceCommonDataForMesh.uvs = geometryObject.faceGeometryData.uvs;
 
+        // pass vertices for simpleShapes only
         scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices);
 
         faceCommonDataForMesh.facesMaterial = geometryObject.facesMaterial;
@@ -889,13 +889,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.totalObjResults = results;
 
 
+        totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;
+        totalGeometryObj.faceCommonDataForMesh = faceCommonDataForMesh;
+
         totalGeometryObj.maxGeometryResult = geometryObject.maxResult;
         totalGeometryObj.minGeometryResult = geometryObject.minResult;
 
-        totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;
-        totalGeometryObj.faceCommonDataForMesh = faceCommonDataForMesh;
-        totalGeometryObj.groups = geometryObject.groups;
-        totalGeometryObj.faces = geometryObject.faces;
         totalGeometryObj.name = name;
 
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
