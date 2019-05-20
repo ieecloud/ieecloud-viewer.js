@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ieecloud viewer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+
+        .full-screen{
+            overflow: hidden;
+            margin: 0px;
+
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .viewer-full-screen {
+            position: absolute;
+            margin-top: 0px;
+            height: 100%;
+            width: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            background-color: #fff;
+        }
+
+        .btn-wrapper{
+            position: absolute;
+        }
+
+        .tree-wrapper{
+            width: 400px;
+            position: relative;
+            z-index: 20;
+            background-color: black;
+            opacity: 0.7;
+            color: white;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner{
+            padding-top: 50px;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel{
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .action-panel{
+            margin-top: 10px;
+        }
+
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .action-panel-inner{
+            padding-left: 37px;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .action-panel-inner h4{
+            display: inline-block;
+            padding-right: 20px;
+            margin-block-start: 1em;
+            margin-block-end: 1em;
+        }
+
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .action-panel-inner select{
+            padding: .375rem .75rem;
+            line-height: 1.5;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel h3{
+            font-weight: 700;
+            font-style: normal;
+            text-decoration: none;
+            border-bottom: 3px solid #fff;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel input[type=text]{
+            width: 55%;
+            color: #222;
+            background-color: white;
+            font-size: .875rem;
+            margin: 0;
+            outline: none;
+            padding: 6px 1px 5px 2px;
+            resize: none;
+        }
+
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel .btn{
+            text-rendering: optimizeLegibility;
+            border: none;
+            display: inline-block;
+            font-family: "Google Sans",Roboto,Arial,Helvetica,sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            height: 20px;
+            line-height: 1;
+            letter-spacing: .75px;
+            padding: 15px 24px;
+            transition: color .15s linear,background-color .15s linear;
+            vertical-align: middle;
+            font-size: 14px;
+            letter-spacing: .5px;
+            line-height: .2;
+            padding: 12px 15px;
+            background-color: #0000FF;
+            color: #fff;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel .btn:hover{
+            box-shadow: 0 1px 2px 0 rgba(26,115,232,0.451), 0 1px 3px 1px rgba(26,115,232,0.302);
+            background-color: #0000FF;
+            border: none;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel .btn:active {
+            box-shadow: 0 1px 2px 0 rgba(26, 115, 232, 0.451), 0 2px 6px 2px rgba(26, 115, 232, 0.302);
+            background-color: #0000FF;
+            border: none;
+            user-select: none;
+        }
+
+        .tree-wrapper  .tree-wrapper-inner  .tree {
+            overflow-y: auto;
+            height: calc(100vh - 470px);
+        }
+
+        .viewer-full-screen .btn-wrapper .buttons, .viewer-full-screen .tree-wrapper .buttons{
+            position: relative;
+            z-index: 1000;
+        }
+
+        /*.viewer-full-screen .tree-wrapper .tree{*/
+        /*position: relative;*/
+        /*z-index: 1000;*/
+        /*}*/
+
+        .viewer-small-screen {
+            position: relative;
+            margin-top: 50px;
+            height: 800px;
+            width: 1500px;
+            background-color: #fff;
+        }
+
+        .viewer-small-screen .buttons{
+            position: relative;
+            z-index: 1000;
+        }
+
+
+
+
+        .inspire-tree .btn {
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            display: inline-block;
+            height: 20px;
+            -webkit-transition: all 150ms linear;
+            transition: all 150ms linear;
+            width: 20px; }
+        .inspire-tree .btn:hover {
+            -webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1); }
+        .inspire-tree .btn + .btn {
+            margin-left: 5px; }
+        .inspire-tree .btn.icon {
+            position: relative; }
+        .inspire-tree .btn.icon::before {
+            display: block;
+            height: 14px;
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            width: 14px; }
+
+        .inspire-tree .btn-group {
+            display: inline-block;
+            height: 25px;
+            line-height: 25px; }
+
+        /* ~~@@@~~~~~ Context Menu ~~~~~@@@~~ */
+        .itree-menu {
+            background: #ddd;
+            border: 1px solid #c4c4c4;
+            border-radius: 3px;
+            font-family: sans-serif;
+            list-style: none;
+            margin: 0;
+            min-width: 150px;
+            padding: 0;
+            position: absolute;
+            z-index: 10; }
+        .itree-menu a {
+            display: block;
+            padding: 3px 8px; }
+        .itree-menu a:hover {
+            background: rgba(218, 250, 255, 0.5);
+            color: rgba(164, 234, 245, 0.5); }
+
+        .inspire-tree {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            /*overflow-y: auto;*/
+            /*height: calc(100vh - 145px);*/
+            /* ~~@@@~~~~~ Lists ~~~~~@@@~~ */
+            /* ~~@@@~~~~~ Node Content ~~~~~@@@~~ */ }
+        .inspire-tree:focus {
+            outline: none; }
+        .inspire-tree, .inspire-tree * {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box; }
+        .inspire-tree ol {
+            list-style: none;
+            margin: 0;
+            padding: 0; }
+        .inspire-tree ol ol {
+            padding-left: 20px; }
+        .inspire-tree .collapsed > ol, .inspire-tree .hidden {
+            display: none; }
+        .inspire-tree li > .title-wrap {
+            min-height: 25px;
+            position: relative;
+            z-index: 2; }
+        .inspire-tree .toggle {
+            height: 25px;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 25px;
+            z-index: 2; }
+        .inspire-tree .toggle::before {
+            display: block;
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); }
+        .inspire-tree [type="checkbox"] {
+            left: 18px;
+            position: absolute;
+            top: 4px;
+            vertical-align: middle;
+            width: 20px;
+            z-index: 2; }
+        .inspire-tree .title {
+            cursor: default;
+            display: block;
+            height: 25px;
+            line-height: 25px;
+            overflow: hidden;
+            padding-left: 42px;
+            position: relative;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            white-space: nowrap;
+            z-index: 1; }
+        .inspire-tree .title.load-more {
+            color: #476cb8;
+            cursor: pointer; }
+        .inspire-tree .title.load-more:hover {
+            text-decoration: underline; }
+        .inspire-tree .title::before {
+            left: 24px;
+            position: absolute;
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            vertical-align: top; }
+        .inspire-tree .title:focus {
+            outline: none; }
+
+        .inspire-tree.drag-and-drop li:not(.drop-target) {
+            opacity: .5; }
+
+        .drag-targeting.drag-targeting-insert.inspire-tree,
+        .drag-targeting.drag-targeting-insert > .title-wrap > .title {
+            border: 1px solid #2dadc5; }
+
+        .drag-targeting.drag-targeting-above > .title-wrap > .title {
+            border-top: 3px solid #2dadc5; }
+
+        .drag-targeting.drag-targeting-below > .title-wrap > .title {
+            border-bottom: 3px solid #2dadc5; }
+
+        .inspire-tree .editable form {
+            display: inline-block;
+            height: 25px;
+            line-height: 25px;
+            padding-top: 2px; }
+        .inspire-tree .editable form input {
+            height: 20px; }
+        .inspire-tree .editable form input, .inspire-tree .editable form .btn {
+            vertical-align: top; }
+
+        .inspire-tree .editable > .btn-group {
+            display: none;
+            padding-top: 2px;
+            position: absolute;
+            right: 10px;
+            z-index: 3; }
+
+        .inspire-tree .editable:hover > .btn-group {
+            display: block; }
+
+        .inspire-tree input + .btn-group {
+            margin-left: 10px; }
+
+        .inspire-tree > .btn.icon {
+            margin-left: 2px; }
+
+        .inspire-tree > ol > .folder:first-child:not(:only-child) {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAMCAYAAACji9dXAAAAFUlEQVQIW2M8d+HSf0YGBgYGRpJZAJ2uFKcp4HfpAAAAAElFTkSuQmCC");
+            background-position: 11px 13px;
+            background-repeat: no-repeat; }
+
+        .inspire-tree .folder:last-child:not(:only-child), .inspire-tree li .folder:last-child {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAMCAYAAACji9dXAAAAFUlEQVQIW2M8d+HSf0YGBgYGRpJZAJ2uFKcp4HfpAAAAAElFTkSuQmCC");
+            background-position: 11px 0;
+            background-repeat: no-repeat; }
+
+        .inspire-tree.editable-add > ol > .folder:last-child:not(:only-child) {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAYCAYAAAA7zJfaAAAAFUlEQVQIW2M8d+HSf0YGBgYGRrqyABKeKU0SV+t2AAAAAElFTkSuQmCC");
+            background-repeat: repeat-y; }
+
+        .inspire-tree > ol .expanded:not(:last-child):not(:first-child), .inspire-tree li:not(:last-child) {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAYCAYAAAA7zJfaAAAAFUlEQVQIW2M8d+HSf0YGBgYGRrqyABKeKU0SV+t2AAAAAElFTkSuQmCC");
+            background-position: 11px 0;
+            background-repeat: no-repeat; }
+
+        .inspire-tree li.expanded:not(:last-child) > ol {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAYCAYAAAA7zJfaAAAAFUlEQVQIW2M8d+HSf0YGBgYGRrqyABKeKU0SV+t2AAAAAElFTkSuQmCC");
+            background-position: 11px 0;
+            background-repeat: repeat-y; }
+
+        .inspire-tree li.expanded.folder:not(.loading) > .title-wrap {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAMCAYAAACji9dXAAAAFUlEQVQIW2M8d+HSf0YGBgYGRpJZAJ2uFKcp4HfpAAAAAElFTkSuQmCC");
+            background-position: 31px 13px;
+            background-repeat: no-repeat; }
+
+        .inspire-tree .leaf:not(:last-child):not(.detached) {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAYCAYAAAAh8HdUAAAAN0lEQVQ4T2M8d+HSfyMDPUYGEgBJimHmMo7aBAmK0dCDJgl4ioClDGLo0dBDDz0SMu5o2oMFFgBXbEeI0XwYIwAAAABJRU5ErkJgggAA");
+            background-position: 11px 0;
+            background-repeat: no-repeat; }
+
+        .inspire-tree .leaf:last-child {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAKklEQVQoU2M8d+HSfyMDPUYGEgBJimHmMo7aBAmK0dCDJgl4ioClDGJoAGUZM32Z0U8tAAAAAElFTkSuQmCC");
+            background-position: 11px 0;
+            background-repeat: no-repeat; }
+
+        .inspire-tree .leaf.detached:last-child {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAMCAYAAACji9dXAAAAFUlEQVQIW2M8d+HSf0YGBgYGRpJZAJ2uFKcp4HfpAAAAAElFTkSuQmCC");
+            background-position: 11px 0;
+            background-repeat: no-repeat; }
+
+        .inspire-tree.editable-add > ol > .leaf:last-child {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAYCAYAAAAh8HdUAAAAN0lEQVQ4T2M8d+HSfyMDPUYGEgBJimHmMo7aBAmK0dCDJgl4ioClDGLo0dBDDz0SMu5o2oMFFgBXbEeI0XwYIwAAAABJRU5ErkJgggAA"); }
+
+        .inspire-tree .icon::before {
+            background-position: 0 0;
+            background-repeat: no-repeat;
+            content: '';
+            display: inline-block;
+            height: 14px;
+            width: 14px; }
+
+        .inspire-tree .icon-check::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%236a6a6a%22%20d%3D%22M27%204l-15%2015-7-7-5%205%2012%2012%2020-20z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-check:hover::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%230ccc0a%22%20d%3D%22M27%204l-15%2015-7-7-5%205%2012%2012%2020-20z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-collapse::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23aaa%22%20d%3D%22M4%201h16q1.242%200%202.121%200.879t0.879%202.121v16q0%201.242-0.879%202.121t-2.121%200.879h-16q-1.242%200-2.121-0.879t-0.879-2.121v-16q0-1.242%200.879-2.121t2.121-0.879zM20%203h-16q-0.414%200-0.707%200.293t-0.293%200.707v16q0%200.414%200.293%200.707t0.707%200.293h16q0.414%200%200.707-0.293t0.293-0.707v-16q0-0.414-0.293-0.707t-0.707-0.293zM8%2011h8q0.414%200%200.707%200.293t0.293%200.707-0.293%200.707-0.707%200.293h-8q-0.414%200-0.707-0.293t-0.293-0.707%200.293-0.707%200.707-0.293z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
+            background-color: white;
+            border-radius: 3px;
+            margin-left: -1px; }
+
+        .inspire-tree .icon-cross::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%236a6a6a%22%20d%3D%22M31.708%2025.708c-0-0-0-0-0-0l-9.708-9.708%209.708-9.708c0-0%200-0%200-0%200.105-0.105%200.18-0.227%200.229-0.357%200.133-0.356%200.057-0.771-0.229-1.057l-4.586-4.586c-0.286-0.286-0.702-0.361-1.057-0.229-0.13%200.048-0.252%200.124-0.357%200.228%200%200-0%200-0%200l-9.708%209.708-9.708-9.708c-0-0-0-0-0-0-0.105-0.104-0.227-0.18-0.357-0.228-0.356-0.133-0.771-0.057-1.057%200.229l-4.586%204.586c-0.286%200.286-0.361%200.702-0.229%201.057%200.049%200.13%200.124%200.252%200.229%200.357%200%200%200%200%200%200l9.708%209.708-9.708%209.708c-0%200-0%200-0%200-0.104%200.105-0.18%200.227-0.229%200.357-0.133%200.355-0.057%200.771%200.229%201.057l4.586%204.586c0.286%200.286%200.702%200.361%201.057%200.229%200.13-0.049%200.252-0.124%200.357-0.229%200-0%200-0%200-0l9.708-9.708%209.708%209.708c0%200%200%200%200%200%200.105%200.105%200.227%200.18%200.357%200.229%200.356%200.133%200.771%200.057%201.057-0.229l4.586-4.586c0.286-0.286%200.362-0.702%200.229-1.057-0.049-0.13-0.124-0.252-0.229-0.357z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-cross:hover::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23c00%22%20d%3D%22M31.708%2025.708c-0-0-0-0-0-0l-9.708-9.708%209.708-9.708c0-0%200-0%200-0%200.105-0.105%200.18-0.227%200.229-0.357%200.133-0.356%200.057-0.771-0.229-1.057l-4.586-4.586c-0.286-0.286-0.702-0.361-1.057-0.229-0.13%200.048-0.252%200.124-0.357%200.228%200%200-0%200-0%200l-9.708%209.708-9.708-9.708c-0-0-0-0-0-0-0.105-0.104-0.227-0.18-0.357-0.228-0.356-0.133-0.771-0.057-1.057%200.229l-4.586%204.586c-0.286%200.286-0.361%200.702-0.229%201.057%200.049%200.13%200.124%200.252%200.229%200.357%200%200%200%200%200%200l9.708%209.708-9.708%209.708c-0%200-0%200-0%200-0.104%200.105-0.18%200.227-0.229%200.357-0.133%200.355-0.057%200.771%200.229%201.057l4.586%204.586c0.286%200.286%200.702%200.361%201.057%200.229%200.13-0.049%200.252-0.124%200.357-0.229%200-0%200-0%200-0l9.708-9.708%209.708%209.708c0%200%200%200%200%200%200.105%200.105%200.227%200.18%200.357%200.229%200.356%200.133%200.771%200.057%201.057-0.229l4.586-4.586c0.286-0.286%200.362-0.702%200.229-1.057-0.049-0.13-0.124-0.252-0.229-0.357z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-expand::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23aaa%22%20d%3D%22M4%201h16q1.242%200%202.121%200.879t0.879%202.121v16q0%201.242-0.879%202.121t-2.121%200.879h-16q-1.242%200-2.121-0.879t-0.879-2.121v-16q0-1.242%200.879-2.121t2.121-0.879zM20%203h-16q-0.414%200-0.707%200.293t-0.293%200.707v16q0%200.414%200.293%200.707t0.707%200.293h16q0.414%200%200.707-0.293t0.293-0.707v-16q0-0.414-0.293-0.707t-0.707-0.293zM12%207q0.414%200%200.707%200.293t0.293%200.707v3h3q0.414%200%200.707%200.293t0.293%200.707-0.293%200.707-0.707%200.293h-3v3q0%200.414-0.293%200.707t-0.707%200.293-0.707-0.293-0.293-0.707v-3h-3q-0.414%200-0.707-0.293t-0.293-0.707%200.293-0.707%200.707-0.293h3v-3q0-0.414%200.293-0.707t0.707-0.293z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
+            background-color: white;
+            border-radius: 3px;
+            margin-left: -1px; }
+
+        .inspire-tree .icon-file-empty::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23a5a5a5%22%20d%3D%22M28.681%207.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378%200-2.5%201.121-2.5%202.5v27c0%201.378%201.122%202.5%202.5%202.5h23c1.378%200%202.5-1.122%202.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543%205.457c0.959%200.959%201.712%201.825%202.268%202.543h-4.811v-4.811c0.718%200.556%201.584%201.309%202.543%202.268zM28%2029.5c0%200.271-0.229%200.5-0.5%200.5h-23c-0.271%200-0.5-0.229-0.5-0.5v-27c0-0.271%200.229-0.5%200.5-0.5%200%200%2015.499-0%2015.5%200v7c0%200.552%200.448%201%201%201h7v19.5z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-folder::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%236a6a6a%22%20d%3D%22M14%204l4%204h14v22h-32v-26z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-folder-open::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%236a6a6a%22%20d%3D%22M26%2030l6-16h-26l-6%2016zM4%2012l-4%2018v-26h9l4%204h13v4z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E%0A"); }
+
+        .inspire-tree .icon-minus::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%236a6a6a%22%20d%3D%22M0%2013v6c0%200.552%200.448%201%201%201h30c0.552%200%201-0.448%201-1v-6c0-0.552-0.448-1-1-1h-30c-0.552%200-1%200.448-1%201z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-minus:hover::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23c00%22%20d%3D%22M0%2013v6c0%200.552%200.448%201%201%201h30c0.552%200%201-0.448%201-1v-6c0-0.552-0.448-1-1-1h-30c-0.552%200-1%200.448-1%201z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-more::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%236a6a6a%22%20d%3D%22M12%209.984c1.078%200%202.016%200.938%202.016%202.016s-0.938%202.016-2.016%202.016-2.016-0.938-2.016-2.016%200.938-2.016%202.016-2.016zM18%209.984c1.078%200%202.016%200.938%202.016%202.016s-0.938%202.016-2.016%202.016-2.016-0.938-2.016-2.016%200.938-2.016%202.016-2.016zM6%209.984c1.078%200%202.016%200.938%202.016%202.016s-0.938%202.016-2.016%202.016-2.016-0.938-2.016-2.016%200.938-2.016%202.016-2.016z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-pencil::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%236a6a6a%22%20d%3D%22M27%200c2.761%200%205%202.239%205%205%200%201.126-0.372%202.164-1%203l-2%202-7-7%202-2c0.836-0.628%201.874-1%203-1zM2%2023l-2%209%209-2%2018.5-18.5-7-7-18.5%2018.5zM22.362%2011.362l-14%2014-1.724-1.724%2014-14%201.724%201.724z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E%0A"); }
+
+        .inspire-tree .icon-pencil:hover::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%230ccc0a%22%20d%3D%22M27%200c2.761%200%205%202.239%205%205%200%201.126-0.372%202.164-1%203l-2%202-7-7%202-2c0.836-0.628%201.874-1%203-1zM2%2023l-2%209%209-2%2018.5-18.5-7-7-18.5%2018.5zM22.362%2011.362l-14%2014-1.724-1.724%2014-14%201.724%201.724z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E%0A"); }
+
+        .inspire-tree .icon-plus::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%236a6a6a%22%20d%3D%22M31%2012h-11v-11c0-0.552-0.448-1-1-1h-6c-0.552%200-1%200.448-1%201v11h-11c-0.552%200-1%200.448-1%201v6c0%200.552%200.448%201%201%201h11v11c0%200.552%200.448%201%201%201h6c0.552%200%201-0.448%201-1v-11h11c0.552%200%201-0.448%201-1v-6c0-0.552-0.448-1-1-1z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .icon-plus:hover::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%230ccc0a%22%20d%3D%22M31%2012h-11v-11c0-0.552-0.448-1-1-1h-6c-0.552%200-1%200.448-1%201v11h-11c-0.552%200-1%200.448-1%201v6c0%200.552%200.448%201%201%201h11v11c0%200.552%200.448%201%201%201h6c0.552%200%201-0.448%201-1v-11h11c0.552%200%201-0.448%201-1v-6c0-0.552-0.448-1-1-1z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .selected > .title-wrap .icon-folder::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23179bb9%22%20d%3D%22M14%204l4%204h14v22h-32v-26z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .selected > .title-wrap .icon-folder-open::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23179bb9%22%20d%3D%22M26%2030l6-16h-26l-6%2016zM4%2012l-4%2018v-26h9l4%204h13v4z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E%0A"); }
+
+        .inspire-tree .selected > .title-wrap .icon-file-empty::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23179bb9%22%20d%3D%22M28.681%207.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378%200-2.5%201.121-2.5%202.5v27c0%201.378%201.122%202.5%202.5%202.5h23c1.378%200%202.5-1.122%202.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543%205.457c0.959%200.959%201.712%201.825%202.268%202.543h-4.811v-4.811c0.718%200.556%201.584%201.309%202.543%202.268zM28%2029.5c0%200.271-0.229%200.5-0.5%200.5h-23c-0.271%200-0.5-0.229-0.5-0.5v-27c0-0.271%200.229-0.5%200.5-0.5%200%200%2015.499-0%2015.5%200v7c0%200.552%200.448%201%201%201h7v19.5z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E"); }
+
+        .inspire-tree .loading > .title-wrap input {
+            display: none; }
+
+        .inspire-tree .loading > .title-wrap .title::before {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2714px%27%20height%3D%2714px%27%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%20preserveAspectRatio%3D%22xMidYMid%22%20class%3D%22uil-ring%22%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22none%22%20class%3D%22bk%22%3E%3C%2Frect%3E%3Cdefs%3E%3Cfilter%20id%3D%22uil-ring-shadow%22%20x%3D%22-100%25%22%20y%3D%22-100%25%22%20width%3D%22300%25%22%20height%3D%22300%25%22%3E%3CfeOffset%20result%3D%22offOut%22%20in%3D%22SourceGraphic%22%20dx%3D%220%22%20dy%3D%220%22%3E%3C%2FfeOffset%3E%3CfeGaussianBlur%20result%3D%22blurOut%22%20in%3D%22offOut%22%20stdDeviation%3D%220%22%3E%3C%2FfeGaussianBlur%3E%3CfeBlend%20in%3D%22SourceGraphic%22%20in2%3D%22blurOut%22%20mode%3D%22normal%22%3E%3C%2FfeBlend%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M10%2C50c0%2C0%2C0%2C0.5%2C0.1%2C1.4c0%2C0.5%2C0.1%2C1%2C0.2%2C1.7c0%2C0.3%2C0.1%2C0.7%2C0.1%2C1.1c0.1%2C0.4%2C0.1%2C0.8%2C0.2%2C1.2c0.2%2C0.8%2C0.3%2C1.8%2C0.5%2C2.8%20c0.3%2C1%2C0.6%2C2.1%2C0.9%2C3.2c0.3%2C1.1%2C0.9%2C2.3%2C1.4%2C3.5c0.5%2C1.2%2C1.2%2C2.4%2C1.8%2C3.7c0.3%2C0.6%2C0.8%2C1.2%2C1.2%2C1.9c0.4%2C0.6%2C0.8%2C1.3%2C1.3%2C1.9%20c1%2C1.2%2C1.9%2C2.6%2C3.1%2C3.7c2.2%2C2.5%2C5%2C4.7%2C7.9%2C6.7c3%2C2%2C6.5%2C3.4%2C10.1%2C4.6c3.6%2C1.1%2C7.5%2C1.5%2C11.2%2C1.6c4-0.1%2C7.7-0.6%2C11.3-1.6%20c3.6-1.2%2C7-2.6%2C10-4.6c3-2%2C5.8-4.2%2C7.9-6.7c1.2-1.2%2C2.1-2.5%2C3.1-3.7c0.5-0.6%2C0.9-1.3%2C1.3-1.9c0.4-0.6%2C0.8-1.3%2C1.2-1.9%20c0.6-1.3%2C1.3-2.5%2C1.8-3.7c0.5-1.2%2C1-2.4%2C1.4-3.5c0.3-1.1%2C0.6-2.2%2C0.9-3.2c0.2-1%2C0.4-1.9%2C0.5-2.8c0.1-0.4%2C0.1-0.8%2C0.2-1.2%20c0-0.4%2C0.1-0.7%2C0.1-1.1c0.1-0.7%2C0.1-1.2%2C0.2-1.7C90%2C50.5%2C90%2C50%2C90%2C50s0%2C0.5%2C0%2C1.4c0%2C0.5%2C0%2C1%2C0%2C1.7c0%2C0.3%2C0%2C0.7%2C0%2C1.1%20c0%2C0.4-0.1%2C0.8-0.1%2C1.2c-0.1%2C0.9-0.2%2C1.8-0.4%2C2.8c-0.2%2C1-0.5%2C2.1-0.7%2C3.3c-0.3%2C1.2-0.8%2C2.4-1.2%2C3.7c-0.2%2C0.7-0.5%2C1.3-0.8%2C1.9%20c-0.3%2C0.7-0.6%2C1.3-0.9%2C2c-0.3%2C0.7-0.7%2C1.3-1.1%2C2c-0.4%2C0.7-0.7%2C1.4-1.2%2C2c-1%2C1.3-1.9%2C2.7-3.1%2C4c-2.2%2C2.7-5%2C5-8.1%2C7.1%20c-0.8%2C0.5-1.6%2C1-2.4%2C1.5c-0.8%2C0.5-1.7%2C0.9-2.6%2C1.3L66%2C87.7l-1.4%2C0.5c-0.9%2C0.3-1.8%2C0.7-2.8%2C1c-3.8%2C1.1-7.9%2C1.7-11.8%2C1.8L47%2C90.8%20c-1%2C0-2-0.2-3-0.3l-1.5-0.2l-0.7-0.1L41.1%2C90c-1-0.3-1.9-0.5-2.9-0.7c-0.9-0.3-1.9-0.7-2.8-1L34%2C87.7l-1.3-0.6%20c-0.9-0.4-1.8-0.8-2.6-1.3c-0.8-0.5-1.6-1-2.4-1.5c-3.1-2.1-5.9-4.5-8.1-7.1c-1.2-1.2-2.1-2.7-3.1-4c-0.5-0.6-0.8-1.4-1.2-2%20c-0.4-0.7-0.8-1.3-1.1-2c-0.3-0.7-0.6-1.3-0.9-2c-0.3-0.7-0.6-1.3-0.8-1.9c-0.4-1.3-0.9-2.5-1.2-3.7c-0.3-1.2-0.5-2.3-0.7-3.3%20c-0.2-1-0.3-2-0.4-2.8c-0.1-0.4-0.1-0.8-0.1-1.2c0-0.4%2C0-0.7%2C0-1.1c0-0.7%2C0-1.2%2C0-1.7C10%2C50.5%2C10%2C50%2C10%2C50z%22%20fill%3D%22%23013138%22%20filter%3D%22url(%23uil-ring-shadow)%22%3E%3CanimateTransform%20attributeName%3D%22transform%22%20type%3D%22rotate%22%20from%3D%220%2050%2050%22%20to%3D%22360%2050%2050%22%20repeatCount%3D%22indefinite%22%20dur%3D%221s%22%3E%3C%2FanimateTransform%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
+            content: '';
+            height: 14px;
+            width: 14px; }
+
+        .inspire-tree > ol {
+            position: relative; }
+
+        .inspire-tree .wholerow {
+            height: 25px;
+            left: 0;
+            margin-top: -25px;
+            position: absolute;
+            width: 100%;
+            z-index: 1; }
+
+        .inspire-tree .focused:not(.selected) > .wholerow {
+            outline: 1px dotted black; }
+
+        .inspire-tree .title-wrap:hover + .wholerow {
+            background: rgba(218, 250, 255, 0.5); }
+
+        .inspire-tree .selected > .wholerow,
+        .inspire-tree .selected > .title-wrap:hover + .wholerow {
+            background: rgba(164, 234, 245, 0.5); }
+
+        .inspire-tree .matched > .wholerow,
+        .inspire-tree .matched > .title-wrap:hover + .wholerow {
+            background: rgba(247, 255, 170, 0.5); }
+
+        .main {
+            width: 100%;
+            background: #eee;
+        }
+
+
+
+
+
+
+
+
+        /*General Menu Styling*/
+        .mainnav {
+            margin: 0 auto;
+            font-family: sans-serif;
+            font-size: 14px;
+            padding-inline-start: 0px;
+            opacity: 0.7;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        li a {
+            text-decoration: none;
+        }
+
+        .dropdown {
+            position: absolute;
+            width: 50px;
+            top: 30px;
+            opacity: 0;
+            visibility: hidden;
+            transition: ease-out .35s;
+            -moz-transition: ease-out .35s;
+            -webkit-transition: ease-out .35s;
+            z-index: 1001;
+        }
+
+        .mainnav li {
+            float: left;
+            padding: 5px;
+            border-left: 1px dotted #fff;
+            background-color: black;
+            /*opacity: 0.7;*/
+            color: #fff;
+        }
+
+        .mainnav li:first-child {
+            border: none;
+        }
+
+        .mainnav li a {
+            display: block;
+            padding: 2px 20px;
+            color: #fff;
+            font-family: arial;
+        }
+
+        .mainnav li:hover {
+            background: #0000FF;
+            color: #fff;
+            opacity: 1;
+            transition: ease-in .35s;
+            -moz-transition: ease-in .35s;
+            -webkit-transition: ease-in .35s;
+        }
+
+        .mainnav li:hover a {
+            color: white;
+            transition: ease-in .35s;
+            -moz-transition: ease-in .35s;
+            -webkit-transition: ease-in .35s;
+        }
+        /*First Level*/
+        .subs {
+            left: -45px;
+            position: relative;
+            top: 0px;
+            /*width: 175px;*/
+            width: 125px;
+            border-left: none !important;
+            border-bottom: 1px dotted #fff !important;
+        }
+
+        .subs:last-child {
+            border: none !important;
+        }
+
+        .hassubs:hover .dropdown, .hassubs .hassubs:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transition: ease-in .35s;
+            -moz-transition: ease-in .35s;
+            -webkit-transition: ease-in .35s;
+        }
+
+        .mainnav li:hover ul a, .mainnav li:hover ul li ul li a {
+            color: white;
+        }
+
+        .mainnav li ul li:hover, .mainnav li ul li ul li:hover {
+            /*background: #fff;*/
+            transition: ease-in-out .35s;
+            -moz-transition: ease-in-out .35s;
+            -webkit-transition: ease-in-out .35s;
+        }
+
+        .mainnav li ul li:hover a, .mainnav li ul li ul li:hover a {
+            color: white;
+            transition: ease-in-out .35s;
+            -moz-transition: ease-in-out .35s;
+            -webkit-transition: ease-in-out .35s;
+        }
+
+        /*Second Level*/
+        .hassubs .hassubs .dropdown .subs {
+            left: -25px;
+            position: relative;
+            width: 115px;
+            top: 0px;
+        }
+
+        .hassubs .hassubs .dropdown {
+            position: absolute;
+            width: 150px;
+            left: 120px;
+            top: 0px;
+            opacity: 0;
+            visibility: hidden;
+            transition: ease-out .35s;
+            -moz-transition: ease-out .35s;
+            -webkit-transition: ease-out .35s;
+        }
+
+        button:focus {
+            outline: 0 !important;
+        }
+
+        .hamburger {
+            padding: 15px 15px;
+            display: inline-block;
+            cursor: pointer;
+            transition-property: opacity, filter;
+            transition-duration: 0.15s;
+            transition-timing-function: linear;
+            font: inherit;
+            color: inherit;
+            text-transform: none;
+            background-color: transparent;
+            border: 0;
+            margin: 0;
+            overflow: visible;
+            position: absolute;
+        }
+        .hamburger:hover {
+            opacity: 0.7; }
+        .hamburger.is-active:hover {
+            opacity: 0.7; }
+        .hamburger.is-active .hamburger-inner,
+        .hamburger.is-active .hamburger-inner::before,
+        .hamburger.is-active .hamburger-inner::after {
+            background-color: #fff; }
+
+        .hamburger-box {
+            width: 40px;
+            height: 24px;
+            display: inline-block;
+            position: relative; }
+
+        .hamburger-inner {
+            display: block;
+            top: 50%;
+            margin-top: -2px;
+            margin-left: -2px; }
+        .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+            width: 30px;
+            height: 4px;
+            background-color: #000;
+            border-radius: 4px;
+            position: absolute;
+            transition-property: transform;
+            transition-duration: 0.15s;
+            transition-timing-function: ease; }
+        .hamburger-inner::before, .hamburger-inner::after {
+            content: "";
+            display: block; }
+        .hamburger-inner::before {
+            top: -10px; }
+        .hamburger-inner::after {
+            bottom: -10px; }
+
+        /*
+           * 3DX
+           */
+        .hamburger--3dx .hamburger-box {
+            perspective: 80px;
+        }
+
+        .hamburger--3dx .hamburger-inner {
+            transition: transform 0.15s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .hamburger--3dx .hamburger-inner::before, .hamburger--3dx .hamburger-inner::after {
+            transition: transform 0s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .hamburger--3dx.is-active .hamburger-inner {
+            background-color: transparent !important;
+            transform: rotateY(180deg);
+        }
+
+        .hamburger--3dx.is-active .hamburger-inner::before {
+            transform: translate3d(0, 10px, 0) rotate(45deg);
+        }
+
+        .hamburger--3dx.is-active .hamburger-inner::after {
+            transform: translate3d(0, -10px, 0) rotate(-45deg);
+        }
+
+
+    </style>
+</head>
+<body id="body" class="full-screen">
+
+<!-- Please don't remove it -->
+<!--<script type="text/javascript" src="http://static.ieecloud.com/js/ieecloud-viewer.js-0.0.0.min.js?t=" + Date.now()></script>-->
+
+<!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
+<script type="text/javascript" src="<%= file %>"></script>
+<% }); %>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.0/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.0.2/jszip-utils.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.10/pako.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.10/pako_inflate.min.js"></script>
+
+<div id="viewer-wrapper" class="viewer-full-screen">
+    <div style="position: relative;
+    z-index: 1000;
+    /*background-color: black;*/
+    opacity: 0.7;
+    /*border-bottom: 1px dotted #fff*/
+    ">
+
+
+
+        <button class="hamburger hamburger--3dx" type="button">
+                 <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                 </span>
+        </button>
+
+
+        <!--<ul class="mainnav">-->
+        <!--<li class="hassubs"><a href="#">File</a>-->
+        <!--<ul class="dropdown">-->
+        <!--<li class="subs"><a href="#" id="loadModel">Load model</a></li>-->
+        <!--</ul>-->
+        <!--</li>-->
+        <!--&lt;!&ndash;<li class="hassubs"><a href="#">Edit</a>&ndash;&gt;-->
+        <!--&lt;!&ndash;<ul class="dropdown">&ndash;&gt;-->
+        <!--&lt;!&ndash;<li class="subs"><a href="#">Undo</a></li>&ndash;&gt;-->
+        <!--&lt;!&ndash;<li class="subs"><a href="#">Redo</a></li>&ndash;&gt;-->
+        <!--&lt;!&ndash;</ul>&ndash;&gt;-->
+        <!--&lt;!&ndash;</li>&ndash;&gt;-->
+        <!--<li class="hassubs"><a href="#">View</a>-->
+        <!--<ul class="dropdown">-->
+        <!--<li class="subs"><a href="#" id="toggleMenu">Tree</a></li>-->
+        <!--</ul>-->
+        <!--</li>-->
+        <!--<li class="hassubs"><a href="#">Result</a>-->
+        <!--<ul class="dropdown">-->
+        <!--<li class="subs hassubs"><a href="#">Isolines</a>-->
+        <!--<ul class="dropdown">-->
+        <!--<li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>-->
+        <!--<li class="subs"> <select id="selectTexture" name="selectTexture"></select></li>-->
+        <!--</ul>-->
+        <!--</li>-->
+        <!--<li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>-->
+        <!--</ul>-->
+        <!--</li>-->
+        <!--<li class="hassubs"><a href="#">Nearest</a>-->
+        <!--<ul class="dropdown">-->
+        <!--<li class="subs hassubs"><a href="#">Mode</a>-->
+        <!--<ul class="dropdown">-->
+        <!--<li class="subs"><a href="#" id="meshesMode">Meshes</a></li>-->
+        <!--<li class="subs"><a href="#" id="linesMode">Lines</a></li>-->
+        <!--</ul>-->
+        <!--</li>-->
+        <!--</ul>-->
+        <!--</li>-->
+        <!--</ul>-->
+        <!--<br style="clear: both;">-->
+
+
+
+
+
+
+        <!--<button id="showTree" class="btn">Show Tree</button>-->
+        <!--<button id="hideTree" class="btn">Hide Tree</button>-->
+
+
+        <!--<button id="loadModel" class="btn">Load Model</button>-->
+        <!--<button id="removeModel" class="btn">Remove Model</button>-->
+
+        <!--<button id="showRulerBtn" class="btn">Ruler</button>-->
+        <!--<button id="showProtractorVBtn" class="btn">Protractor V</button>-->
+        <!--<button id="showProtractorHBtn" class="btn">Protractor H</button>-->
+        <!--<button id="exitFromFullScreen" class="btn">Exit from full screen</button>-->
+        <!--<button id="addIsolines" class="btn">Add Isolines </button>-->
+        <!--<button id="removeIsolines" class="btn">Remove Isolines </button>-->
+        <!--<select id="selectMode" name="selectMode">-->
+        <!--<option value=""></option>-->
+        <!--<option value="MESHES" selected='selected'>MESHES</option>-->
+        <!--<option value="LINES">LINES</option>-->
+        <!--</select>-->
+        <!--<select id="selectTexture" name="selectTexture"></select>-->
+        <!--<button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>-->
+        <!--<button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>-->
+        <!--<button id="takeScreenShort" class="btn">Take Screen Shot</button>-->
+        <!--<button id="saveScreenShot" class="btn">Save Screen Shot</button>-->
+        <!--<button id="returnToImageViewBtn" class="btn">Return to image view</button>-->
+        <!--<button id="changeImageBtn" class="btn">Change Image</button>-->
+        <!--<input id="modeInput"/>-->
+        <!--<button id="setModeBtn" class="btn">Set Mode</button>-->
+        <!--<button id="attachToNewDiv" class="btn">Attach to new div</button>-->
+        <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
+        <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
+
+
+    </div>
+
+
+    <div id="tree-wrapper" class="tree-wrapper">
+        <div class="tree-wrapper-inner">
+            <div class="tree-menu">
+                <div class="tree-menu-panel">
+                    <h3>Model</h3>
+                    <button id="loadModel" class="btn">Load</button>
+                    <button id="saveScreenShot" class="btn">ScreenShot</button>
+                    <button id="saveModelPositionBtn" class="btn">Save Position</button>
+                </div>
+
+                <div class="tree-menu-panel">
+                    <h3>Results</h3>
+                    <div class="action-panel">
+                        <button id="removeAllResultsBtn" class="btn" style="width:100%">Remove</button>
+                    </div>
+                    <div class="action-panel-inner">
+                        <h4>Nearest search mode</h4>
+                        <select id="selectMode" name="selectMode">
+                            <option value=""></option>
+                            <option value="MESHES" selected='selected'>MESHES</option>
+                            <option value="LINES">LINES</option>
+                        </select>
+                    </div>
+                    <div class="action-panel-inner">
+                        <h4>Isolines</h4>
+                        <select id="toggleIsolines" name="toggleIsolines">
+                            <option value="ON" selected='selected'>ON</option>
+                            <option value="OFF">OFF</option>
+                        </select>
+                        <select id="selectTexture" name="selectTexture"></select>
+                    </div>
+
+                </div>
+
+                <div class="tree-menu-panel">
+                    <h3>Tree</h3>
+                    <div class="action-panel">
+                        <button id="selectAllTree" class="btn">Select All</button>
+                        <button id="deselectAllTree" class="btn">Deselect All</button>
+                    </div>
+                    <div class="action-panel">
+                        <input style="width:50%" type="text" id="search-input"/>
+                        <button id="select-btn" class="btn">Select</button>
+                        <button id="deselect-btn" class="btn">Deselect</button>
+                    </div>
+                </div>
+                <div class="tree-menu-panel">
+                    <input type="radio" name="filterBy" id="all-filter" checked value="ALL"/> All
+                    <input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges
+                    <input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces
+                </div>
+            </div>
+            <div class="tree"></div>
+        </div>
+    </div>
+
+    <div id="viewer" class="viewer"></div>
+</div>
+
+
+
+
+<script>
+
+    window.THREE.ImageUtils.crossOrigin = '';
+
+    var tree;
+    $("#tree-wrapper").hide();
+
+    var $hamburger = $(".hamburger");
+    $hamburger.on("click", function(e) {
+        $hamburger.toggleClass("is-active");
+        $("#tree-wrapper").toggle();
+    });
+
+    var textures = [
+        {id:"1" , name: "cs-red-blue", type: "url", default:true, nColors:5, data:"http://static.ieecloud.com/images/cs-red.png"},
+        {id:"2" , name: "cs-blue-red", type: "url", default:false, nColors:5, data:"http://static.ieecloud.com/images/cs-blue.png"},
+        {id:"3" , name: "cs-rainbow1", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow1.jpg"},
+        {id:"4" , name: "cs-rainbow2", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow2.jpg"},
+        {id:"5" , name: "cs-rainbow3", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow3.png"},
+        {id:"6" , name: "cs-rainbow4", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow4.png"},
+        {id:"7" , name: "cs-coolwarm", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/coolwarm.png"},
+        {id:"8" , name: "cs-warmcool", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/warmcool.png"}
+    ];
+    initDropdownTextures('selectTexture', getParameterValue("texture", undefined));
+
+    $("#viewer").ieecloudEditor({
+        id: getParameterValue("id", "1"),
+        textureUrl: getParameterValue("textureUrl", "http://static.ieecloud.com/images/"),
+        texture: getParameterValue("texture", undefined),
+        textures: textures,
+        mode: getParameterValue("mode", "3d_point"),
+        resultDigits: getParameterValue("resultDigits", 3),
+        drawResults: getParameterValue("drawResults", true),
+        gridVisible: getParameterValue("gridVisible", false),
+        axisVisible: getParameterValue("axisVisible", false),
+        resultColor: getParameterValue("resultColor", "white"),
+        resultTextColor: getParameterValue("resultTextColor", "white"),
+        sceneBackgroundColor: getParameterValue("sceneBackgroundColor", "white"),
+        infoTextColor: getParameterValue("infoTextColor", "black"),
+        backgroundColor: getParameterValue("backgroundColor", "#aaa"),
+        nearestPointColor: getParameterValue("nearestPointColor", "red"),
+        resultPointColor: getParameterValue("resultPointColor", "white"),
+        resultPointSize: getParameterValue("resultPointSize", 0.005),
+        searchNearestPointMode: getParameterValue("searchNearestPointMode", "MESHES"),
+        //rotationScale: {fov:0.35082010187266344, position: {x: 35.06093200951128, y: -87.23789463891883, z: 136.7042316558606}},
+        rotationScale: getRotationScale("rotationScale", {fov:0.35082010187266344, position: {x: 35.06093200951128, y: -87.23789463891883, z: 136.7042316558606}}),
+        detailModelView: getParameterValue("detailModelView", false),
+        onTreeLoad:function(treeData){
+            var tData = treeData.children;
+            if(!tree){
+                tree = new InspireTree({
+                    selection: {
+                        mode: 'checkbox'
+                    },
+                    data: tData
+                });
+                new InspireTreeDOM(tree, {
+                    target: '.tree'
+                });
+
+                tree.nodes().select();
+
+                tree.on('node.checked', function(node, event) {
+                    if(node.object){
+                        $("#viewer").ieecloudEditor("showObject", node.object);
+                    }
+
+                });
+
+                tree.on('node.unchecked', function(node, event) {
+                    if(node.object){
+                        $("#viewer").ieecloudEditor("hideObject", node.object);
+                    }
+
+                });
+
+                let toggleNodes = (funcBeforeDoName , funcDoName) => {
+                    var queryString = $("#search-input").val();
+                    var filterValue = $('input[name="filterBy"]').filter(':checked').val();
+                    let query = new RegExp(queryString, 'i');
+                    let predicate = (node) => {
+                        return query.test(node.text);
+                    };
+
+                    let filterPredicate = (node, filterValue) => {
+                        return _.endsWith(node.text, filterValue);
+                    };
+
+                    tree.model.recurseDown((node) => {
+                        if (!node.removed()) {
+                        if (predicate(node)) {
+                            node[funcDoName]();
+                            if (filterValue !== 'ALL') {
+                                node.recurseDown((nodeInner) => {
+                                    if (!nodeInner.removed()) {
+                                    nodeInner[funcBeforeDoName]();
+                                    if (filterPredicate(nodeInner, filterValue)) {
+                                        nodeInner[funcDoName]()
+                                    }
+                                }
+                            });
+                            }
+                        }
+                    }
+                });
+                };
+
+                $("#deselect-btn").on('click', function(event) {
+                    toggleNodes("select", "deselect");
+                });
+
+                $("#select-btn").on('click', function(event) {
+                    toggleNodes("deselect", "select");
+                });
+
+            }
+        },
+        onSelect3dPoint: function (point) {
+        },
+        onSaveModelPosition: function(modelPosition){
+            console.log(modelPosition);
+        },
+        onPrintScreenDone: function (urlRenderer) {
+            console.log(urlRenderer);
+
+            var dataJson = '{"name":"descript.ion","path":"descript.ion","type":"file","format":"base64","content":"Ny16aXAuY2htIDctWmlwIEhlbHANCjctWmlwLmRsbCA3LVppcCBQbHVnaW4NCjd6LmRsbCA3LVppcCBFbmdpbmUNCjd6LmV4ZSA3LVppcCBDb25zb2xlIA0KN3ouc2Z4IDctWmlwIEdVSSBTRlgNCjd6Q29uLnNmeCA3LVppcCBDb25zb2xlIFNGWA0KN3pGTS5leGUgNy1aaXAgRmlsZSBNYW5hZ2VyDQo3emcuZXhlIDctWmlwIEdVSQ0KZGVzY3JpcHQuaW9uIDctWmlwIEZpbGUgRGVzY3JpcHRpb25zDQpoaXN0b3J5LnR4dCA3LVppcCBIaXN0b3J5DQpMYW5nIDctWmlwIFRyYW5zbGF0aW9ucw0KbGljZW5zZS50eHQgNy1aaXAgTGljZW5zZQ0KcmVhZG1lLnR4dCA3LVppcCBPdmVydmlldw0K"}';
+
+            var dataJson1 = {
+                name:"descript.ion",
+                path:"descript.ion",
+                type:"file",
+                format:"base64",
+                content:urlRenderer
+            };
+
+            $.ajax({
+                url: 'http://notebook.ieecloud.com:8888/api/contents/test3.txt',
+                type: 'PUT',
+                beforeSend: function(request) {
+                    request.setRequestHeader("Cookie", '_xsrf=2|1dd65df0|648aafe1bdf3f416f1110b055dd72588|1522481551; username-notebook-ieecloud-com-8888="2|1:0|10:1522868735|35:username-notebook-ieecloud-com-8888|44:ODY5NDgwNzNhNzIzNGJkNjg3MDk0MDAzODI3ZDRlNjg=|f3503f7310c00807026e40bac979768ebbc6c844ac5c65a74ff6e2cfe61c9018"');
+                    request.setRequestHeader("X-XSRFToken", '2|1dd65df0|648aafe1bdf3f416f1110b055dd72588|1522481551');
+                },
+                data: JSON.stringify(dataJson1),
+                success: function(data) {
+                    alert('Load was performed.');
+                }
+            });
+        }
+    });
+
+    $("#attachToNewDiv").click(function () {
+        $("#viewer").ieecloudEditor('removeModel');
+        var options = {
+            textureUrl: "http://static.ieecloud.com/images/",
+            mode: "3d_point",
+            resultDigits: 2,
+            drawResults: true,
+            gridVisible: false,
+            detailModelView: false,
+            resultColor: "white",
+            backgroundColor: "#d4d4d4",
+            resultTextColor: "white",
+            id: "1"
+        };
+        $("#viewer").ieecloudEditor('attachTo', document.getElementById("viewer2"), options);
+    });
+
+
+    $("#removeAllResultsBtn").click(function () {
+        $("#viewer").ieecloudEditor('removeSelectedResults');
+    });
+
+    $("#showRulerBtn").click(function () {
+        $("#viewer").ieecloudEditor('showRuler', true);
+    });
+
+    $("#showProtractorVBtn").click(function () {
+        $("#viewer").ieecloudEditor('showVProtractor', true);
+    });
+
+    $("#showProtractorHBtn").click(function () {
+        $("#viewer").ieecloudEditor('showHProtractor', true);
+    });
+
+    $("#setModeBtn").click(function () {
+        $("#viewer").ieecloudEditor('setMode', $("#modeInput").val());
+    });
+
+    $("#setSearchNearestModeOctreeBtn").click(function () {
+        $("#viewer").ieecloudEditor('toggleSearchNearestMode', true);
+    });
+
+    $("#setSearchNearestModeSimpleBtn").click(function () {
+        $("#viewer").ieecloudEditor('toggleSearchNearestMode', false);
+    });
+
+    $("#takeScreenShort").click(function () {
+        $("#viewer").ieecloudEditor('printScreen', "printScreen.png");
+    });
+
+    $("#saveScreenShot").click(function () {
+        $("#viewer").ieecloudEditor('printScreen', "printScreen.png");
+    });
+
+
+    $("#toggleIsolines").change(function () {
+
+        var e = document.getElementById("toggleIsolines");
+        var value = e.options[e.selectedIndex].value;
+        var bValue = false;
+        if(value === "ON"){
+            bValue = true;
+        }
+
+        $("#viewer").ieecloudEditor('toggleIsolines', bValue);
+    });
+
+
+    $("#saveModelPositionBtn").click(function () {
+        $("#viewer").ieecloudEditor('saveModelPosition');
+    });
+
+    $("#removeModel").click(function () {
+        $("#viewer").ieecloudEditor('removeModel');
+    });
+
+    $("#showTree").click(function () {
+        $("#tree-wrapper").show();
+    });
+
+    $("#hideTree").click(function () {
+        $("#tree-wrapper").hide();
+    });
+
+    $("#toggleMenu").click(function () {
+        $("#tree-wrapper").toggle();
+    });
+
+
+    $("#selectAllTree").click(function () {
+        $("#viewer").ieecloudEditor('turnAllMode');
+        tree['recurseDown'](function (node) {
+            node._tree.batch();
+            node.state("checked", true);
+            if(node.object){
+                $("#viewer").ieecloudEditor("preShowObject", node.object);
+            }
+            node.markDirty();
+            node._tree.end();
+
+        });
+
+        $("#viewer").ieecloudEditor('toggleWholeModel', true);
+    });
+
+
+    $("#deselectAllTree").click(function () {
+        $("#viewer").ieecloudEditor('turnAllMode');
+        tree['recurseDown'](function (node) {
+            node._tree.batch();
+            node.state("checked", false);
+            if(node.object){
+                $("#viewer").ieecloudEditor("preHideObject", node.object);
+            }
+            node.markDirty();
+            node._tree.end();
+
+        });
+
+        $("#viewer").ieecloudEditor('toggleWholeModel', false);
+    });
+
+    // Not remove it. It's used in Jupyter.
+    $.ajaxSetup({
+        async: false
+    });
+    //$.getJSON('http://static.ieecloud.com/data/test/small_box.json?t=' + Date.now(), function(json) {
+    //    $.getJSON(getParameterByName('dataUrl'), function (json) {
+    //        $("#viewer").ieecloudEditor('reloadModel', json);
+    //    });
+
+    // load_json(getParameterValue("data") + ".js", function(){
+    //     $("#viewer").ieecloudEditor('reloadModel', data);
+    // });
+
+
+    function getFloat(array) {
+        var view = new DataView(new ArrayBuffer(8));
+        array.forEach(function (b, i) {
+            view.setUint8(i, b);
+        });
+        return view.getFloat64(0);
+    }
+
+    function load_binary_resource(url, ieeVar) {
+
+        //
+        // var byteArray = [];
+        // var req = new XMLHttpRequest();
+        // req.open('GET', url, false);
+        // req.overrideMimeType('text\/plain; charset=x-user-defined');
+        // req.send(null);
+        // if (req.status != 200) return byteArray;
+        //
+        // var startTime = new Date().getTime();
+        // for (var i = 0; i < req.responseText.length; ++i) {
+        //     byteArray.push(req.responseText.charCodeAt(i) & 0xff)
+        // }
+        // console.log(ieeVar + ": " + (new Date().getTime() - startTime));
+        //
+        // i = 0;
+        // result = [];
+        //
+        // var startTime = new Date().getTime();
+        // while (i < byteArray.length) {
+        //     result.push(getFloat(byteArray.slice(i, i + 8)));
+        //     i += 8;
+        // }
+        //
+        // window[ieeVar] = byteArray;
+        //
+        // console.log(ieeVar + ": " + (new Date().getTime() - startTime));
+
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", url, true);
+        oReq.responseType = "arraybuffer";
+        oReq.onload = function (oEvent) {
+            var arrayBuffer = oReq.response; // Note: not oReq.responseText
+            if (arrayBuffer) {
+
+                var startTime = new Date().getTime();
+                var dataview = new DataView(arrayBuffer);
+                var ints = new Float64Array(arrayBuffer.byteLength / 8);
+                for (var i = 0; i < ints.length; i++) {
+                    ints[i] = dataview.getFloat64(i * 8);
+                }
+
+                window[ieeVar] = ints;
+                console.log(ieeVar + ": " + (new Date().getTime() - startTime));
+
+                // console.log("ints: " +ints )
+                //window[ieeVar] = new Float64Array(arrayBuffer);
+            }
+        };
+
+        oReq.send(null);
+
+
+        // var request = new XMLHttpRequest();
+        //
+        // request.open( 'GET', url, true );
+        // request.responseType = 'arraybuffer';
+        //
+        // request.onload = function() {
+        //     //processConcatenatedFile( request.response );
+        //     callback( request.response );
+        // };
+        //
+        // request.send();
+
+
+        // var byteArray = [];
+        // var req = new XMLHttpRequest();
+        // req.open('GET', url, false);
+        // // req.responseType = 'arraybuffer';
+        // // req.responseType = 'arraybuffer';
+        //
+        // // req.overrideMimeType('text\/plain; charset=x-user-defined');
+        // req.send(null);
+        // if (req.status != 200) return byteArray;
+        // // for (var i = 0; i < req.responseText.length; ++i) {
+        // //     byteArray.push(req.responseText.charCodeAt(i) & 0xff)
+        // // }
+        //
+        // var buffer = req.response;
+        //
+        // return buffer;
+    }
+
+    positions_iee = undefined;
+    normals_iee = undefined;
+    uvs_iee = undefined;
+    line_positions_iee = undefined;
+    all_iee = undefined;
+
+    function callback1(data) {
+        console.log(data);
+        positions_iee = new Float64Array(data);
+        console.log(positions_iee);
+    }
+
+    function zipFileRead(zip, fileName, ieeVar) {
+
+        // zip.file(fileName).internalStream("arraybuffer")
+        //     .on("data", function (data) {
+        //         window[ieeVar] = data;
+        //     })
+        //     .on("error", function (e) {
+        //     })
+        //     .on("end", function () {
+        //     })
+
+        zip.file(fileName).async("arraybuffer").then(
+            function success(content) {
+                // console.log(content);
+
+                var startTime = new Date().getTime();
+                var dataview = new DataView(content);
+                var ints = new Float64Array(content.byteLength / 8);
+                for (var i = 0; i < ints.length; i++) {
+                    ints[i] = dataview.getFloat64(i * 8);
+                }
+                window[ieeVar] = ints;
+                console.log("unzipped file: " + ieeVar + ": " + (new Date().getTime() - startTime));
+
+                console.log("unzipped file startTime_load_binary_resource2: " + ieeVar + ": " + (new Date().getTime() - startTime_load_binary_resource2));
+
+            },
+            function error(e) {
+                // handle the error↵});"
+            });
+    }
+
+    // https://stuk.github.io/jszip/documentation/howto/read_zip.html
+    function load_binary_resource2(url) {
+        JSZipUtils.getBinaryContent(url, function(err, data) {
+            if(err) {
+                throw err; // or handle err
+            }
+
+            var startTime = new Date().getTime();
+            JSZip.loadAsync(data).then(function (zip) {
+                console.log("unzip finish: " + url + " time:" + (new Date().getTime() - startTime));
+                // ...
+                console.log("zip:" + zip);
+
+                zipFileRead(zip, "positions.iee", "positions_iee");
+                zipFileRead(zip, "normals.iee", "normals_iee");
+                zipFileRead(zip, "uvs.iee", "uvs_iee");
+                zipFileRead(zip, "line_positions.iee", "line_positions_iee");
+
+
+                // zip.file("positions.iee").async("arraybuffer").then(
+                //     function success(content) {
+                //         // console.log(content);
+                //         positions_iee = content;
+                //         },
+                //     function error(e) {
+                //         // handle the error↵});"
+                //     });
+                //
+                // zip.file("normals.iee").async("arraybuffer").then(
+                //     function success(content) {
+                //         // console.log(content);
+                //         normals_iee = content;
+                //     },
+                //     function error(e) {
+                //         // handle the error↵});"
+                //     });
+                //
+                // zip.file("uvs.iee").async("arraybuffer").then(
+                //     function success(content) {
+                //         // console.log(content);
+                //         uvs_iee = content;
+                //     },
+                //     function error(e) {
+                //         // handle the error↵});"
+                //     });
+                //
+                // zip.file("line_positions.iee").async("arraybuffer").then(
+                //     function success(content) {
+                //         // console.log(content);
+                //         line_positions_iee = content;
+                //     },
+                //     function error(e) {
+                //         // handle the error↵});"
+                //     });
+
+            });
+        });
+
+
+        // var xhr = new XMLHttpRequest();
+        // xhr.open('GET', '/path/to/image.png', true);
+        // xhr.responseType = 'blob';
+        //
+        // xhr.onload = function(e) {
+        //     if (this.status == 200) {
+        //         // Note: .response instead of .responseText
+        //         var blob = new Blob([this.response], {type: 'image/png'});
+        //     ...
+        //     }
+        // };
+        //
+        // xhr.send();
+
+
+        // JSZip.loadAsync(req.response).then(function (zip) {
+        //     return zip.file("path/to/file.txt").async("text");
+        // }).then(function (txt) {
+        //     console.log("the content is", txt);
+        // });
+        //
+        // return req.responseText;
+    }
+
+    function zipFileRead4(zip, fileName, ieeVar) {
+
+        // zip.file(fileName).internalStream("uint8array")
+        //     .on("data", function (data) {
+        //         window[ieeVar] = data;
+        //     })
+        //     .on("error", function (e) {
+        //     })
+        //     .on("end", function () {
+        //     });
+
+        zip.file(fileName).async("uint8array").then(
+            function success(contentIn) {
+                // console.log(content);
+
+                var startTime = new Date().getTime();
+                var content = pako.ungzip(contentIn);
+                console.log("pako.ungzip file: " + ieeVar + ": " + (new Date().getTime() - startTime));
+
+                content = content.buffer;
+
+                var startTime = new Date().getTime();
+                var dataview = new DataView(content);
+                var ints = new Float32Array(content.byteLength / 4);
+                for (var i = 0; i < ints.length; i++) {
+                    ints[i] = dataview.getFloat32(i * 4);
+                }
+                window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                console.log("unzipped file: " + ieeVar + ": " + (new Date().getTime() - startTime));
+
+                console.log("unzipped file startTime_load_binary_resource2: " + ieeVar + ": " + (new Date().getTime() - startTime_load_binary_resource2));
+
+            },
+            function error(e) {
+                // handle the error↵});"
+            });
+    }
+
+    function concatenate(resultConstructor, array1, array2) {
+
+        if(!array1) {
+            return array2;
+        }
+
+        // var totalLength = 0;
+        var totalLength =  array1.length + array2.length;
+        // for (var arr of arrays) {
+        //     totalLength += arr.length;
+        // }
+        var result = new resultConstructor(totalLength);
+        var offset = 0;
+        result.set(array1, offset);
+        offset += array1.length;
+        result.set(array2, offset);
+        // for (let arr of arrays) {
+        //     result.set(arr, offset);
+        //     offset += arr.length;
+        // }
+        return result;
+    }
+
+    function load_binary_resource4(url) {
+        JSZipUtils.getBinaryContent(url, function(err, data) {
+            if(err) {
+                throw err; // or handle err
+            }
+
+            var startTime = new Date().getTime();
+            JSZip.loadAsync(data).then(function (zip) {
+                console.log("unzip finish: " + url + " time:" + (new Date().getTime() - startTime));
+                // ...
+                console.log("zip:" + zip);
+                // zipFileRead4(zip, "all.gz", "all_iee");
+
+                // zipFileRead4(zip, "all.gz", "positions_iee");
+
+
+                zip.forEach(function (relativePath, file){
+                    // console.log("iterating over", file);
+
+                    var fileName = file.name;
+                    var ieeVar = file.name;
+
+                    // TODO parse view.json
+                    if(fileName.startsWith('view.json')) {
+
+                    }
+
+                    if(fileName.startsWith('positions')) {
+                        ieeVar = "positions_iee";
+                    } else if(fileName.startsWith('normals')) {
+                        ieeVar = "normals_iee";
+                    } else if(fileName.startsWith('uvs')) {
+                        ieeVar = "uvs_iee";
+                    } else if(fileName.startsWith('line_positions')) {
+                        ieeVar = "line_positions_iee";
+                    } else if(fileName.startsWith('all')) {
+                        ieeVar = "all";
+                    }
+
+                    file.async("uint8array").then(
+                        function success(contentIn) {
+                            // console.log(content);
+
+                            var startTime = new Date().getTime();
+                            var content = pako.ungzip(contentIn);
+                            console.log("pako.ungzip file: " + ieeVar + ": " + (new Date().getTime() - startTime));
+
+                            content = content.buffer;
+
+                            var startTime = new Date().getTime();
+
+                            if(ieeVar == "all") {
+
+                                // TODO
+                                // GET it from view.json
+                                var linePositionSize = 72;
+                                var positionsSize = 216;
+                                var normalsSize = 216;
+                                var uvsSize = 144;
+
+                                var dataview = new DataView(content);
+                                var currentIndex = 0;
+                                {
+                                    // fill line_positions_iee
+                                    ieeVar = "line_positions_iee";
+                                    var ints = new Float32Array(linePositionSize);
+                                    for (var i = 0; i < ints.length; i++) {
+                                        ints[i] = dataview.getFloat32(i * 4 + currentIndex);
+                                    }
+                                    window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    currentIndex = linePositionSize * 4;
+                                }
+
+                                {
+                                    // fill line_positions_iee
+                                    ieeVar = "line_positions_iee";
+                                    var ints = new Float32Array(positionsSize);
+                                    for (var i = 0; i < ints.length; i++) {
+                                        ints[i] = dataview.getFloat32(i * 4 + currentIndex);
+                                    }
+                                    window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    currentIndex = currentIndex + positionsSize * 4;
+                                }
+
+                                {
+                                    // fill line_positions_iee
+                                    ieeVar = "normals_iee";
+                                    var ints = new Float32Array(normalsSize);
+                                    for (var i = 0; i < ints.length; i++) {
+                                        ints[i] = dataview.getFloat32(i * 4 + currentIndex);
+                                    }
+                                    window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    currentIndex = currentIndex + normalsSize * 4;
+                                }
+
+                                {
+                                    // fill line_positions_iee
+                                    ieeVar = "uvs_iee";
+                                    var ints = new Float32Array(uvsSize);
+                                    for (var i = 0; i < ints.length; i++) {
+                                        ints[i] = dataview.getFloat32(i * 4 + currentIndex);
+                                    }
+                                    window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    currentIndex = currentIndex + uvsSize * 4;
+                                }
+                                console.log("currentIndex:" + currentIndex);
+                                console.log("dataview.byteLength:" + dataview.byteLength);
+
+
+                                console.log("unzipped file: " + ieeVar + ": " + (new Date().getTime() - startTime));
+                            } else {
+                                var dataview = new DataView(content);
+                                var ints = new Float32Array(content.byteLength / 4);
+                                for (var i = 0; i < ints.length; i++) {
+                                    ints[i] = dataview.getFloat32(i * 4);
+                                }
+                                window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                console.log("unzipped file: " + ieeVar + ": " + (new Date().getTime() - startTime));
+                            }
+
+                            console.log("unzipped file startTime_load_binary_resource2: " + ieeVar + ": " + (new Date().getTime() - startTime_load_binary_resource2));
+
+                        },
+                        function error(e) {
+                            // handle the error↵});"
+                        });
+
+
+                });
+                //
+                //
+                //
+                //     // zipFileRead4(zip, "positions_P325x7{CircularTubeSection}[E 210000000.0][rho 0][d 0.325][tw 0.007][position 0][z 0][alpha 0.0].gz", "positions_iee");
+                //     // zipFileRead4(zip, "normals_P325x7{CircularTubeSection}[E 210000000.0][rho 0][d 0.325][tw 0.007][position 0][z 0][alpha 0.0].gz", "normals_iee");
+                //     // zipFileRead4(zip, "uvs_P325x7{CircularTubeSection}[E 210000000.0][rho 0][d 0.325][tw 0.007][position 0][z 0][alpha 0.0].gz", "uvs_iee");
+                //     // zipFileRead4(zip, "line_positions_P325x7{CircularTubeSection}[E 210000000.0][rho 0][d 0.325][tw 0.007][position 0][z 0][alpha 0.0].gz", "line_positions_iee");
+                //     //
+                //     // zipFileRead4(zip, "positions_Progon_I_70x0.8_20x1.0{IShapeSection}[E 210000000.0][rho 0][b 0.2][h 0.72][tf 0.01][tw 0.008][position 0][z 0][alpha 0.0].gz", "positions_iee");
+                //     // zipFileRead4(zip, "normals_Progon_I_70x0.8_20x1.0{IShapeSection}[E 210000000.0][rho 0][b 0.2][h 0.72][tf 0.01][tw 0.008][position 0][z 0][alpha 0.0].gz", "normals_iee");
+                //     // zipFileRead4(zip, "uvs_Progon_I_70x0.8_20x1.0{IShapeSection}[E 210000000.0][rho 0][b 0.2][h 0.72][tf 0.01][tw 0.008][position 0][z 0][alpha 0.0].gz", "uvs_iee");
+                //     // zipFileRead4(zip, "line_positions_Progon_I_70x0.8_20x1.0{IShapeSection}[E 210000000.0][rho 0][b 0.2][h 0.72][tf 0.01][tw 0.008][position 0][z 0][alpha 0.0].gz", "line_positions_iee");
+            });
+        });
+
+    }
+
+
+    // var model = (function() {
+    //
+    //     return {
+    //         getEntries : function(file, onend) {
+    //             zip.createReader(new zip.BlobReader(file), function(zipReader) {
+    //                 zipReader.getEntries(onend);
+    //             }, onerror);
+    //         },
+    //         getEntryFile : function(entry, creationMethod, onend, onprogress) {
+    //             var writer, zipFileEntry;
+    //
+    //             function getData() {
+    //                 entry.getData(writer, function(blob) {
+    //                     var blobURL = creationMethod == "Blob" ? URL.createObjectURL(blob) : zipFileEntry.toURL();
+    //                     onend(blobURL);
+    //                 }, onprogress);
+    //             }
+    //
+    //             if (creationMethod == "Blob") {
+    //                 writer = new zip.BlobWriter();
+    //                 getData();
+    //             } else {
+    //                 createTempFile(function(fileEntry) {
+    //                     zipFileEntry = fileEntry;
+    //                     writer = new zip.FileWriter(zipFileEntry);
+    //                     getData();
+    //                 });
+    //             }
+    //         }
+    //     };
+    // })();
+
+    $("#loadModel").click(function () {
+//        $.getJSON("../resources/virtual_3D_objects.json", function (json) {
+//            $("#viewer").ieecloudEditor('reloadModel', json);
+//        });
+
+        startTime_load_binary_resource2 = new Date().getTime();
+        load_binary_resource4("../resources/bytes/box.zip");
+
+
+        // var positions = load_binary_resource("../resources/bytes/positions.iee", 'positions_iee');
+        // var normals = load_binary_resource("../resources/bytes/normals.iee", 'normals_iee');
+        // var uvs = load_binary_resource("../resources/bytes/uvs.iee", 'uvs_iee');
+        // var line_positions = load_binary_resource("../resources/bytes/line_positions.iee", 'line_positions_iee');
+
+        // positions_iee = new Float64Array(positions);
+        // normals_iee = new Float64Array(normals);
+        // uvs_iee = new Float64Array(uvs);
+        // line_positions_iee = new Float64Array(line_positions);
+
+        setTimeout(function() {
+
+            var xhr = new XMLHttpRequest();
+
+            var startTimeLoadJson = new Date().getTime();
+            xhr.onreadystatechange = function(){
+
+                if(this.readyState === 4 && this.status === 200){
+                    console.log("json load time: " + (new Date().getTime() - startTimeLoadJson));
+
+                    // startTimeLoadJson = new Date().getTime();
+                    // console.log("jsonData:" + this.response.pictureData.length);
+                    // console.log("json pictureData time: " + (new Date().getTime() - startTimeLoadJson));
+
+                    console.log("start json parse");
+                    var startTime = new Date().getTime();
+                    var data = JSON.parse(this.responseText);
+                    console.log("json parse time: " + (new Date().getTime() - startTime));
+
+                    var pictureData = data.pictureData;
+                    for (var i = 0; i < pictureData.length; i++) {
+                        var geometryObject = pictureData[i];
+                        geometryObject.lineGeometryData.positions = line_positions_iee;
+
+                        geometryObject.faceGeometryData.positions = positions_iee;
+                        geometryObject.faceGeometryData.normals = normals_iee;
+                        geometryObject.faceGeometryData.uvs = uvs_iee;
+                    }
+
+                    $("#viewer").ieecloudEditor('reloadModel', data);
+                }
+            };
+
+            xhr.onerror = function(){
+                console.log('there was an error:', this);
+            };
+
+            xhr.open('GET', "../resources/bytes/view.json", true);
+            xhr.send();
+
+        }, 4000);
+
+
+    });
+
+    $("#exitFromFullScreen").click(function () {
+        $("#viewer-wrapper").removeClass('viewer-full-screen');
+        $("#viewer-wrapper").addClass('viewer-small-screen');
+        $("#body").removeClass('full-screen');
+        $("#btn-wrapper-id").removeClass('btn-wrapper');
+        window.dispatchEvent(new Event('resize'));
+    });
+
+    $("#toFullScreen").click(function () {
+        $("#viewer-wrapper").addClass('viewer-full-screen');
+        $("#viewer-wrapper").removeClass('viewer-small-screen');
+        $("#body").addClass('full-screen');
+        $("#btn-wrapper-id").addClass('btn-wrapper');
+        window.dispatchEvent(new Event('resize'));
+    });
+
+    $("#selectMode").change(function () {
+        var e = document.getElementById("selectMode");
+        var value = e.options[e.selectedIndex].value;
+        $("#viewer").ieecloudEditor('setSearchNearestPointMode', value);
+    });
+
+    $("#selectTexture").change(function () {
+        var e = document.getElementById("selectTexture");
+        var value = e.options[e.selectedIndex].value;
+        $("#viewer").ieecloudEditor('setTexture', value);
+    });
+
+    function getCurrentTexture(textures, reqParamTextureName) {
+        var paramTexture;
+        var defaultTexture;
+        for (var i = 0; i < textures.length; i++) {
+            if(reqParamTextureName && reqParamTextureName == textures[i].name) {
+                paramTexture = textures[i];
+            }
+            if(textures[i].default) {
+                defaultTexture = textures[i];
+            }
+        }
+        return paramTexture ? paramTexture : defaultTexture;
+    }
+
+    function initDropdownTextures(id, reqParamTextureName) {
+        var select, option;
+        var currentTexture = getCurrentTexture(textures, reqParamTextureName);
+        select = document.getElementById( id );
+        for (var i = 0; i < textures.length; i++) {
+            option = document.createElement( 'option' );
+            option.value = textures[i].name;
+            option.text = textures[i].name;
+            if(textures[i].name == currentTexture.name) {
+                option.selected = 'selected';
+            }
+            select.add( option );
+        }
+    }
+
+    function getRotationScale() {
+
+        var position = getParameterByName("position");
+        if(position && position != 'None') {
+            return {position: {x:position[0], y: position[1], z: position[2]}};
+        }
+
+//        var rotY = getParameterByName("rotY");
+//        var rotZ = getParameterByName("rotZ");
+//
+//        rotX = rotX && rotX !== "" ? rotX : 48.22379092090737;
+//        rotY = rotY && rotY !== "" ? rotY : -38.052186013287574;
+//        rotZ = rotZ && rotZ !== "" ? rotZ : 154.37283345146167;
+
+//        return {position: {x:rotX, y: rotY, z: rotZ}}
+        return undefined;
+    }
+
+    //    textureUrl: undefined,
+    //        id: undefined,
+    //        mode: "3d_point",
+    //        resultDigits: 2,
+    //        drawResults: true,
+    //        gridVisible: false,
+    //        axisVisible: false,
+    //        resultTextColor: "black",
+    //        sceneBackgroundColor:"white",
+    //        infoTextColor:"black",
+    //        backgroundColor: "#aaa",
+    //        nearestPointColor: "red",
+    //        resultPointColor: "white",
+    //        resultPointSize: 0.005,
+    //        searchNearestPointMode: "MESHES"
+
+    function getParameterValue(name, defaultValue) {
+        var paramValue = getParameterByName(name);
+        if("position" == name) {
+            if(paramValue && paramValue != 'None') {
+                return {position: {x: paramValue[0], y: paramValue[1], z: paramValue[2]}};
+            } else {
+                return defaultValue;
+            }
+        }
+
+        return paramValue ? paramValue : defaultValue;
+    }
+
+    function getParameterByName( name ){
+        var regexS = "[\\?&]"+name+"=([^&#]*)",
+            regex = new RegExp( regexS ),
+            results = regex.exec( window.location.search );
+        if( results == null ){
+            return undefined;
+        } else{
+            return decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+    }
+
+    function load_json(src, onLoadCallback) {
+        var head = document.getElementsByTagName('head')[0];
+
+        //use class, as we can't reference by id
+        var element = head.getElementsByClassName("json")[0];
+
+        try {
+            element.parentNode.removeChild(element);
+        } catch (e) {
+            //
+        }
+
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = src;
+        script.className = "json";
+        script.async = false;
+        //script.onload = myParticularCallback;
+        script.addEventListener('load', onLoadCallback);
+        head.appendChild(script);
+
+        //call the postload function after a slight delay to allow the json to load
+        //window.setTimeout(postloadfunction, 100)
+    }
+
+</script>
+
+</body>
+</html>
