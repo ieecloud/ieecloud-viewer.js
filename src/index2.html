@@ -1479,7 +1479,7 @@
                         ieeVar = "uvs_iee";
                     } else if(fileName.startsWith('line_positions')) {
                         ieeVar = "line_positions_iee";
-                    } else if(fileName.startsWith('all')) {
+                    } else if(fileName.startsWith('data_')) {
                         ieeVar = "all";
                     }
 
@@ -1513,18 +1513,24 @@
                                     for (var i = 0; i < ints.length; i++) {
                                         ints[i] = dataview.getFloat32(i * 4 + currentIndex);
                                     }
-                                    window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    // window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    window[ieeVar] = ints;
+                                    console.log('all ' + ieeVar + " = " + ints.length);
+                                    console.log('all ' + ieeVar + " = " + ints);
                                     currentIndex = linePositionSize * 4;
                                 }
 
                                 {
                                     // fill line_positions_iee
-                                    ieeVar = "line_positions_iee";
+                                    ieeVar = "positions_iee";
                                     var ints = new Float32Array(positionsSize);
                                     for (var i = 0; i < ints.length; i++) {
                                         ints[i] = dataview.getFloat32(i * 4 + currentIndex);
                                     }
-                                    window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    // window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    window[ieeVar] = ints;
+                                    console.log('all ' + ieeVar + " = " + ints.length);
+                                    console.log('all ' + ieeVar + " = " + ints);
                                     currentIndex = currentIndex + positionsSize * 4;
                                 }
 
@@ -1535,7 +1541,10 @@
                                     for (var i = 0; i < ints.length; i++) {
                                         ints[i] = dataview.getFloat32(i * 4 + currentIndex);
                                     }
-                                    window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    // window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    window[ieeVar] = ints;
+                                    console.log('all ' + ieeVar + " = " + ints.length);
+                                    console.log('all ' + ieeVar + " = " + ints);
                                     currentIndex = currentIndex + normalsSize * 4;
                                 }
 
@@ -1546,7 +1555,10 @@
                                     for (var i = 0; i < ints.length; i++) {
                                         ints[i] = dataview.getFloat32(i * 4 + currentIndex);
                                     }
-                                    window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    // window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                    window[ieeVar] = ints;
+                                    console.log('all ' + ieeVar + " = " + ints.length);
+                                    console.log('all ' + ieeVar + " = " + ints);
                                     currentIndex = currentIndex + uvsSize * 4;
                                 }
                                 console.log("currentIndex:" + currentIndex);
@@ -1560,7 +1572,10 @@
                                 for (var i = 0; i < ints.length; i++) {
                                     ints[i] = dataview.getFloat32(i * 4);
                                 }
-                                window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                // window[ieeVar] = concatenate(Float32Array, window[ieeVar], ints);
+                                //window[ieeVar] = ints;
+                                console.log('individual ' + ieeVar + " = " + ints.length);
+                                console.log('individual ' + ieeVar + " = " + ints);
                                 console.log("unzipped file: " + ieeVar + ": " + (new Date().getTime() - startTime));
                             }
 
@@ -1682,7 +1697,7 @@
             xhr.open('GET', "../resources/bytes/view.json", true);
             xhr.send();
 
-        }, 4000);
+        }, 2000);
 
 
     });

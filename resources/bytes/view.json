@@ -32,6 +32,7 @@
 "positionsSize" : 216,
 "normalsSize" : 216,
 "uvsSize" : 144,
+"uuid" : "39a2fc0ad8794045aa7df14b036a2156",
 "pointsTable" : {"maxR" : 0.0,"minR" : 0.0,"tableSize" : 10,"table" : [[49],[],[],[],[],[],[],[],[],[48,51,53,50,52,55,54]]}
 }
 ],
