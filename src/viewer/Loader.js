@@ -476,6 +476,69 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     };
 
+
+    function convertBytesToGeometryMetadata(dataview, size, currentIndex) {
+        var ints = new Float32Array(size);
+        for (var i = 0; i < ints.length; i++) {
+            ints[i] = dataview.getFloat32(i * 4 + currentIndex);
+        }
+
+        return ints;
+    }
+
+    function parseGeometryObjectGz(geometryObject, file) {
+
+
+        var linePositionSize = geometryObject.linePositionsSize;
+        var positionsSize = geometryObject.positionsSize;
+        var normalsSize = geometryObject.normalsSize;
+        var uvsSize = geometryObject.uvsSize;
+
+
+        return file.async("uint8array").then(
+            function success(contentIn) {
+                var content = pako.ungzip(contentIn);
+                content = content.buffer;
+
+                var dataview = new DataView(content);
+                var currentIndex = 0;
+
+
+                // fill line_positions_iee
+                if(!geometryObject.lineGeometryData){
+                    geometryObject.lineGeometryData = {};
+                }
+                geometryObject.lineGeometryData.positions  = convertBytesToGeometryMetadata(dataview, linePositionSize, currentIndex);
+
+                currentIndex = linePositionSize * 4;
+
+                // fill positions_iee
+                if(!geometryObject.faceGeometryData){
+                    geometryObject.faceGeometryData = {};
+                }
+                geometryObject.faceGeometryData.positions = convertBytesToGeometryMetadata(dataview, positionsSize, currentIndex);
+                currentIndex = currentIndex + positionsSize * 4;
+
+                // fill line_positions_iee
+                geometryObject.faceGeometryData.normals = convertBytesToGeometryMetadata(dataview, normalsSize, currentIndex);
+                currentIndex = currentIndex + normalsSize * 4;
+
+                // fill uvs_iee
+                geometryObject.faceGeometryData.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
+                currentIndex = currentIndex + uvsSize * 4;
+
+                console.log("currentIndex:" + currentIndex);
+                console.log("dataview.byteLength:" + dataview.byteLength);
+
+            },
+            function error(e) {
+                // handle the error↵});"
+            });
+    }
+
+
+
+
     this.removeModel = function () {
         editor.removeAllObjects();
     };
@@ -485,6 +548,57 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         scope.handleJSONData(data);
         data = null;
         delete data;
+    };
+
+    this.loadBinaryModel = function (url) {
+        var me = this;
+        JSZipUtils.getBinaryContent(url, function(err, data) {
+            if(err) {
+                throw err; // or handle err
+            }
+
+            JSZip.loadAsync(data).then(function (zip) {
+
+                var filterResults = zip.filter(function (relativePath, file) {
+                    var fileName = file.name;
+                    return fileName.startsWith('view.json');
+
+                });
+
+                if (filterResults.length > 0) {
+                    var configurationEntry = filterResults[0];
+
+                    configurationEntry.async("string").then(function (dataString) {
+
+                        var data = JSON.parse(dataString);
+
+                        var pictureData = data.pictureData;
+
+                        var promises = [];
+
+                        for (var i = 0; i < pictureData.length; i++) {
+                            var geometryObject = pictureData[i];
+                            var geomObjUuid = geometryObject.uuid;
+
+                            var foundedGZArray = zip.filter(function (relativePath, file) {
+                                var fileName = file.name;
+                                return fileName.includes(geomObjUuid);
+                            });
+
+                            if (foundedGZArray.length > 0) {
+                                var foundedGZ = foundedGZArray[0];
+                                promises.push(parseGeometryObjectGz(geometryObject, foundedGZ))
+                            }
+                        }
+
+
+                        Promise.all(promises).then(function (object) {
+                            me.reloadModel(data);
+                        });
+                    });
+                }
+            });
+        });
     };
 
 

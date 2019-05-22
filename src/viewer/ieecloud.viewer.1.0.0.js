@@ -119,6 +119,10 @@ function Viewer(target, options) {
         this.threeEditor.loader.reloadModel(modelJsn);
     };
 
+    Viewer.prototype.loadBinaryModel = function (zipModelUrl) {
+        this.threeEditor.loader.loadBinaryModel(zipModelUrl);
+    };
+
     Viewer.prototype.changeRotationScale = function (rotationScale) {
         if(rotationScale) {
             this.options.rotationScale = rotationScale;
