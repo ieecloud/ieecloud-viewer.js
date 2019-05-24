@@ -545,9 +545,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 geometryObject.faceGeometryData.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
                 currentIndex = currentIndex + uvsSize * 4;
 
-                console.log("currentIndex:" + currentIndex);
-                console.log("dataview.byteLength:" + dataview.byteLength);
-
             },
             function error(e) {
                 // handle the error↵});"
