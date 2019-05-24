@@ -495,13 +495,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var dataview = new DataView(content);
                 var currentIndex = 0;
                 var size = content.byteLength / 4;
-
-                console.log("geometryObject.coords OLD --- ", geometryObject.coords)
-
                 // fill_coords
                 geometryObject.coords  = convertBytesToGeometryMetadata(dataview, size, currentIndex);
-
-                console.log("geometryObject.coords --- ", geometryObject.coords)
 
             },
             function error(e) {
@@ -549,9 +544,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 // fill uvs_iee
                 geometryObject.faceGeometryData.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
                 currentIndex = currentIndex + uvsSize * 4;
-
-                console.log("currentIndex:" + currentIndex);
-                console.log("dataview.byteLength:" + dataview.byteLength);
 
             },
             function error(e) {
@@ -620,7 +612,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                             if (foundedGZCoordsArray.length > 0) {
                                 var foundedCoordsGZ = foundedGZCoordsArray[0];
-                                promises.push(parseGeometryObjectCoordsGz(geometryObject, foundedGZ))
+                                promises.push(parseGeometryObjectCoordsGz(geometryObject, foundedCoordsGZ))
                             }
                         }
 
