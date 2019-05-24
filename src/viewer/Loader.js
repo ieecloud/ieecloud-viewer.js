@@ -533,7 +533,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                 // fill coords
                 geometryObject.coords = convertBytesToGeometryMetadata(dataview, coordsSize, currentIndex);
-                currentIndex = currentIndex + uvsSize * 4;
+                currentIndex = currentIndex + coordsSize * 4;
 
                 // fill results
                 geometryObject.results = convertBytesToGeometryMetadata(dataview, resultsSize, currentIndex);
