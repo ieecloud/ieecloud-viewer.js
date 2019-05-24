@@ -486,6 +486,29 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         return ints;
     }
 
+
+    function parseGeometryObjectCoordsGz(geometryObject, file) {
+        return file.async("uint8array").then(
+            function success(contentIn) {
+                var content = pako.ungzip(contentIn);
+                content = content.buffer;
+                var dataview = new DataView(content);
+                var currentIndex = 0;
+                var size = content.byteLength / 4;
+
+                console.log("geometryObject.coords OLD --- ", geometryObject.coords)
+
+                // fill_coords
+                geometryObject.coords  = convertBytesToGeometryMetadata(dataview, size, currentIndex);
+
+                console.log("geometryObject.coords --- ", geometryObject.coords)
+
+            },
+            function error(e) {
+                // handle the error↵});"
+            });
+    }
+
     function parseGeometryObjectGz(geometryObject, file) {
 
 
@@ -582,12 +605,22 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                             var foundedGZArray = zip.filter(function (relativePath, file) {
                                 var fileName = file.name;
-                                return fileName.includes(geomObjUuid);
+                                return fileName.includes("data_" + geomObjUuid);
                             });
 
                             if (foundedGZArray.length > 0) {
                                 var foundedGZ = foundedGZArray[0];
                                 promises.push(parseGeometryObjectGz(geometryObject, foundedGZ))
+                            }
+
+                            var foundedGZCoordsArray = zip.filter(function (relativePath, file) {
+                                var fileName = file.name;
+                                return fileName.includes("data_coords_" + geomObjUuid);
+                            });
+
+                            if (foundedGZCoordsArray.length > 0) {
+                                var foundedCoordsGZ = foundedGZCoordsArray[0];
+                                promises.push(parseGeometryObjectCoordsGz(geometryObject, foundedGZ))
                             }
                         }
 
