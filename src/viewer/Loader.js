@@ -487,22 +487,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     }
 
 
-    function parseGeometryObjectCoordsGz(geometryObject, file) {
-        return file.async("uint8array").then(
-            function success(contentIn) {
-                var content = pako.ungzip(contentIn);
-                content = content.buffer;
-                var dataview = new DataView(content);
-                var currentIndex = 0;
-                var size = content.byteLength / 4;
-                // fill_coords
-                geometryObject.coords  = convertBytesToGeometryMetadata(dataview, size, currentIndex);
-
-            },
-            function error(e) {
-                // handle the error↵});"
-            });
-    }
 
     function parseGeometryObjectGz(geometryObject, file) {
 
@@ -511,6 +495,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var positionsSize = geometryObject.positionsSize;
         var normalsSize = geometryObject.normalsSize;
         var uvsSize = geometryObject.uvsSize;
+        var coordsSize = geometryObject.coordsSize;
+        var resultsSize = geometryObject.resultsSize;
 
 
         return file.async("uint8array").then(
@@ -544,6 +530,13 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 // fill uvs_iee
                 geometryObject.faceGeometryData.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
                 currentIndex = currentIndex + uvsSize * 4;
+
+                // fill coords
+                geometryObject.coords = convertBytesToGeometryMetadata(dataview, coordsSize, currentIndex);
+                currentIndex = currentIndex + uvsSize * 4;
+
+                // fill results
+                geometryObject.results = convertBytesToGeometryMetadata(dataview, resultsSize, currentIndex);
 
             },
             function error(e) {
@@ -605,15 +598,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                 promises.push(parseGeometryObjectGz(geometryObject, foundedGZ))
                             }
 
-                            var foundedGZCoordsArray = zip.filter(function (relativePath, file) {
-                                var fileName = file.name;
-                                return fileName.includes("data_coords_" + geomObjUuid);
-                            });
-
-                            if (foundedGZCoordsArray.length > 0) {
-                                var foundedCoordsGZ = foundedGZCoordsArray[0];
-                                promises.push(parseGeometryObjectCoordsGz(geometryObject, foundedCoordsGZ))
-                            }
                         }
 
 
