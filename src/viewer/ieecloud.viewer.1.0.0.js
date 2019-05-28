@@ -123,6 +123,10 @@ function Viewer(target, options) {
         this.threeEditor.loader.loadBinaryModel(zipModelUrl);
     };
 
+    Viewer.prototype.loadBase64Model = function (zipModelUrl) {
+        this.threeEditor.loader.loadBase64Model(zipModelUrl);
+    };
+
     Viewer.prototype.changeRotationScale = function (rotationScale) {
         if(rotationScale) {
             this.options.rotationScale = rotationScale;
