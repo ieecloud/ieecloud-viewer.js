@@ -558,54 +558,66 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         delete data;
     };
 
+
+    this.loadZipModel = function (zip) {
+        var me = this;
+        var filterResults = zip.filter(function (relativePath, file) {
+            var fileName = file.name;
+            return fileName.startsWith('view.json');
+
+        });
+
+        if (filterResults.length > 0) {
+            var configurationEntry = filterResults[0];
+
+            configurationEntry.async("string").then(function (dataString) {
+
+                var data = JSON.parse(dataString);
+
+                var pictureData = data.pictureData;
+
+                var promises = [];
+
+                for (var i = 0; i < pictureData.length; i++) {
+                    var geometryObject = pictureData[i];
+                    var geomObjUuid = geometryObject.uuid;
+
+                    var foundedGZArray = zip.filter(function (relativePath, file) {
+                        var fileName = file.name;
+                        return fileName.includes("data_" + geomObjUuid);
+                    });
+
+                    if (foundedGZArray.length > 0) {
+                        var foundedGZ = foundedGZArray[0];
+                        promises.push(parseGeometryObjectGz(geometryObject, foundedGZ))
+                    }
+
+                }
+
+                Promise.all(promises).then(function (object) {
+                    me.reloadModel(data);
+                });
+            });
+        }
+    };
+
+
+    this.loadBase64Model = function (base64Str) {
+        var me = this;
+        JSZip.loadAsync(base64Str, {base64: true}).then(function (zip) {
+            me.loadZipModel(zip);
+
+        });
+    };
+
     this.loadBinaryModel = function (url) {
         var me = this;
         JSZipUtils.getBinaryContent(url, function(err, data) {
             if(err) {
                 throw err; // or handle err
             }
-
             JSZip.loadAsync(data).then(function (zip) {
-
-                var filterResults = zip.filter(function (relativePath, file) {
-                    var fileName = file.name;
-                    return fileName.startsWith('view.json');
-
-                });
-
-                if (filterResults.length > 0) {
-                    var configurationEntry = filterResults[0];
-
-                    configurationEntry.async("string").then(function (dataString) {
-
-                        var data = JSON.parse(dataString);
-
-                        var pictureData = data.pictureData;
-
-                        var promises = [];
-
-                        for (var i = 0; i < pictureData.length; i++) {
-                            var geometryObject = pictureData[i];
-                            var geomObjUuid = geometryObject.uuid;
-
-                            var foundedGZArray = zip.filter(function (relativePath, file) {
-                                var fileName = file.name;
-                                return fileName.includes("data_" + geomObjUuid);
-                            });
-
-                            if (foundedGZArray.length > 0) {
-                                var foundedGZ = foundedGZArray[0];
-                                promises.push(parseGeometryObjectGz(geometryObject, foundedGZ))
-                            }
-
-                        }
-
-
-                        Promise.all(promises).then(function (object) {
-                            me.reloadModel(data);
-                        });
-                    });
-                }
+                me.loadZipModel(zip);
             });
         });
     };
