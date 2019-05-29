@@ -676,7 +676,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                 if (prevNode.children && prevNode.children.length > 0) {
                                     var upperNodeContainer = new THREE.Object3D();
                                     for (var k = 0; k < prevNode.children.length; k++) {
-                                        upperNodeContainer.add(prevNode.children[k].object ? prevNode.children[k].object : undefined);
+                                        if (prevNode.children[k].object) {
+                                            upperNodeContainer.add(prevNode.children[k].object);
+                                        }
                                     }
                                     prevNode.object = upperNodeContainer;
                                     if(prevNode.object){
