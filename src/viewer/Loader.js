@@ -488,7 +488,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
 
-    function parseGeometryObjectGz(geometryObject, file) {
+    function parseGeometryObjectGz(geometryObject, file, value) {
 
 
         var linePositionSize = geometryObject.linePositionsSize;
@@ -497,7 +497,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var uvsSize = geometryObject.uvsSize;
         var coordsSize = geometryObject.coordsSize;
         var resultsSize = geometryObject.resultsSize;
-
 
         return file.async("uint8array").then(
             function success(contentIn) {
@@ -541,7 +540,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             },
             function error(e) {
                 // handle the error↵});"
-            });
+            }).finally(function () {
+                editor.onZipUpdateStatus("parsing  " + geometryObject.name, value);
+        })
     }
 
 
@@ -556,11 +557,13 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         scope.handleJSONData(data);
         data = null;
         delete data;
+        editor.onZipUpdateStatus("stop", 1.0);
     };
 
 
     this.loadZipModel = function (zip) {
         var me = this;
+        editor.onZipUpdateStatus("loading model configuration...", 0.1);
         var filterResults = zip.filter(function (relativePath, file) {
             var fileName = file.name;
             return fileName.startsWith('view.json');
@@ -578,6 +581,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                 var promises = [];
 
+
+                var progressValue = 0.7;
+
+                editor.onZipUpdateStatus("loading model metadata...", progressValue);
+
                 for (var i = 0; i < pictureData.length; i++) {
                     var geometryObject = pictureData[i];
                     var geomObjUuid = geometryObject.uuid;
@@ -589,13 +597,17 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                     if (foundedGZArray.length > 0) {
                         var foundedGZ = foundedGZArray[0];
-                        promises.push(parseGeometryObjectGz(geometryObject, foundedGZ))
-                    }
 
+                        var factor = i / pictureData.length;
+
+                        progressValue = progressValue + factor / 100000;
+
+                        promises.push(parseGeometryObjectGz(geometryObject, foundedGZ, progressValue));
+                    }
                 }
 
                 Promise.all(promises).then(function (object) {
-                    me.reloadModel(data);
+                    setTimeout(function() { editor.onZipUpdateStatus("loading model...", 0.9); me.reloadModel(data) }, 0);
                 });
             });
         }
@@ -612,6 +624,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     this.loadBinaryModel = function (url) {
         var me = this;
+        editor.onZipUpdateStatus("loading binary model content ...");
         JSZipUtils.getBinaryContent(url, function(err, data) {
             if(err) {
                 throw err; // or handle err

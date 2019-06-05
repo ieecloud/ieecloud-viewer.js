@@ -58,6 +58,7 @@ module.exports = {
           'node_modules/pako/dist/pako.min.js',
           'node_modules/pako/dist/pako_inflate.min.js',
           'node_modules/jszip-utils/dist/jszip-utils.min.js',
+          'node_modules/progressbar.js/dist/progressbar.min.js',
           'vendor/three.min.js',
           'vendor/ui.js',
           'vendor/fatlines/LineSegmentsGeometry.js',

@@ -23,6 +23,7 @@ var Editor = function (options) {
         treeLoad: new SIGNALS.Signal(),
         startRender: new SIGNALS.Signal(),
         onPrintScreenDone: new SIGNALS.Signal(),
+        onZipUpdateStatus: new SIGNALS.Signal(),
         showRuler: new SIGNALS.Signal(),
         showVProtractor: new SIGNALS.Signal(),
         showHProtractor: new SIGNALS.Signal(),
@@ -99,6 +100,10 @@ Editor.prototype = {
 
     onRenderDone: function () {
         this.signals.endRender.dispatch();
+    },
+
+    onZipUpdateStatus: function (status, percent) {
+        this.signals.onZipUpdateStatus.dispatch(status, percent);
     },
 
     onPrintScreenDone: function (urlRenderer) {

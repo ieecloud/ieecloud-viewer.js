@@ -84,6 +84,12 @@ function Viewer(target, options) {
             }
         });
 
+        $this.threeEditor.signals.onZipUpdateStatus.add(function (status, percent) {
+            if ($this.options.onZipUpdateStatus) {
+                $this.options.onZipUpdateStatus(status, percent);
+            }
+        });
+
     };
 
 

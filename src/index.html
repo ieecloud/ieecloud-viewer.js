@@ -32,6 +32,38 @@
             position: absolute;
         }
 
+        .progress-bar-wrapper{
+            padding: 0;
+            margin: 0;
+            display: -webkit-box;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            height: 100vh;
+            z-index: 21;
+            background-color: black;
+            opacity: 0.5;
+            display: none;
+        }
+
+        .progress-bar-row {
+            width: 25%;
+            z-index: 30;
+        }
+
+        .progress-bar {
+            font-size: 1.1em;
+            text-align: start;
+        }
+
+
         .tree-wrapper{
             width: 400px;
             position: relative;
@@ -39,6 +71,7 @@
             background-color: black;
             opacity: 0.7;
             color: white;
+            display:none;
         }
 
         .tree-wrapper  .tree-wrapper-inner{
@@ -634,6 +667,7 @@
             margin: 0;
             overflow: visible;
             position: absolute;
+            z-index: 22;
         }
         .hamburger:hover {
             opacity: 0.7; }
@@ -713,15 +747,6 @@
 <% }); %>
 
 <div id="viewer-wrapper" class="viewer-full-screen">
-    <div style="position: relative;
-    z-index: 1000;
-    /*background-color: black;*/
-    opacity: 0.7;
-    /*border-bottom: 1px dotted #fff*/
-    ">
-
-
-
         <button class="hamburger hamburger--3dx" type="button">
                  <span class="hamburger-box">
                     <span class="hamburger-inner"></span>
@@ -805,9 +830,12 @@
         <!--<button id="attachToNewDiv" class="btn">Attach to new div</button>-->
         <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
         <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
-
-
-    </div>
+        <div class="progress-bar-wrapper">
+            <div class="progress-bar-row">
+                <div class="progress-bar">
+                </div>
+            </div>
+        </div>
 
 
     <div id="tree-wrapper" class="tree-wrapper">
@@ -877,7 +905,6 @@
     window.THREE.ImageUtils.crossOrigin = '';
 
     var tree;
-    $("#tree-wrapper").hide();
 
     var $hamburger = $(".hamburger");
     $hamburger.on("click", function(e) {
@@ -896,6 +923,40 @@
         {id:"8" , name: "cs-warmcool", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/warmcool.png"}
     ];
     initDropdownTextures('selectTexture', getParameterValue("texture", undefined));
+
+
+    var bar = new ProgressBar.Line(".progress-bar", {
+        strokeWidth: 3,
+        easing: 'easeInOut',
+        duration: 1400,
+        color: '#FFEA82',
+        trailColor: '#eee',
+        trailWidth: 2,
+        svgStyle: {width: '100%', height: '100%'},
+        text: {
+            style: {
+                // Text color.
+                // Default: same as stroke color (options.color)
+                color: '#FFF',
+                right: '0',
+                top: '30px',
+                padding: 0,
+                margin: 0,
+                transform: null,
+                "white-space": 'nowrap',
+                overflow: 'hidden',
+                "text-overflow": 'ellipsis',
+                "max-width": '100%'
+            },
+            autoStyleContainer: false
+        },
+        from: {color: '#FFEA82'},
+        to: {color: '#5ad2ed'},
+        step: (state, bar) => {
+            bar.path.setAttribute('stroke', state.color);
+        }
+    });
+
 
     $("#viewer").ieecloudEditor({
         id: getParameterValue("id", "1"),
@@ -919,6 +980,17 @@
         //rotationScale: {fov:0.35082010187266344, position: {x: 35.06093200951128, y: -87.23789463891883, z: 136.7042316558606}},
         rotationScale: getRotationScale("rotationScale", {fov:0.35082010187266344, position: {x: 35.06093200951128, y: -87.23789463891883, z: 136.7042316558606}}),
         detailModelView: getParameterValue("detailModelView", false),
+        onZipUpdateStatus:function(status, percent){
+            if (percent) {
+                bar.animate(percent);
+            }
+            if (status !== "stop") {
+                bar.setText(status);
+            } else {
+                setTimeout(function() {   $(".progress-bar-wrapper").css("display", "none"); }, 1000);
+            }
+        },
+
         onTreeLoad:function(treeData){
             var tData = treeData.children;
             if(!tree){
@@ -1159,7 +1231,10 @@
 
 
     $("#loadModel").click(function () {
-       $("#viewer").ieecloudEditor('loadBinaryModel', "../resources/bytes/box.zip");
+        bar.animate(0);
+        bar.setText("");
+        $(".progress-bar-wrapper").css("display", "flex");
+        $("#viewer").ieecloudEditor('loadBinaryModel', "../resources/bytes/boxes.zip");
 
         // var data = 'UEsDBBQACAgIAImzu04AAAAAAAAAAAAAAAAoAAAAZGF0YV84N2JlM2Y2YTRlYzM0YjUzOWIzMGNlNWVlOTZjNWIzNy5negHoARf+H4sIAAAAAAAAAGNgwAT2DZhsEI3MRpZH5mPTR8gsbBibHLF2oouhuwWbO3C5hZB/SAkrfG7ExicUroTCilDY4vIDLjWE3IVNHJvbsfFxuQefu3CpJxSHuMwjFHa4zCcUB+huw+Y3XABfPKHrJcZecuIfm3p8fiekDpv6Bgbc7P0NEBofG188w8B+ItiDzT349JPjtwYCbFLCaLC4hxpuIuQOctPRQLsHV7kBY2MrJ/CVIbjy+aj5w9N8bACbfbjMxWUWLrXYzMKG8bmXkJ3oYuhuwRe2xIQRvjDB519CZuPSi0sMV1ihyxHrdnzqcMUPNrcji1Ea9nYbf622d1HXsS/4kGcvUeJir5LFZKt3YLW9dVe8TVdstb3FjyK7mSdi7d4/CbTnrRWw1+GcZrd51V67qxbr7BNlGO2d3yranV2xwV7gvZHdZ6tU++L1TbZXGk7YB4uk2stG3baTX7LC3sLoo33R7M92/dLVdqsrJOzEyz7Ycxlo2ef//GEvunOLvWX9V3vz/vm2se7ado6Hc+waP0vY8/H32yTlt9ideyNvF+t13HaB0Xl7/hRD+zKHqXasl5TslhUE2d2fMNXum22S3crMhXafaufa27+/a2+x6529xkt1u+L5Lnay4q4AbhPAEKANAABQSwcIEChuJ+0BAADoAQAAUEsDBBQACAgIAImzu04AAAAAAAAAAAAAAAAJAAAAdmlldy5qc29urZNNb9wgEIbv/hURudLKNuCP3qJk01tUZSv1UPmAMZulssHCuNrE8n8vYOxNoiRSpK6sfTUPw8wwDFMEjOYcXHy7mAA7irbRXDrrdzRFQNLOLwHe0sEIBmAEhGz4ycHYGi92VHNUzRb2gplR8xtq6IeRzGPP10APWo394N3B7ub7LgbQaxI0DYqC4qAkaBY0D1oELdc4W0AX8fbq2mdwutppUBQUByWgsvWp+g9n5s6eIhRZq5Nf6JWQZrgbu5rrZYlkjht+Mmmz9MWag+j6lu+PtA8BLP38V62d2nNjhHxYQk0z/Px3PtTzWBNoheTXqlXa39Zl7H+2FQfKXvLDwXN3zrf8Hd+Lp+WCvyYWaCqHntp/9rjAGPpsv0Rjjo4kjrh9dnh8MbObpk7Iez6MrVlc8jLPSpQgXGQpSki+Q3HhvOjp7PXlXTeX74cahBFKDmt5eerv8RVNk8xiqXRH21dw/LuBBGP3DJTSzZllLpX25WyQ+I2j8CMBirzm6JBRzBnCNUFljWLGCedlxkiNcrBN1k9at+F5ujNunXNt2QzjnLb0K1jmDJcfTBQuIEkgQZDEkKSQEEhwZd+xfcn/u/W+R7eUmWVU7GVH8z9QSwcI9tktXs0BAAB+BAAAUEsBAhQAFAAICAgAibO7ThAobiftAQAA6AEAACgAAAAAAAAAAAAAAAAAAAAAAGRhdGFfODdiZTNmNmE0ZWMzNGI1MzliMzBjZTVlZTk2YzViMzcuZ3pQSwECFAAUAAgICACJs7tO9tktXs0BAAB+BAAACQAAAAAAAAAAAAAAAABDAgAAdmlldy5qc29uUEsFBgAAAAACAAIAjQAAAEcEAAAAAA==';
         // $("#viewer").ieecloudEditor('loadBase64Model', data);
