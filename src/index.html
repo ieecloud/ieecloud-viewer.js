@@ -47,7 +47,7 @@
             left: 0;
             right: 0;
             height: 100vh;
-            z-index: 21;
+            z-index: 22;
             background-color: black;
             opacity: 0.5;
             display: none;
@@ -65,17 +65,18 @@
 
 
         .tree-wrapper{
-            width: 400px;
+            width: 415px;
             position: relative;
             z-index: 20;
             background-color: black;
             opacity: 0.7;
             color: white;
-            display:none;
+            /*display:none;*/
         }
 
         .tree-wrapper  .tree-wrapper-inner{
-            padding-top: 50px;
+            padding-top: 8px;
+            padding-bottom: 8px;
         }
 
         .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel{
@@ -167,7 +168,7 @@
 
         .tree-wrapper  .tree-wrapper-inner  .tree {
             overflow-y: auto;
-            height: calc(100vh - 470px);
+            height: calc(100vh - 153px);
         }
 
         .viewer-full-screen .btn-wrapper .buttons, .viewer-full-screen .tree-wrapper .buttons{
@@ -525,7 +526,7 @@
 
         /*General Menu Styling*/
         .mainnav {
-            margin: 0 auto;
+            /*margin: 0 auto;*/
             font-family: sans-serif;
             font-size: 14px;
             padding-inline-start: 0px;
@@ -543,7 +544,7 @@
         .dropdown {
             position: absolute;
             width: 50px;
-            top: 30px;
+            top: 31px;
             opacity: 0;
             visibility: hidden;
             transition: ease-out .35s;
@@ -666,8 +667,8 @@
             border: 0;
             margin: 0;
             overflow: visible;
-            position: absolute;
-            z-index: 22;
+            /*position: absolute;*/
+            z-index: 23;
         }
         .hamburger:hover {
             opacity: 0.7; }
@@ -676,7 +677,7 @@
         .hamburger.is-active .hamburger-inner,
         .hamburger.is-active .hamburger-inner::before,
         .hamburger.is-active .hamburger-inner::after {
-            background-color: #fff; }
+            background-color: #000000; }
 
         .hamburger-box {
             width: 40px;
@@ -735,6 +736,84 @@
         }
 
 
+
+
+
+
+
+        .slide-in {
+            /*z-index: 10; !* to position it in front of the other content *!*/
+            position: absolute;
+            z-index: 21;
+            /*overflow: hidden; !* to prevent scrollbar appearing *!*/
+        }
+
+        .slide-in.from-left {
+            left: 0;
+        }
+
+        .slide-in.from-right {
+            right: 0;
+        }
+
+        .slide-in-content {
+            padding: 0px 70px;
+            transition: all .5s ease; /* our nice transition */
+        }
+
+        .slide-in.from-left .slide-in-content {
+            transform: translateX(-100%);
+            -webkit-transform: translateX(-100%);
+        }
+
+        .slide-in.from-right .slide-in-content {
+            transform: translateX(100%);
+            -webkit-transform: translateX(100%);
+        }
+
+        .slide-in.show .slide-in-content {
+            transform: translateX(0);
+            -webkit-transform: translateX(0);
+        }
+
+        .slide-in-tree {
+            position: absolute;
+            z-index: 20;
+            top: 50px;
+            /*overflow: hidden; !* to prevent scrollbar appearing *!*/
+        }
+
+        .slide-in-tree.from-left {
+            left: 0;
+        }
+
+        .slide-in-tree.from-right {
+            right: 0;
+        }
+
+        .slide-in-content-tree {
+            padding: 0px 0px;
+            transition: all .5s ease; /* our nice transition */
+        }
+
+        .slide-in-tree.from-left .slide-in-content-tree {
+            transform: translateX(-100%);
+            -webkit-transform: translateX(-100%);
+        }
+
+        .slide-in-tree.from-right .slide-in-content-tree {
+            transform: translateX(100%);
+            -webkit-transform: translateX(100%);
+        }
+
+        .slide-in-tree.show .slide-in-content-tree {
+            transform: translateX(0);
+            -webkit-transform: translateX(0);
+        }
+
+
+
+
     </style>
 </head>
 <body id="body" class="full-screen">
@@ -747,53 +826,128 @@
 <% }); %>
 
 <div id="viewer-wrapper" class="viewer-full-screen">
+
+
+
+    <div style="display:flex;">
+
+
         <button class="hamburger hamburger--3dx" type="button">
                  <span class="hamburger-box">
                     <span class="hamburger-inner"></span>
                  </span>
         </button>
 
+        <div class="slide-in from-left">
+            <div class="slide-in-content">
+                <ul class="mainnav">
+                    <li class="hassubs"><a href="#">File</a>
+                        <ul class="dropdown">
+                            <li class="subs"><a href="#" id="loadModel">Load model</a></li>
+                        </ul>
+                    </li>
+                    <li class="hassubs"><a href="#">View</a>
+                        <ul class="dropdown">
+                            <li class="subs"><a href="#" id="toggleMenu">Tree</a></li>
+                        </ul>
+                    </li>
+                    <li class="hassubs"><a href="#">Result</a>
+                        <ul class="dropdown">
+                            <li class="subs hassubs"><a href="#">Isolines</a>
+                                <ul class="dropdown">
+                                    <li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>
+                                    <li class="subs"><select id="selectTexture" name="selectTexture"></select></li>
+                                </ul>
+                            </li>
+                            <li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>
+                        </ul>
+                    </li>
+                    <li class="hassubs"><a href="#">Nearest</a>
+                        <ul class="dropdown">
+                            <li class="subs hassubs"><a href="#">Mode</a>
+                                <ul class="dropdown">
+                                    <li class="subs"><a href="#" id="meshesMode">Meshes</a></li>
+                                    <li class="subs"><a href="#" id="linesMode">Lines</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-        <!--<ul class="mainnav">-->
-        <!--<li class="hassubs"><a href="#">File</a>-->
-        <!--<ul class="dropdown">-->
-        <!--<li class="subs"><a href="#" id="loadModel">Load model</a></li>-->
-        <!--</ul>-->
-        <!--</li>-->
-        <!--&lt;!&ndash;<li class="hassubs"><a href="#">Edit</a>&ndash;&gt;-->
-        <!--&lt;!&ndash;<ul class="dropdown">&ndash;&gt;-->
-        <!--&lt;!&ndash;<li class="subs"><a href="#">Undo</a></li>&ndash;&gt;-->
-        <!--&lt;!&ndash;<li class="subs"><a href="#">Redo</a></li>&ndash;&gt;-->
-        <!--&lt;!&ndash;</ul>&ndash;&gt;-->
-        <!--&lt;!&ndash;</li>&ndash;&gt;-->
-        <!--<li class="hassubs"><a href="#">View</a>-->
-        <!--<ul class="dropdown">-->
-        <!--<li class="subs"><a href="#" id="toggleMenu">Tree</a></li>-->
-        <!--</ul>-->
-        <!--</li>-->
-        <!--<li class="hassubs"><a href="#">Result</a>-->
-        <!--<ul class="dropdown">-->
-        <!--<li class="subs hassubs"><a href="#">Isolines</a>-->
-        <!--<ul class="dropdown">-->
-        <!--<li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>-->
-        <!--<li class="subs"> <select id="selectTexture" name="selectTexture"></select></li>-->
-        <!--</ul>-->
-        <!--</li>-->
-        <!--<li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>-->
-        <!--</ul>-->
-        <!--</li>-->
-        <!--<li class="hassubs"><a href="#">Nearest</a>-->
-        <!--<ul class="dropdown">-->
-        <!--<li class="subs hassubs"><a href="#">Mode</a>-->
-        <!--<ul class="dropdown">-->
-        <!--<li class="subs"><a href="#" id="meshesMode">Meshes</a></li>-->
-        <!--<li class="subs"><a href="#" id="linesMode">Lines</a></li>-->
-        <!--</ul>-->
-        <!--</li>-->
-        <!--</ul>-->
-        <!--</li>-->
-        <!--</ul>-->
-        <!--<br style="clear: both;">-->
+
+
+        <div class="slide-in-tree from-left">
+            <div class="slide-in-content-tree">
+                <div id="tree-wrapper" class="tree-wrapper">
+                    <div class="tree-wrapper-inner">
+                        <div class="tree-menu">
+                            <!--<div class="tree-menu-panel">-->
+                            <!--<h3>Model</h3>-->
+                            <!--<button id="loadModel" class="btn">Load</button>-->
+                            <!--<button id="saveScreenShot" class="btn">ScreenShot</button>-->
+                            <!--<button id="saveModelPositionBtn" class="btn">Save Position</button>-->
+                            <!--</div>-->
+
+                            <!--<div class="tree-menu-panel">-->
+                            <!--<h3>Results</h3>-->
+                            <!--<div class="action-panel">-->
+                            <!--<button id="removeAllResultsBtn" class="btn" style="width:100%">Remove</button>-->
+                            <!--</div>-->
+                            <!--<div class="action-panel-inner">-->
+                            <!--<h4>Nearest search mode</h4>-->
+                            <!--<select id="selectMode" name="selectMode">-->
+                            <!--<option value=""></option>-->
+                            <!--<option value="MESHES" selected='selected'>MESHES</option>-->
+                            <!--<option value="LINES">LINES</option>-->
+                            <!--</select>-->
+                            <!--</div>-->
+                            <!--<div class="action-panel-inner">-->
+                            <!--<h4>Isolines</h4>-->
+                            <!--<select id="toggleIsolines" name="toggleIsolines">-->
+                            <!--<option value="ON" selected='selected'>ON</option>-->
+                            <!--<option value="OFF">OFF</option>-->
+                            <!--</select>-->
+                            <!--<select id="selectTexture" name="selectTexture"></select>-->
+                            <!--</div>-->
+
+                            <!--</div>-->
+
+                            <div class="tree-menu-panel">
+                                <div class="action-panel">
+                                    <button id="selectAllTree" class="btn">Select All</button>
+                                    <button id="deselectAllTree" class="btn">Deselect All</button>
+                                </div>
+                                <div class="action-panel">
+                                    <input style="width:50%" type="text" id="search-input"/>
+                                    <button id="select-btn" class="btn">Select</button>
+                                    <button id="deselect-btn" class="btn">Deselect</button>
+                                </div>
+                            </div>
+                            <div class="tree-menu-panel">
+                                <input type="radio" name="filterBy" id="all-filter" checked value="ALL"/> All
+                                <input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges
+                                <input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces
+                            </div>
+                        </div>
+                        <div class="tree"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <div class="progress-bar-wrapper">
+            <div class="progress-bar-row">
+                <div class="progress-bar">
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -830,69 +984,9 @@
         <!--<button id="attachToNewDiv" class="btn">Attach to new div</button>-->
         <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
         <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
-        <div class="progress-bar-wrapper">
-            <div class="progress-bar-row">
-                <div class="progress-bar">
-                </div>
-            </div>
-        </div>
 
 
-    <div id="tree-wrapper" class="tree-wrapper">
-        <div class="tree-wrapper-inner">
-            <div class="tree-menu">
-                <div class="tree-menu-panel">
-                    <h3>Model</h3>
-                    <button id="loadModel" class="btn">Load</button>
-                    <button id="saveScreenShot" class="btn">ScreenShot</button>
-                    <button id="saveModelPositionBtn" class="btn">Save Position</button>
-                </div>
-
-                <div class="tree-menu-panel">
-                    <h3>Results</h3>
-                    <div class="action-panel">
-                        <button id="removeAllResultsBtn" class="btn" style="width:100%">Remove</button>
-                    </div>
-                    <div class="action-panel-inner">
-                        <h4>Nearest search mode</h4>
-                        <select id="selectMode" name="selectMode">
-                            <option value=""></option>
-                            <option value="MESHES" selected='selected'>MESHES</option>
-                            <option value="LINES">LINES</option>
-                        </select>
-                    </div>
-                    <div class="action-panel-inner">
-                        <h4>Isolines</h4>
-                        <select id="toggleIsolines" name="toggleIsolines">
-                            <option value="ON" selected='selected'>ON</option>
-                            <option value="OFF">OFF</option>
-                        </select>
-                        <select id="selectTexture" name="selectTexture"></select>
-                    </div>
-
-                </div>
-
-                <div class="tree-menu-panel">
-                    <h3>Tree</h3>
-                    <div class="action-panel">
-                        <button id="selectAllTree" class="btn">Select All</button>
-                        <button id="deselectAllTree" class="btn">Deselect All</button>
-                    </div>
-                    <div class="action-panel">
-                        <input style="width:50%" type="text" id="search-input"/>
-                        <button id="select-btn" class="btn">Select</button>
-                        <button id="deselect-btn" class="btn">Deselect</button>
-                    </div>
-                </div>
-                <div class="tree-menu-panel">
-                    <input type="radio" name="filterBy" id="all-filter" checked value="ALL"/> All
-                    <input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges
-                    <input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces
-                </div>
-            </div>
-            <div class="tree"></div>
-        </div>
-    </div>
+</div>
 
     <div id="viewer" class="viewer"></div>
 </div>
@@ -909,7 +1003,7 @@
     var $hamburger = $(".hamburger");
     $hamburger.on("click", function(e) {
         $hamburger.toggleClass("is-active");
-        $("#tree-wrapper").toggle();
+        $(".slide-in").toggleClass('show');
     });
 
     var textures = [
@@ -1179,7 +1273,7 @@
     });
 
     $("#toggleMenu").click(function () {
-        $("#tree-wrapper").toggle();
+        $(".slide-in-tree").toggleClass('show');
     });
 
 
