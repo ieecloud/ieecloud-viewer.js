@@ -71,8 +71,14 @@
             background-color: black;
             opacity: 0.7;
             color: white;
+            padding: 20px;
             /*display:none;*/
         }
+
+        .horizontal-menu .sub-horizontal-menu {
+            padding-left:20px;
+        }
+
         .tree-wrapper{
             width: 415px;
             position: relative;
@@ -590,6 +596,7 @@
             font-family: arial;
         }
 
+
         .mainnav li:hover {
             background: #0000FF;
             color: #fff;
@@ -903,19 +910,37 @@
                     <li><a href="#" id="toggleMenu">Tree</a></li>
                     <li><a href="#" >Result</a>
 
-                        <!--<ul>-->
-                            <!--<li><a href="#">Isolines</a>-->
-                                <!--<ul>-->
-                                    <!--<li><a href="#" id="toggleIsolines">Toogle</a></li>-->
-                                    <!--<li><select id="selectTexture" name="selectTexture"></select></li>-->
-                                <!--</ul>-->
-                            <!--</li>-->
-                            <!--<li><a href="#" id="removeAllResultsBtn">Remove</a></li>-->
-                        <!--</ul>-->
+                        <ul class="sub-horizontal-menu">
+                            <li><a href="#">Isolines</a>
+                                <ul  class="sub-horizontal-menu">
+                                    <li><a href="#" id="toggleIsolines">Toogle</a></li>
+                                    <li><a href="#" id="selectTexture">Select ... </a>
+
+                                        <ul id="selectTexturesList" class="sub-horizontal-menu">
+                                            <!--<li><a href="#" id="meshesMode">Meshes</a></li>-->
+                                            <!--<li><a href="#" id="linesMode">Lines</a></li>-->
+                                        </ul>
+
+
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><a href="#" id="removeAllResultsBtn">Remove</a></li>
+                        </ul>
 
 
                     </li>
-                    <li><a href="#" >Nearest</a></li>
+                    <li><a href="#" >Nearest</a>
+
+                        <ul class="sub-horizontal-menu">
+                            <li><a href="#">Mode</a>
+                                <ul class="sub-horizontal-menu">
+                                    <li><a href="#" id="meshesMode">Meshes</a></li>
+                                    <li><a href="#" id="linesMode">Lines</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -1015,19 +1040,18 @@
     });
 
 
-    var textures  =[];
 
-//    var textures = [
-//        {id:"1" , name: "cs-red-blue", type: "url", default:true, nColors:5, data:"http://static.ieecloud.com/images/cs-red.png"},
-//        {id:"2" , name: "cs-blue-red", type: "url", default:false, nColors:5, data:"http://static.ieecloud.com/images/cs-blue.png"},
-//        {id:"3" , name: "cs-rainbow1", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow1.jpg"},
-//        {id:"4" , name: "cs-rainbow2", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow2.jpg"},
-//        {id:"5" , name: "cs-rainbow3", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow3.png"},
-//        {id:"6" , name: "cs-rainbow4", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow4.png"},
-//        {id:"7" , name: "cs-coolwarm", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/coolwarm.png"},
-//        {id:"8" , name: "cs-warmcool", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/warmcool.png"}
-//    ];
-//    initDropdownTextures('selectTexture', getParameterValue("texture", undefined));
+    var textures = [
+        {id:"1" , name: "cs-red-blue", type: "url", default:true, nColors:5, data:"http://static.ieecloud.com/images/cs-red.png"},
+        {id:"2" , name: "cs-blue-red", type: "url", default:false, nColors:5, data:"http://static.ieecloud.com/images/cs-blue.png"},
+        {id:"3" , name: "cs-rainbow1", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow1.jpg"},
+        {id:"4" , name: "cs-rainbow2", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow2.jpg"},
+        {id:"5" , name: "cs-rainbow3", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow3.png"},
+        {id:"6" , name: "cs-rainbow4", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow4.png"},
+        {id:"7" , name: "cs-coolwarm", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/coolwarm.png"},
+        {id:"8" , name: "cs-warmcool", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/warmcool.png"}
+    ];
+    initSubMenuTextures('selectTexturesList', getParameterValue("texture", undefined));
 
 
     var bar = new ProgressBar.Line(".progress-bar", {
@@ -1387,18 +1411,21 @@
         return paramTexture ? paramTexture : defaultTexture;
     }
 
-    function initDropdownTextures(id, reqParamTextureName) {
-        var select, option;
+
+    function initSubMenuTextures(id, reqParamTextureName) {
+        var ul, li, a;
         var currentTexture = getCurrentTexture(textures, reqParamTextureName);
-        select = document.getElementById( id );
+        ul = document.getElementById( id );
         for (var i = 0; i < textures.length; i++) {
-            option = document.createElement( 'option' );
-            option.value = textures[i].name;
-            option.text = textures[i].name;
+            li = document.createElement( 'li' );
+            a = document.createElement( 'a' );
+            a.value = textures[i].name;
+            a.text = textures[i].name;
             if(textures[i].name == currentTexture.name) {
-                option.selected = 'selected';
+//                option.selected = 'selected';
             }
-            select.add( option );
+            li.appendChild(a);
+            ul.appendChild(li);
         }
     }
 
