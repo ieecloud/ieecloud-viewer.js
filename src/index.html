@@ -64,6 +64,15 @@
         }
 
 
+        .horizontal-menu{
+            width: 200px;
+            position: relative;
+            z-index: 20;
+            background-color: black;
+            opacity: 0.7;
+            color: white;
+            /*display:none;*/
+        }
         .tree-wrapper{
             width: 415px;
             position: relative;
@@ -168,7 +177,7 @@
 
         .tree-wrapper  .tree-wrapper-inner  .tree {
             overflow-y: auto;
-            height: calc(100vh - 153px);
+            height: calc(100vh - 100px);
         }
 
         .viewer-full-screen .btn-wrapper .buttons, .viewer-full-screen .tree-wrapper .buttons{
@@ -573,6 +582,14 @@
             font-family: arial;
         }
 
+
+        .horizontal-menu li a {
+            display: block;
+            padding: 10px 10px;
+            color: #fff;
+            font-family: arial;
+        }
+
         .mainnav li:hover {
             background: #0000FF;
             color: #fff;
@@ -654,7 +671,7 @@
         }
 
         .hamburger {
-            padding: 15px 15px;
+            padding: 10px 10px;
             display: inline-block;
             cursor: pointer;
             transition-property: opacity, filter;
@@ -741,45 +758,9 @@
 
 
 
-        .slide-in {
-            /*z-index: 10; !* to position it in front of the other content *!*/
-            position: absolute;
-            z-index: 21;
-            /*overflow: hidden; !* to prevent scrollbar appearing *!*/
-        }
-
-        .slide-in.from-left {
-            left: 0;
-        }
-
-        .slide-in.from-right {
-            right: 0;
-        }
-
-        .slide-in-content {
-            padding: 0px 70px;
-            transition: all .5s ease; /* our nice transition */
-        }
-
-        .slide-in.from-left .slide-in-content {
-            transform: translateX(-100%);
-            -webkit-transform: translateX(-100%);
-        }
-
-        .slide-in.from-right .slide-in-content {
-            transform: translateX(100%);
-            -webkit-transform: translateX(100%);
-        }
-
-        .slide-in.show .slide-in-content {
-            transform: translateX(0);
-            -webkit-transform: translateX(0);
-        }
-
         .slide-in-tree {
             position: absolute;
             z-index: 20;
-            top: 50px;
             /*overflow: hidden; !* to prevent scrollbar appearing *!*/
         }
 
@@ -809,8 +790,45 @@
         .slide-in-tree.show .slide-in-content-tree {
             transform: translateX(0);
             -webkit-transform: translateX(0);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
+
+        .slide-in {
+            position: absolute;
+            z-index: 20;
+            top: 30px;
+            /*overflow: hidden; !* to prevent scrollbar appearing *!*/
+        }
+
+        .slide-in.from-left {
+            left: 0;
+        }
+
+        .slide-in.from-right {
+            right: 0;
+        }
+
+        .slide-in-content {
+            padding: 0px 0px;
+            transition: all .5s ease; /* our nice transition */
+        }
+
+        .slide-in.from-left .slide-in-content {
+            transform: translateX(-100%);
+            -webkit-transform: translateX(-100%);
+        }
+
+        .slide-in.from-right .slide-in-content {
+            transform: translateX(100%);
+            -webkit-transform: translateX(100%);
+        }
+
+        .slide-in.show .slide-in-content {
+            transform: translateX(0);
+            -webkit-transform: translateX(0);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
 
 
 
@@ -838,82 +856,76 @@
                  </span>
         </button>
 
+        <!--<div class="slide-in from-left">-->
+            <!--<div class="slide-in-content">-->
+                <!--<ul class="mainnav">-->
+                    <!--<li class="hassubs"><a href="#">File</a>-->
+                        <!--<ul class="dropdown">-->
+                            <!--<li class="subs"><a href="#" id="loadModel">Load model</a></li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                    <!--<li class="hassubs"><a href="#">View</a>-->
+                        <!--<ul class="dropdown">-->
+                            <!--<li class="subs"><a href="#" id="toggleMenu">Tree</a></li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                    <!--<li class="hassubs"><a href="#">Result</a>-->
+                        <!--<ul class="dropdown">-->
+                            <!--<li class="subs hassubs"><a href="#">Isolines</a>-->
+                                <!--<ul class="dropdown">-->
+                                    <!--<li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>-->
+                                    <!--<li class="subs"><select id="selectTexture" name="selectTexture"></select></li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                            <!--<li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                    <!--<li class="hassubs"><a href="#">Nearest</a>-->
+                        <!--<ul class="dropdown">-->
+                            <!--<li class="subs hassubs"><a href="#">Mode</a>-->
+                                <!--<ul class="dropdown">-->
+                                    <!--<li class="subs"><a href="#" id="meshesMode">Meshes</a></li>-->
+                                    <!--<li class="subs"><a href="#" id="linesMode">Lines</a></li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+        <!--</div>-->
+
+
+
         <div class="slide-in from-left">
             <div class="slide-in-content">
-                <ul class="mainnav">
-                    <li class="hassubs"><a href="#">File</a>
-                        <ul class="dropdown">
-                            <li class="subs"><a href="#" id="loadModel">Load model</a></li>
-                        </ul>
+                <ul class = "horizontal-menu">
+                    <li><a href="#" id="loadModel">Load model</a></li>
+                    <li><a href="#" id="toggleMenu">Tree</a></li>
+                    <li><a href="#" >Result</a>
+
+                        <!--<ul>-->
+                            <!--<li><a href="#">Isolines</a>-->
+                                <!--<ul>-->
+                                    <!--<li><a href="#" id="toggleIsolines">Toogle</a></li>-->
+                                    <!--<li><select id="selectTexture" name="selectTexture"></select></li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                            <!--<li><a href="#" id="removeAllResultsBtn">Remove</a></li>-->
+                        <!--</ul>-->
+
+
                     </li>
-                    <li class="hassubs"><a href="#">View</a>
-                        <ul class="dropdown">
-                            <li class="subs"><a href="#" id="toggleMenu">Tree</a></li>
-                        </ul>
-                    </li>
-                    <li class="hassubs"><a href="#">Result</a>
-                        <ul class="dropdown">
-                            <li class="subs hassubs"><a href="#">Isolines</a>
-                                <ul class="dropdown">
-                                    <li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>
-                                    <li class="subs"><select id="selectTexture" name="selectTexture"></select></li>
-                                </ul>
-                            </li>
-                            <li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>
-                        </ul>
-                    </li>
-                    <li class="hassubs"><a href="#">Nearest</a>
-                        <ul class="dropdown">
-                            <li class="subs hassubs"><a href="#">Mode</a>
-                                <ul class="dropdown">
-                                    <li class="subs"><a href="#" id="meshesMode">Meshes</a></li>
-                                    <li class="subs"><a href="#" id="linesMode">Lines</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
+                    <li><a href="#" >Nearest</a></li>
                 </ul>
             </div>
         </div>
 
 
-
-        <div class="slide-in-tree from-left">
+        <div class="slide-in-tree from-right">
             <div class="slide-in-content-tree">
                 <div id="tree-wrapper" class="tree-wrapper">
                     <div class="tree-wrapper-inner">
                         <div class="tree-menu">
-                            <!--<div class="tree-menu-panel">-->
-                            <!--<h3>Model</h3>-->
-                            <!--<button id="loadModel" class="btn">Load</button>-->
-                            <!--<button id="saveScreenShot" class="btn">ScreenShot</button>-->
-                            <!--<button id="saveModelPositionBtn" class="btn">Save Position</button>-->
-                            <!--</div>-->
-
-                            <!--<div class="tree-menu-panel">-->
-                            <!--<h3>Results</h3>-->
-                            <!--<div class="action-panel">-->
-                            <!--<button id="removeAllResultsBtn" class="btn" style="width:100%">Remove</button>-->
-                            <!--</div>-->
-                            <!--<div class="action-panel-inner">-->
-                            <!--<h4>Nearest search mode</h4>-->
-                            <!--<select id="selectMode" name="selectMode">-->
-                            <!--<option value=""></option>-->
-                            <!--<option value="MESHES" selected='selected'>MESHES</option>-->
-                            <!--<option value="LINES">LINES</option>-->
-                            <!--</select>-->
-                            <!--</div>-->
-                            <!--<div class="action-panel-inner">-->
-                            <!--<h4>Isolines</h4>-->
-                            <!--<select id="toggleIsolines" name="toggleIsolines">-->
-                            <!--<option value="ON" selected='selected'>ON</option>-->
-                            <!--<option value="OFF">OFF</option>-->
-                            <!--</select>-->
-                            <!--<select id="selectTexture" name="selectTexture"></select>-->
-                            <!--</div>-->
-
-                            <!--</div>-->
-
                             <div class="tree-menu-panel">
                                 <div class="action-panel">
                                     <button id="selectAllTree" class="btn">Select All</button>
@@ -936,10 +948,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
 
         <div class="progress-bar-wrapper">
             <div class="progress-bar-row">
@@ -1006,17 +1014,20 @@
         $(".slide-in").toggleClass('show');
     });
 
-    var textures = [
-        {id:"1" , name: "cs-red-blue", type: "url", default:true, nColors:5, data:"http://static.ieecloud.com/images/cs-red.png"},
-        {id:"2" , name: "cs-blue-red", type: "url", default:false, nColors:5, data:"http://static.ieecloud.com/images/cs-blue.png"},
-        {id:"3" , name: "cs-rainbow1", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow1.jpg"},
-        {id:"4" , name: "cs-rainbow2", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow2.jpg"},
-        {id:"5" , name: "cs-rainbow3", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow3.png"},
-        {id:"6" , name: "cs-rainbow4", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow4.png"},
-        {id:"7" , name: "cs-coolwarm", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/coolwarm.png"},
-        {id:"8" , name: "cs-warmcool", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/warmcool.png"}
-    ];
-    initDropdownTextures('selectTexture', getParameterValue("texture", undefined));
+
+    var textures  =[];
+
+//    var textures = [
+//        {id:"1" , name: "cs-red-blue", type: "url", default:true, nColors:5, data:"http://static.ieecloud.com/images/cs-red.png"},
+//        {id:"2" , name: "cs-blue-red", type: "url", default:false, nColors:5, data:"http://static.ieecloud.com/images/cs-blue.png"},
+//        {id:"3" , name: "cs-rainbow1", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow1.jpg"},
+//        {id:"4" , name: "cs-rainbow2", type: "url", default:false, nColors:22, data:"http://static.ieecloud.com/images/cs-rainbow2.jpg"},
+//        {id:"5" , name: "cs-rainbow3", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow3.png"},
+//        {id:"6" , name: "cs-rainbow4", type: "url", default:false, nColors:8, data:"http://static.ieecloud.com/images/cs-rainbow4.png"},
+//        {id:"7" , name: "cs-coolwarm", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/coolwarm.png"},
+//        {id:"8" , name: "cs-warmcool", type: "url", default:false, nColors:2, data:"http://static.ieecloud.com/images/warmcool.png"}
+//    ];
+//    initDropdownTextures('selectTexture', getParameterValue("texture", undefined));
 
 
     var bar = new ProgressBar.Line(".progress-bar", {
