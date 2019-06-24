@@ -118,15 +118,22 @@ Editor.prototype = {
         this.signals.objectColorSelected.dispatch(object);
     },
 
+
+    makeWholeObjectsChainVisible: function (object) {
+        var me =  this;
+        object.visible = true;
+        var parentToShowObject = object.parent;
+        if(parentToShowObject && !(parentToShowObject instanceof THREE.Scene)){
+            me.makeWholeObjectsChainVisible(parentToShowObject);
+
+        }
+    },
+
     preShowObject: function (object) {
         var me = this;
         if (object !== null && !object.visible) {
-            var parentToHideObject = object.parent;
-            object.visible = true;
 
-            if (!parentToHideObject.visible) {
-                 parentToHideObject.visible = true;
-            }
+            me.makeWholeObjectsChainVisible(object);
 
             if(!me.lastModel.visible){
                 me.lastModel.visible = true;
@@ -156,13 +163,13 @@ Editor.prototype = {
                 }
 
                 if (maxChanged || minChanged) {
-
                     if (!me.modeAllVisible) {
-                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible) return true;
+                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, resultInfo.maxResult,
+                            resultInfo.minResult, function (oNode) {
+                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
                         });
+                        me.setIntermediateMinMaxResult(minResult, maxResult);
                     }
-
                     me.setMinMaxResult(minResult, maxResult);
                 }
             }
@@ -198,16 +205,13 @@ Editor.prototype = {
     },
 
 
-    getNewUv: function (prevUv, newMaxResult, newMinResult) {
+    getNewUv: function (prevUv, newMaxResult, newMinResult, prevMaxResult, prevMinResult) {
         var me = this;
-        var resultInfo = me.getResultInfo();
-        var prevMaxResult = resultInfo.maxResult;
-        var prevMinResult = resultInfo.minResult;
         var result = prevUv * (prevMaxResult - prevMinResult) + prevMinResult;
         return me.loader.getV(result, newMaxResult, newMinResult);
     },
 
-    recalculateUvs: function (aTree, newMaxResult, newMinResult, fCompair) {
+    recalculateUvs: function (aTree, newMaxResult, newMinResult, oldMaxResult, oldMinResult, fCompair) {
 
 
         var me = this;
@@ -230,11 +234,11 @@ Editor.prototype = {
                 for (var k = 0; k < currentUvs.length; k+=6) {
                     newUvs.push(
                         0.0,
-                        me.getNewUv(currentUvs[k + 1], newMaxResult, newMinResult),
+                        me.getNewUv(currentUvs[k + 1], newMaxResult, newMinResult, oldMaxResult, oldMinResult),
                         0.0,
-                        me.getNewUv(currentUvs[k + 3], newMaxResult, newMinResult),
+                        me.getNewUv(currentUvs[k + 3], newMaxResult, newMinResult, oldMaxResult, oldMinResult),
                         0.0,
-                        me.getNewUv(currentUvs[k + 5], newMaxResult, newMinResult));
+                        me.getNewUv(currentUvs[k + 5], newMaxResult, newMinResult, oldMaxResult, oldMinResult));
 
                 }
                 oNode.object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(newUvs, 2));
@@ -262,16 +266,23 @@ Editor.prototype = {
         this.lastModel.visible = visible;
 
         // recalculate for Whole model not for every geometry object
-        if (visible && me.loader.DRAW_RESULTS) {
+        if (me.loader.DRAW_RESULTS) {
+
             var resultInfo = me.getResultInfo();
+            var oldMinResult = resultInfo.initialMinResult;
+            var oldMaxResult =  resultInfo.initialMaxResult;
 
-            var maxResult = resultInfo.maxResult;
-            var minResult = resultInfo.minResult;
-            me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
-            });
+            if(resultInfo.intermediateMinResult && resultInfo.intermediateMaxResult){
+                oldMinResult = resultInfo.intermediateMinResult;
+                oldMaxResult =  resultInfo.intermediateMaxResult;
+            }
+            me.recalculateUvs(this.loader.objectsTree, resultInfo.maxResult, resultInfo.minResult,
+                oldMaxResult,
+                oldMinResult, function (oNode) {
+                    if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
+                });
+            me.setIntermediateMinMaxResult(resultInfo.minResult, resultInfo.maxResult);
         }
-
         this.signals.sceneGraphChanged.dispatch();
 
     },
@@ -312,7 +323,7 @@ Editor.prototype = {
                 me.loader.pretenderMaxs = new Set(_.orderBy(Array.from(me.loader.pretenderMaxs), null, 'asc'));
 
                 if (maxChanged) {
-                    maxResult = _.last(Array.from(me.loader.pretenderMaxs));
+                    maxResult = _.last(Array.from(me.loader.pretenderMaxs)) || maxGeometryResult;
                 }
 
                 if (me.loader.pretenderMins.has(minGeometryResult)) {
@@ -321,17 +332,17 @@ Editor.prototype = {
                 me.loader.pretenderMins = new Set(_.orderBy(Array.from(me.loader.pretenderMins), null, 'desc'));
 
                 if (minChanged) {
-                    minResult = _.last(Array.from(me.loader.pretenderMins));
+                    minResult = _.last(Array.from(me.loader.pretenderMins)) || minGeometryResult;
                 }
 
                 if (maxChanged || minChanged) {
-
                     if (!me.modeAllVisible) {
-                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, resultInfo.maxResult,
+                            resultInfo.minResult, function (oNode) {
                             if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
                         });
+                        me.setIntermediateMinMaxResult(minResult, maxResult);
                     }
-
                     me.setMinMaxResult(minResult, maxResult);
 
                 }
@@ -512,7 +523,7 @@ Editor.prototype = {
 
         });
         this.isolineSpriteMaterial = new THREE.SpriteMaterial({map: texture});
-        this.resultInfo = {};
+        this.resultInfo = this.resultInfo || {};
         this.resultInfo.minResult = minResult;
         this.resultInfo.maxResult = maxResult;
     },
@@ -592,9 +603,21 @@ Editor.prototype = {
     },
 
     setMinMaxResult: function (minResult, maxResult) {
-        this.resultInfo = {};
+        this.resultInfo =  this.resultInfo || {};
         this.resultInfo.minResult = minResult;
         this.resultInfo.maxResult = maxResult;
+    },
+
+    setInitialMinMaxResult: function (minResult, maxResult) {
+        this.resultInfo =  this.resultInfo || {};
+        this.resultInfo.initialMinResult = minResult;
+        this.resultInfo.initialMaxResult = maxResult;
+    },
+
+    setIntermediateMinMaxResult: function (minResult, maxResult) {
+        this.resultInfo =  this.resultInfo || {};
+        this.resultInfo.intermediateMinResult = minResult;
+        this.resultInfo.intermediateMaxResult = maxResult;
     },
 
     toggleIsolines: function (showFlag) {

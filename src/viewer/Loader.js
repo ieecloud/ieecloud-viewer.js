@@ -1125,6 +1125,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var currentTextureName = scope.texture ? scope.texture : this.getDefaultTexture(textures);
             colorMapTexture = editor.setTexture(currentTextureName);
             editor.setMinMaxResult(minResult, maxResult);
+            editor.setInitialMinMaxResult(minResult, maxResult);
             // editor.addTexture(colorMapTexture, minResult, maxResult);
         }
 
