@@ -151,8 +151,8 @@ Editor.prototype = {
                 var maxResult = resultInfo.maxResult;
                 var minResult = resultInfo.minResult;
 
-                var maxChanged = maxGeometryResult >= maxResult || !maxResult;
-                var minChanged = minGeometryResult <= minResult || !minResult;
+                var maxChanged = maxGeometryResult >= maxResult ||  me.loader.pretenderMaxs.size === 0;
+                var minChanged = minGeometryResult <= minResult ||  me.loader.pretenderMins.size === 0;
                 me.loader.pretenderMaxs.add(maxGeometryResult);
                 if (maxChanged) {
                     maxResult = maxGeometryResult;
