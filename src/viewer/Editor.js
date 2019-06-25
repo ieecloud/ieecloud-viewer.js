@@ -283,7 +283,7 @@ Editor.prototype = {
                 });
             me.setIntermediateMinMaxResult(resultInfo.minResult, resultInfo.maxResult);
         }
-        this.signals.sceneGraphChanged.dispatch();
+        this.signals.objectChanged.dispatch(this.lastModel)
 
     },
 
