@@ -47,7 +47,7 @@
             left: 0;
             right: 0;
             height: 100vh;
-            z-index: 22;
+            z-index: 23;
             background-color: black;
             opacity: 0.5;
             display: none;
@@ -65,14 +65,17 @@
 
 
         .horizontal-menu{
-            width: 200px;
+            width: 220px;
             position: relative;
             z-index: 20;
             background-color: black;
             opacity: 0.7;
             color: white;
-            padding: 20px;
+            margin:0px;
+            /*padding: 40px;*/
+            height: 100vh;
             /*display:none;*/
+            padding: 45px 40px 40px 0px;
         }
 
         .horizontal-menu .sub-horizontal-menu {
@@ -591,7 +594,7 @@
 
         .horizontal-menu li a {
             display: block;
-            padding: 10px 10px;
+            /*padding: 10px 10px;*/
             color: #fff;
             font-family: arial;
         }
@@ -701,7 +704,7 @@
         .hamburger.is-active .hamburger-inner,
         .hamburger.is-active .hamburger-inner::before,
         .hamburger.is-active .hamburger-inner::after {
-            background-color: #000000; }
+            background-color: #fff; }
 
         .hamburger-box {
             width: 40px;
@@ -804,7 +807,6 @@
         .slide-in {
             position: absolute;
             z-index: 20;
-            top: 30px;
             /*overflow: hidden; !* to prevent scrollbar appearing *!*/
         }
 
@@ -820,6 +822,65 @@
             padding: 0px 0px;
             transition: all .5s ease; /* our nice transition */
         }
+
+
+        .slide-in-content .wholerow {
+            height: 40px;
+            left: 0;
+            margin-top: -40px;
+            position: absolute;
+            width: 100%;
+            z-index: 1; }
+
+
+        .slide-in-content li > .title-wrap {
+            min-height: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        .slide-in-content li > .title-wrap .title .texture-image {
+            height: 25px;
+            left: 12px;
+            position: absolute;
+            top: 7px;
+            width: 25px;
+            z-index: 2;
+        }
+
+        .slide-in-content .title {
+            cursor: default;
+            display: block;
+            height: 40px;
+            line-height: 40px;
+            overflow: hidden;
+            padding-left: 42px;
+            position: relative;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        .slide-in-content .title .material-icons.icon-action {
+            height: 25px;
+            left: 12px;
+            position: absolute;
+            top: 7px;
+            width: 25px;
+            z-index: 2;
+        }
+
+        .slide-in-content .title .material-icons.icon-action-state {
+            float: right;
+            line-height: 1.5;
+        }
+
+        .slide-in-content .focused:not(.selected) > .wholerow {
+            outline: 1px dotted black; }
+
+        .slide-in-content .title-wrap:hover + .wholerow {
+            background: rgba(218, 250, 255, 0.5); }
+
 
         .slide-in.from-left .slide-in-content {
             transform: translateX(-100%);
@@ -839,6 +900,38 @@
 
 
 
+
+
+        .close {
+          position: absolute;
+          right: 20px;
+          width: 20px;
+          height: 20px;
+          opacity: 1;
+        }
+
+        .close:hover {
+          opacity: 1;
+          cursor: pointer;
+        }
+        .close:before, .close:after {
+          position: absolute;
+          content: ' ';
+          height: 25px;
+          width: 3px;
+          background-color: #fff;
+        }
+
+        .close:before {
+          transform: rotate(45deg);
+        }
+
+        .close:after {
+          transform: rotate(-45deg);
+        }
+
+
+
     </style>
 </head>
 <body id="body" class="full-screen">
@@ -849,6 +942,9 @@
 <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
 <script type="text/javascript" src="<%= file %>"></script>
 <% }); %>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 
 <div id="viewer-wrapper" class="viewer-full-screen">
 
@@ -906,38 +1002,101 @@
         <div class="slide-in from-left">
             <div class="slide-in-content">
                 <ul class = "horizontal-menu">
-                    <li><a href="#" id="loadModel">Load model</a></li>
-                    <li><a href="#" id="toggleMenu">Tree</a></li>
-                    <li><a href="#" >Result</a>
-
+                    <li>
+                        <div class="title-wrap">
+                            <a  class="title" href="#" id="loadModel"><i class="material-icons icon-action">play_for_work</i>Load model</a>
+                        </div>
+                        <div class="wholerow"></div>
+                    </li>
+                    <li>
+                        <div class="title-wrap">
+                            <a class="title" href="#" id="toggleMenu"><i class="material-icons icon-action">
+                                list
+                            </i>Tree
+                                <i class="material-icons icon-action-state" style="display:none;" id="tree-state-icon">
+                                done
+                            </i></a>
+                        </div>
+                        <div class="wholerow"></div>
+                    </li>
+                    <li>
+                        <div class="title-wrap">
+                            <a class="title" href="#"><i class="material-icons icon-action">
+                                scatter_plot
+                            </i>Result</a>
+                        </div>
+                        <div class="wholerow"></div>
                         <ul class="sub-horizontal-menu">
-                            <li><a href="#">Isolines</a>
-                                <ul  class="sub-horizontal-menu">
-                                    <li><a href="#" id="toggleIsolines">Toogle</a></li>
-                                    <li><a href="#" id="selectTexture">Select ... </a>
-
+                            <li>
+                                <div class="title-wrap">
+                                    <a class="title" href="#"><i class="material-icons icon-action">
+                                        waves
+                                    </i>Isolines</a>
+                                </div>
+                                <div class="wholerow"></div>
+                                <ul class="sub-horizontal-menu">
+                                    <li>
+                                        <div class="title-wrap">
+                                            <a class="title" href="#" id="toggleIsolines"><i class="material-icons icon-action">
+                                                radio_button_checked
+                                            </i>Toogle <i class="material-icons icon-action-state" id="texture-toggle-icon">
+                                                done
+                                            </i></a>
+                                        </div>
+                                        <div class="wholerow"></div>
+                                    </li>
+                                    <li>
+                                        <div class="title-wrap">
+                                            <a class="title" href="#" id="selectTexture"><i class="material-icons icon-action">
+                                                select_all
+                                            </i>Select ... </a>
+                                        </div>
+                                        <div class="wholerow"></div>
                                         <ul id="selectTexturesList" class="sub-horizontal-menu">
-                                            <!--<li><a href="#" id="meshesMode">Meshes</a></li>-->
-                                            <!--<li><a href="#" id="linesMode">Lines</a></li>-->
                                         </ul>
-
-
                                     </li>
                                 </ul>
                             </li>
-                            <li><a href="#" id="removeAllResultsBtn">Remove</a></li>
+                            <li>
+                                <div class="title-wrap">
+                                    <a class="title" href="#" id="removeAllResultsBtn"><i class="material-icons icon-action">
+                                        delete
+                                    </i>Remove</a>
+                                </div>
+                                <div class="wholerow"></div>
+                            </li>
                         </ul>
 
-
                     </li>
-                    <li><a href="#" >Nearest</a>
-
+                    <li>
+                        <div class="title-wrap">
+                            <a class="title" href="#"><i class="material-icons icon-action">
+                                timeline
+                            </i>Nearest</a>
+                        </div>
+                        <div class="wholerow"></div>
                         <ul class="sub-horizontal-menu">
-                            <li><a href="#">Mode</a>
-                                <ul class="sub-horizontal-menu">
-                                    <li><a href="#" id="meshesMode">Meshes</a></li>
-                                    <li><a href="#" id="linesMode">Lines</a></li>
-                                </ul>
+                            <li>
+                                <div class="title-wrap">
+                                    <a class="title" href="#" id="meshesMode"><i class="material-icons icon-action">
+                                        view_carousel
+                                    </i>Meshes<i class="material-icons icon-action-state"  id="nearest-meshes-mode-icon">
+                                        done
+                                    </i></a>
+                                </div>
+                                <div class="wholerow"></div>
+                            </li>
+                            <li>
+                                <div class="title-wrap">
+                                    <a class="title" href="#" id="linesMode"><i
+                                            class="material-icons icon-action">
+                                        line_weight</i>
+                                        Lines<i class="material-icons icon-action-state"
+                                                style="display:none;" id="nearest-lines-mode-icon">
+                                            done
+                                        </i></a>
+                                </div>
+                                <div class="wholerow"></div>
                             </li>
                         </ul>
                     </li>
@@ -955,6 +1114,7 @@
                                 <div class="action-panel">
                                     <button id="selectAllTree" class="btn">Select All</button>
                                     <button id="deselectAllTree" class="btn">Deselect All</button>
+                                    <a id="closeTree" class="close"></a>
                                 </div>
                                 <div class="action-panel">
                                     <input style="width:50%" type="text" id="search-input"/>
@@ -1032,6 +1192,7 @@
     window.THREE.ImageUtils.crossOrigin = '';
 
     var tree;
+    var toggleTexture = true;
 
     var $hamburger = $(".hamburger");
     $hamburger.on("click", function(e) {
@@ -1278,16 +1439,10 @@
     });
 
 
-    $("#toggleIsolines").change(function () {
-
-        var e = document.getElementById("toggleIsolines");
-        var value = e.options[e.selectedIndex].value;
-        var bValue = false;
-        if(value === "ON"){
-            bValue = true;
-        }
-
-        $("#viewer").ieecloudEditor('toggleIsolines', bValue);
+    $("#toggleIsolines").click(function () {
+        toggleTexture = !toggleTexture
+        $("#viewer").ieecloudEditor('toggleIsolines', toggleTexture);
+        $("#texture-toggle-icon").toggle();
     });
 
 
@@ -1301,14 +1456,23 @@
 
     $("#showTree").click(function () {
         $("#tree-wrapper").show();
+        $("#tree-state-icon").show();
     });
 
     $("#hideTree").click(function () {
         $("#tree-wrapper").hide();
+        $("#tree-state-icon").hide();
     });
 
     $("#toggleMenu").click(function () {
         $(".slide-in-tree").toggleClass('show');
+        $("#tree-state-icon").toggle();
+    });
+
+
+    $("#closeTree").click(function () {
+        $(".slide-in-tree").removeClass('show');
+        $("#tree-state-icon").hide();
     });
 
 
@@ -1363,10 +1527,10 @@
         bar.animate(0);
         bar.setText("");
         $(".progress-bar-wrapper").css("display", "flex");
-        $("#viewer").ieecloudEditor('loadBinaryModel', "../resources/bytes/boxes.zip");
+        $("#viewer").ieecloudEditor('loadBinaryModel', "../resources/bytes/table1.zip");
 
-        // var data = 'UEsDBBQACAgIAImzu04AAAAAAAAAAAAAAAAoAAAAZGF0YV84N2JlM2Y2YTRlYzM0YjUzOWIzMGNlNWVlOTZjNWIzNy5negHoARf+H4sIAAAAAAAAAGNgwAT2DZhsEI3MRpZH5mPTR8gsbBibHLF2oouhuwWbO3C5hZB/SAkrfG7ExicUroTCilDY4vIDLjWE3IVNHJvbsfFxuQefu3CpJxSHuMwjFHa4zCcUB+huw+Y3XABfPKHrJcZecuIfm3p8fiekDpv6Bgbc7P0NEBofG188w8B+ItiDzT349JPjtwYCbFLCaLC4hxpuIuQOctPRQLsHV7kBY2MrJ/CVIbjy+aj5w9N8bACbfbjMxWUWLrXYzMKG8bmXkJ3oYuhuwRe2xIQRvjDB519CZuPSi0sMV1ihyxHrdnzqcMUPNrcji1Ea9nYbf622d1HXsS/4kGcvUeJir5LFZKt3YLW9dVe8TVdstb3FjyK7mSdi7d4/CbTnrRWw1+GcZrd51V67qxbr7BNlGO2d3yranV2xwV7gvZHdZ6tU++L1TbZXGk7YB4uk2stG3baTX7LC3sLoo33R7M92/dLVdqsrJOzEyz7Ycxlo2ef//GEvunOLvWX9V3vz/vm2se7ado6Hc+waP0vY8/H32yTlt9ideyNvF+t13HaB0Xl7/hRD+zKHqXasl5TslhUE2d2fMNXum22S3crMhXafaufa27+/a2+x6529xkt1u+L5Lnay4q4AbhPAEKANAABQSwcIEChuJ+0BAADoAQAAUEsDBBQACAgIAImzu04AAAAAAAAAAAAAAAAJAAAAdmlldy5qc29urZNNb9wgEIbv/hURudLKNuCP3qJk01tUZSv1UPmAMZulssHCuNrE8n8vYOxNoiRSpK6sfTUPw8wwDFMEjOYcXHy7mAA7irbRXDrrdzRFQNLOLwHe0sEIBmAEhGz4ycHYGi92VHNUzRb2gplR8xtq6IeRzGPP10APWo394N3B7ub7LgbQaxI0DYqC4qAkaBY0D1oELdc4W0AX8fbq2mdwutppUBQUByWgsvWp+g9n5s6eIhRZq5Nf6JWQZrgbu5rrZYlkjht+Mmmz9MWag+j6lu+PtA8BLP38V62d2nNjhHxYQk0z/Px3PtTzWBNoheTXqlXa39Zl7H+2FQfKXvLDwXN3zrf8Hd+Lp+WCvyYWaCqHntp/9rjAGPpsv0Rjjo4kjrh9dnh8MbObpk7Iez6MrVlc8jLPSpQgXGQpSki+Q3HhvOjp7PXlXTeX74cahBFKDmt5eerv8RVNk8xiqXRH21dw/LuBBGP3DJTSzZllLpX25WyQ+I2j8CMBirzm6JBRzBnCNUFljWLGCedlxkiNcrBN1k9at+F5ujNunXNt2QzjnLb0K1jmDJcfTBQuIEkgQZDEkKSQEEhwZd+xfcn/u/W+R7eUmWVU7GVH8z9QSwcI9tktXs0BAAB+BAAAUEsBAhQAFAAICAgAibO7ThAobiftAQAA6AEAACgAAAAAAAAAAAAAAAAAAAAAAGRhdGFfODdiZTNmNmE0ZWMzNGI1MzliMzBjZTVlZTk2YzViMzcuZ3pQSwECFAAUAAgICACJs7tO9tktXs0BAAB+BAAACQAAAAAAAAAAAAAAAABDAgAAdmlldy5qc29uUEsFBgAAAAACAAIAjQAAAEcEAAAAAA==';
-        // $("#viewer").ieecloudEditor('loadBase64Model', data);
+//         var data = 'UEsDBBQACAgIAImzu04AAAAAAAAAAAAAAAAoAAAAZGF0YV84N2JlM2Y2YTRlYzM0YjUzOWIzMGNlNWVlOTZjNWIzNy5negHoARf+H4sIAAAAAAAAAGNgwAT2DZhsEI3MRpZH5mPTR8gsbBibHLF2oouhuwWbO3C5hZB/SAkrfG7ExicUroTCilDY4vIDLjWE3IVNHJvbsfFxuQefu3CpJxSHuMwjFHa4zCcUB+huw+Y3XABfPKHrJcZecuIfm3p8fiekDpv6Bgbc7P0NEBofG188w8B+ItiDzT349JPjtwYCbFLCaLC4hxpuIuQOctPRQLsHV7kBY2MrJ/CVIbjy+aj5w9N8bACbfbjMxWUWLrXYzMKG8bmXkJ3oYuhuwRe2xIQRvjDB519CZuPSi0sMV1ihyxHrdnzqcMUPNrcji1Ea9nYbf622d1HXsS/4kGcvUeJir5LFZKt3YLW9dVe8TVdstb3FjyK7mSdi7d4/CbTnrRWw1+GcZrd51V67qxbr7BNlGO2d3yranV2xwV7gvZHdZ6tU++L1TbZXGk7YB4uk2stG3baTX7LC3sLoo33R7M92/dLVdqsrJOzEyz7Ycxlo2ef//GEvunOLvWX9V3vz/vm2se7ado6Hc+waP0vY8/H32yTlt9ideyNvF+t13HaB0Xl7/hRD+zKHqXasl5TslhUE2d2fMNXum22S3crMhXafaufa27+/a2+x6529xkt1u+L5Lnay4q4AbhPAEKANAABQSwcIEChuJ+0BAADoAQAAUEsDBBQACAgIAImzu04AAAAAAAAAAAAAAAAJAAAAdmlldy5qc29urZNNb9wgEIbv/hURudLKNuCP3qJk01tUZSv1UPmAMZulssHCuNrE8n8vYOxNoiRSpK6sfTUPw8wwDFMEjOYcXHy7mAA7irbRXDrrdzRFQNLOLwHe0sEIBmAEhGz4ycHYGi92VHNUzRb2gplR8xtq6IeRzGPP10APWo394N3B7ub7LgbQaxI0DYqC4qAkaBY0D1oELdc4W0AX8fbq2mdwutppUBQUByWgsvWp+g9n5s6eIhRZq5Nf6JWQZrgbu5rrZYlkjht+Mmmz9MWag+j6lu+PtA8BLP38V62d2nNjhHxYQk0z/Px3PtTzWBNoheTXqlXa39Zl7H+2FQfKXvLDwXN3zrf8Hd+Lp+WCvyYWaCqHntp/9rjAGPpsv0Rjjo4kjrh9dnh8MbObpk7Iez6MrVlc8jLPSpQgXGQpSki+Q3HhvOjp7PXlXTeX74cahBFKDmt5eerv8RVNk8xiqXRH21dw/LuBBGP3DJTSzZllLpX25WyQ+I2j8CMBirzm6JBRzBnCNUFljWLGCedlxkiNcrBN1k9at+F5ujNunXNt2QzjnLb0K1jmDJcfTBQuIEkgQZDEkKSQEEhwZd+xfcn/u/W+R7eUmWVU7GVH8z9QSwcI9tktXs0BAAB+BAAAUEsBAhQAFAAICAgAibO7ThAobiftAQAA6AEAACgAAAAAAAAAAAAAAAAAAAAAAGRhdGFfODdiZTNmNmE0ZWMzNGI1MzliMzBjZTVlZTk2YzViMzcuZ3pQSwECFAAUAAgICACJs7tO9tktXs0BAAB+BAAACQAAAAAAAAAAAAAAAABDAgAAdmlldy5qc29uUEsFBgAAAAACAAIAjQAAAEcEAAAAAA==';
+//         $("#viewer").ieecloudEditor('loadBase64Model', data);
     });
 
     $("#exitFromFullScreen").click(function () {
@@ -1385,16 +1549,17 @@
         window.dispatchEvent(new Event('resize'));
     });
 
-    $("#selectMode").change(function () {
-        var e = document.getElementById("selectMode");
-        var value = e.options[e.selectedIndex].value;
-        $("#viewer").ieecloudEditor('setSearchNearestPointMode', value);
+
+    $("#meshesMode").click(function () {
+        $("#nearest-lines-mode-icon").hide();
+        $("#nearest-meshes-mode-icon").show();
+        $("#viewer").ieecloudEditor('setSearchNearestPointMode', "MESHES");
     });
 
-    $("#selectTexture").change(function () {
-        var e = document.getElementById("selectTexture");
-        var value = e.options[e.selectedIndex].value;
-        $("#viewer").ieecloudEditor('setTexture', value);
+    $("#linesMode").click(function () {
+        $("#nearest-meshes-mode-icon").hide();
+        $("#nearest-lines-mode-icon").show();
+        $("#viewer").ieecloudEditor('setSearchNearestPointMode', "LINES");
     });
 
     function getCurrentTexture(textures, reqParamTextureName) {
@@ -1413,21 +1578,63 @@
 
 
     function initSubMenuTextures(id, reqParamTextureName) {
-        var ul, li, a;
+        var ul, li, a, div, divRow, image, span, doneIcon;
         var currentTexture = getCurrentTexture(textures, reqParamTextureName);
         ul = document.getElementById( id );
         for (var i = 0; i < textures.length; i++) {
             li = document.createElement( 'li' );
+            div = document.createElement( 'div' );
+            div.classList.add("title-wrap");
+
+
+            divRow = document.createElement( 'div' );
+            divRow.classList.add("wholerow");
+
             a = document.createElement( 'a' );
             a.value = textures[i].name;
-            a.text = textures[i].name;
+            a.classList.add("title");
+
+            image = document.createElement( 'img' );
+            image.height = 20;
+            image.width = 20;
+            image.src = textures[i].data;
+            image.classList.add("texture-image");
+            span = document.createElement( 'span' );
+            span.textContent = textures[i].name;
+
+            doneIcon = document.createElement( 'i' );
+            doneIcon.classList.add("material-icons");
+            doneIcon.classList.add("icon-action-state");
+            doneIcon.classList.add("icon-texture-state");
+            doneIcon.style = 'display:none';
+            doneIcon.textContent = 'done';
             if(textures[i].name == currentTexture.name) {
-//                option.selected = 'selected';
+                doneIcon.style = 'display:block';
             }
-            li.appendChild(a);
+            $(a).data("value", textures[i].name);
+
+            $(a).click(function(event){
+                $("#viewer").ieecloudEditor('setTexture', $(this).data("value"));
+
+                $(".icon-texture-state").hide();
+                $(this).children('i').show();
+            });
+
+            a.appendChild(image);
+            a.appendChild(span);
+            a.appendChild(doneIcon);
+            div.appendChild(a);
+            li.appendChild(div);
+            li.appendChild(divRow);
             ul.appendChild(li);
         }
     }
+
+
+//    <div class="title-wrap">
+//        <a href="#" id="toggleIsolines">Toogle</a>
+//        </div>
+//        <div class="wholerow"></div>
 
     function getRotationScale() {
 

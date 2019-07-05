@@ -902,6 +902,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             geometryObject.facesMaterial = simpleFacesMaterial;
             if (drawResults) {
                 geometryObject.drawResultsMaterial = drawResultsMaterial;
+                geometryObject.drawResults = true;
             }
 
             geometryObject.edgesMaterial = simpleLinesMaterial;
@@ -930,6 +931,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     // pictureGeometryElement.drawResults = drawResults;
                     if (drawResults) { // Draw face with spectral texture according to results
                         geometryObject.groups[j].drawResultsMaterial = drawResultsMaterial;
+                        geometryObject.groups[j].drawResults = drawResults;
                         geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
                     } else {
                         if (drawTexture && settings.texture.name != undefined) {
@@ -1026,6 +1028,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
         faceCommonDataForMesh.facesMaterial = geometryObject.facesMaterial;
         faceCommonDataForMesh.drawResultsMaterial = geometryObject.drawResultsMaterial;
+        faceCommonDataForMesh.drawResults = geometryObject.drawResults;
 
         lineCommonDataForLine.edgesMaterial = geometryObject.edgesMaterial;
 
