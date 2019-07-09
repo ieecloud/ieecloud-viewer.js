@@ -4,6 +4,9 @@
     <title>ieecloud viewer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <style>
 
         .full-screen{
@@ -1006,6 +1009,9 @@
                         <div class="title-wrap">
                             <a  class="title" href="#" id="loadModel"><i class="material-icons icon-action">play_for_work</i>Load model</a>
                         </div>
+                        <div class="title-wrap">
+                            <a  class="title" href="#" id="saveScreenShot"><i class="material-icons icon-action">save</i>Save Screenshot</a>
+                        </div>
                         <div class="wholerow"></div>
                     </li>
                     <li>
@@ -1277,7 +1283,7 @@
             if (status !== "stop") {
                 bar.setText(status);
             } else {
-                setTimeout(function() {   $(".progress-bar-wrapper").css("display", "none"); }, 1000);
+                $(".progress-bar-wrapper").css("display", "none");
             }
         },
 
@@ -1357,28 +1363,60 @@
             console.log(modelPosition);
         },
         onPrintScreenDone: function (urlRenderer) {
+            // console.log(urlRenderer);
+            //
+            // var dataJson = '{"name":"descript.ion","path":"descript.ion","type":"file","format":"base64","content":"Ny16aXAuY2htIDctWmlwIEhlbHANCjctWmlwLmRsbCA3LVppcCBQbHVnaW4NCjd6LmRsbCA3LVppcCBFbmdpbmUNCjd6LmV4ZSA3LVppcCBDb25zb2xlIA0KN3ouc2Z4IDctWmlwIEdVSSBTRlgNCjd6Q29uLnNmeCA3LVppcCBDb25zb2xlIFNGWA0KN3pGTS5leGUgNy1aaXAgRmlsZSBNYW5hZ2VyDQo3emcuZXhlIDctWmlwIEdVSQ0KZGVzY3JpcHQuaW9uIDctWmlwIEZpbGUgRGVzY3JpcHRpb25zDQpoaXN0b3J5LnR4dCA3LVppcCBIaXN0b3J5DQpMYW5nIDctWmlwIFRyYW5zbGF0aW9ucw0KbGljZW5zZS50eHQgNy1aaXAgTGljZW5zZQ0KcmVhZG1lLnR4dCA3LVppcCBPdmVydmlldw0K"}';
+            //
+            // var dataJson1 = {
+            //     name:"descript.ion",
+            //     path:"descript.ion",
+            //     type:"file",
+            //     format:"base64",
+            //     content:urlRenderer
+            // };
+            //
+            // $.ajax({
+            //     url: 'http://notebook.ieecloud.com:8888/api/contents/test3.txt',
+            //     type: 'PUT',
+            //     beforeSend: function(request) {
+            //         request.setRequestHeader("Cookie", '_xsrf=2|1dd65df0|648aafe1bdf3f416f1110b055dd72588|1522481551; username-notebook-ieecloud-com-8888="2|1:0|10:1522868735|35:username-notebook-ieecloud-com-8888|44:ODY5NDgwNzNhNzIzNGJkNjg3MDk0MDAzODI3ZDRlNjg=|f3503f7310c00807026e40bac979768ebbc6c844ac5c65a74ff6e2cfe61c9018"');
+            //         request.setRequestHeader("X-XSRFToken", '2|1dd65df0|648aafe1bdf3f416f1110b055dd72588|1522481551');
+            //     },
+            //     data: JSON.stringify(dataJson1),
+            //     success: function(data) {
+            //         alert('Load was performed.');
+            //     }
+            // });
+
             console.log(urlRenderer);
 
-            var dataJson = '{"name":"descript.ion","path":"descript.ion","type":"file","format":"base64","content":"Ny16aXAuY2htIDctWmlwIEhlbHANCjctWmlwLmRsbCA3LVppcCBQbHVnaW4NCjd6LmRsbCA3LVppcCBFbmdpbmUNCjd6LmV4ZSA3LVppcCBDb25zb2xlIA0KN3ouc2Z4IDctWmlwIEdVSSBTRlgNCjd6Q29uLnNmeCA3LVppcCBDb25zb2xlIFNGWA0KN3pGTS5leGUgNy1aaXAgRmlsZSBNYW5hZ2VyDQo3emcuZXhlIDctWmlwIEdVSQ0KZGVzY3JpcHQuaW9uIDctWmlwIEZpbGUgRGVzY3JpcHRpb25zDQpoaXN0b3J5LnR4dCA3LVppcCBIaXN0b3J5DQpMYW5nIDctWmlwIFRyYW5zbGF0aW9ucw0KbGljZW5zZS50eHQgNy1aaXAgTGljZW5zZQ0KcmVhZG1lLnR4dCA3LVppcCBPdmVydmlldw0K"}';
+            function getCookie(name) {
+                var matches = document.cookie.match(new RegExp(
+                    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+                ));
+                return matches ? decodeURIComponent(matches[1]) : undefined;
+            }
 
-            var dataJson1 = {
-                name:"descript.ion",
-                path:"descript.ion",
-                type:"file",
-                format:"base64",
-                content:urlRenderer
-            };
+            urlRenderer = urlRenderer.replace("data:image/png;base64,", "").replace(/\n/g, "\\n");
+
+            //var dataJson = '{"name":"test3.png","path":"test3.png","type":"file","format":"base64","content":"'+urlRenderer+'"}';
+
+            var dataPath = getParameterByName('dataPath');
+            var dataPathPng = dataPath.replace('.json', '.png');
+
+            var dataJson2 = {name:"test3.png",path:"test3.png",type:"file",format:"base64",content:urlRenderer};
 
             $.ajax({
-                url: 'http://notebook.ieecloud.com:8888/api/contents/test3.txt',
+                //url: '/api/contents/test3.png',
+                url: '/api/contents/'+dataPathPng,
                 type: 'PUT',
+                crossDomain: true,
                 beforeSend: function(request) {
-                    request.setRequestHeader("Cookie", '_xsrf=2|1dd65df0|648aafe1bdf3f416f1110b055dd72588|1522481551; username-notebook-ieecloud-com-8888="2|1:0|10:1522868735|35:username-notebook-ieecloud-com-8888|44:ODY5NDgwNzNhNzIzNGJkNjg3MDk0MDAzODI3ZDRlNjg=|f3503f7310c00807026e40bac979768ebbc6c844ac5c65a74ff6e2cfe61c9018"');
-                    request.setRequestHeader("X-XSRFToken", '2|1dd65df0|648aafe1bdf3f416f1110b055dd72588|1522481551');
+                    request.setRequestHeader("Authorization", "Token b632f2a0233c:e7a699bfca06be374cec762950ff23de4c7952");
                 },
-                data: JSON.stringify(dataJson1),
+                data: JSON.stringify(dataJson2),
                 success: function(data) {
-                    alert('Load was performed.');
+                    //alert('Load was performed.');
                 }
             });
         }
@@ -1522,6 +1560,26 @@
     //     $("#viewer").ieecloudEditor('reloadModel', data);
     // });
 
+
+    // $.ajaxSetup({ cache: false });
+    // $.ajax({
+    //     url: '../resources/bytes/table1.zip',
+    //     //dataType: "json",
+    //     crossDomain: true,
+    //     beforeSend: function(request) {
+    //        // request.setRequestHeader("Authorization", "Token b632f2a0233c:e7a699bfca06be374cec762950ff23de4c7952");
+    //     },
+    //     success: function(data) {
+    //         bar.animate(0);
+    //         bar.setText("");
+    //         $(".progress-bar-wrapper").css("display", "flex");
+    //         // $("#viewer").ieecloudEditor('loadBinaryModel', data.content);
+    //         $("#viewer").ieecloudEditor('loadBinaryModel', "../resources/bytes/table1.zip");
+    //     },
+    //     complete: function() {
+    //
+    //     }
+    // });
 
     $("#loadModel").click(function () {
         bar.animate(0);
