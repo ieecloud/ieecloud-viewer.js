@@ -980,7 +980,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         names.push(name);
         var textPositionsData = {};
         var coords = geometryObject.coords;
-        var edges = geometryObject.edges;
+        // var edges = geometryObject.edges; TODO:remove edges from model
         var results = geometryObject.results;
         var pointsTable = geometryObject.pointsTable;
         var objectNames = geometryObject.objectNames;

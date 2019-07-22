@@ -102,11 +102,13 @@ var Viewport = function (editor) {
     // dom
     var container2 = new UI.Panel().setId("slave" + editor.id);
     container2.setPosition('absolute');
+    container2.setPointerEvents('none');
 
 
     // dom
     var container3 = new UI.Panel().setId("slave3" + editor.id);
     container3.setPosition('absolute');
+    container3.setPointerEvents('none');
 
 
     var modal = new UI.Modal();

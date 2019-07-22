@@ -101,7 +101,7 @@
         }
 
         .tree-wrapper{
-            width: 415px;
+            /*width: 415px;*/
             /*position: relative;*/
             /*z-index: 20;*/
             background-color: black;
@@ -612,7 +612,6 @@
 
         .horizontal-menu li a {
             display: block;
-            /*padding: 10px 10px;*/
             color: #fff;
             font-family: arial;
         }
@@ -698,165 +697,302 @@
             outline: 0 !important;
         }
 
-        .hamburger {
-            padding: 10px 10px;
-            display: inline-block;
-            cursor: pointer;
-            transition-property: opacity, filter;
-            transition-duration: 0.15s;
-            transition-timing-function: linear;
-            font: inherit;
-            color: inherit;
-            text-transform: none;
-            background-color: transparent;
-            border: 0;
-            margin: 0;
-            overflow: visible;
+        /*.hamburger {*/
+            /*padding: 10px 10px;*/
+            /*display: inline-block;*/
+            /*cursor: pointer;*/
+            /*transition-property: opacity, filter;*/
+            /*transition-duration: 0.15s;*/
+            /*transition-timing-function: linear;*/
+            /*font: inherit;*/
+            /*color: inherit;*/
+            /*text-transform: none;*/
+            /*background-color: transparent;*/
+            /*border: 0;*/
+            /*margin: 0;*/
+            /*overflow: visible;*/
+            /*!*position: absolute;*!*/
+            /*z-index: 23;*/
+        /*}*/
+        /*.hamburger:hover {*/
+            /*opacity: 0.7; }*/
+        /*.hamburger.is-active:hover {*/
+            /*opacity: 0.7; }*/
+        /*.hamburger.is-active .hamburger-inner,*/
+        /*.hamburger.is-active .hamburger-inner::before,*/
+        /*.hamburger.is-active .hamburger-inner::after {*/
+            /*background-color: #fff; }*/
+
+        /*.hamburger-box {*/
+            /*width: 40px;*/
+            /*height: 24px;*/
+            /*display: inline-block;*/
+            /*position: relative; }*/
+
+        /*.hamburger-inner {*/
+            /*display: block;*/
+            /*top: 50%;*/
+            /*margin-top: -2px;*/
+            /*margin-left: -2px; }*/
+        /*.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {*/
+            /*width: 30px;*/
+            /*height: 4px;*/
+            /*background-color: #000;*/
+            /*border-radius: 4px;*/
             /*position: absolute;*/
-            z-index: 23;
+            /*transition-property: transform;*/
+            /*transition-duration: 0.15s;*/
+            /*transition-timing-function: ease; }*/
+        /*.hamburger-inner::before, .hamburger-inner::after {*/
+            /*content: "";*/
+            /*display: block; }*/
+        /*.hamburger-inner::before {*/
+            /*top: -10px; }*/
+        /*.hamburger-inner::after {*/
+            /*bottom: -10px; }*/
+
+        /*!**/
+           /** 3DX*/
+           /**!*/
+        /*.hamburger--3dx .hamburger-box {*/
+            /*perspective: 80px;*/
+        /*}*/
+
+        /*.hamburger--3dx .hamburger-inner {*/
+            /*transition: transform 0.15s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);*/
+        /*}*/
+
+        /*.hamburger--3dx .hamburger-inner::before, .hamburger--3dx .hamburger-inner::after {*/
+            /*transition: transform 0s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);*/
+        /*}*/
+
+        /*.hamburger--3dx.is-active .hamburger-inner {*/
+            /*background-color: transparent !important;*/
+            /*transform: rotateY(180deg);*/
+        /*}*/
+
+        /*.hamburger--3dx.is-active .hamburger-inner::before {*/
+            /*transform: translate3d(0, 10px, 0) rotate(45deg);*/
+        /*}*/
+
+        /*.hamburger--3dx.is-active .hamburger-inner::after {*/
+            /*transform: translate3d(0, -10px, 0) rotate(-45deg);*/
+        /*}*/
+
+
+
+
+
+
+
+        /*.slide-in-tree {*/
+            /*position: absolute;*/
+            /*z-index: 20;*/
+            /*!*overflow: hidden; !* to prevent scrollbar appearing *!*!*/
+        /*}*/
+
+        /*.slide-in-tree.from-left {*/
+            /*left: 0;*/
+        /*}*/
+
+        /*.slide-in-tree.from-right {*/
+            /*right: 0;*/
+        /*}*/
+
+        /*.slide-in-content-tree {*/
+            /*padding: 0px 0px;*/
+            /*transition: all .5s ease; !* our nice transition *!*/
+        /*}*/
+
+        /*.slide-in-tree.from-left .slide-in-content-tree {*/
+            /*transform: translateX(-100%);*/
+            /*-webkit-transform: translateX(-100%);*/
+        /*}*/
+
+        /*.slide-in-tree.from-right .slide-in-content-tree {*/
+            /*transform: translateX(100%);*/
+            /*-webkit-transform: translateX(100%);*/
+        /*}*/
+
+        /*.slide-in-tree.show .slide-in-content-tree {*/
+            /*transform: translateX(0);*/
+            /*-webkit-transform: translateX(0);*/
+            /*box-shadow: 0 0 10px rgba(0,0,0,0.5);*/
+        /*}*/
+
+
+        /*.slide-in {*/
+            /*position: absolute;*/
+            /*z-index: 20;*/
+            /*!*overflow: hidden; !* to prevent scrollbar appearing *!*!*/
+        /*}*/
+
+        /*.slide-in.from-left {*/
+            /*left: 0;*/
+        /*}*/
+
+        /*.slide-in.from-right {*/
+            /*right: 0;*/
+        /*}*/
+
+        /*.slide-in-content {*/
+            /*padding: 0px 0px;*/
+            /*transition: all .5s ease; !* our nice transition *!*/
+        /*}*/
+
+
+        /*.slide-in-content .wholerow {*/
+            /*height: 40px;*/
+            /*left: 0;*/
+            /*margin-top: -40px;*/
+            /*position: absolute;*/
+            /*width: 100%;*/
+            /*z-index: 1; }*/
+
+
+        /*.slide-in-content li > .title-wrap {*/
+            /*min-height: 40px;*/
+            /*position: relative;*/
+            /*z-index: 2;*/
+        /*}*/
+        /*.slide-in-content li > .title-wrap .title .texture-image {*/
+            /*height: 25px;*/
+            /*left: 12px;*/
+            /*position: absolute;*/
+            /*top: 7px;*/
+            /*width: 25px;*/
+            /*z-index: 2;*/
+        /*}*/
+
+        /*.slide-in-content .title {*/
+            /*cursor: default;*/
+            /*display: block;*/
+            /*height: 40px;*/
+            /*line-height: 40px;*/
+            /*overflow: hidden;*/
+            /*padding-left: 42px;*/
+            /*position: relative;*/
+            /*text-overflow: ellipsis;*/
+            /*vertical-align: middle;*/
+            /*white-space: nowrap;*/
+            /*z-index: 1;*/
+        /*}*/
+
+        /*.slide-in-content .title .material-icons.icon-action {*/
+            /*height: 25px;*/
+            /*left: 12px;*/
+            /*position: absolute;*/
+            /*top: 7px;*/
+            /*width: 25px;*/
+            /*z-index: 2;*/
+        /*}*/
+
+        /*.slide-in-content .title .material-icons.icon-action-state {*/
+            /*float: right;*/
+            /*line-height: 1.5;*/
+        /*}*/
+
+        /*.slide-in-content .focused:not(.selected) > .wholerow {*/
+            /*outline: 1px dotted black; }*/
+
+        /*.slide-in-content .title-wrap:hover + .wholerow {*/
+            /*background: rgba(218, 250, 255, 0.5); }*/
+
+
+        /*.slide-in.from-left .slide-in-content {*/
+            /*transform: translateX(-100%);*/
+            /*-webkit-transform: translateX(-100%);*/
+        /*}*/
+
+        /*.slide-in.from-right .slide-in-content {*/
+            /*transform: translateX(100%);*/
+            /*-webkit-transform: translateX(100%);*/
+        /*}*/
+
+        /*.slide-in.show .slide-in-content {*/
+            /*transform: translateX(0);*/
+            /*-webkit-transform: translateX(0);*/
+            /*box-shadow: 0 0 10px rgba(0,0,0,0.5);*/
+        /*}*/
+
+
+
+
+        .parent .header, .parent .sidebar-menu {
+            opacity: 0.7;
+            z-index: 10;
         }
-        .hamburger:hover {
-            opacity: 0.7; }
-        .hamburger.is-active:hover {
-            opacity: 0.7; }
-        .hamburger.is-active .hamburger-inner,
-        .hamburger.is-active .hamburger-inner::before,
-        .hamburger.is-active .hamburger-inner::after {
-            background-color: #fff; }
 
-        .hamburger-box {
-            width: 40px;
-            height: 24px;
-            display: inline-block;
-            position: relative; }
 
-        .hamburger-inner {
+        .header {
             display: block;
-            top: 50%;
-            margin-top: -2px;
-            margin-left: -2px; }
-        .hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
-            width: 30px;
-            height: 4px;
-            background-color: #000;
-            border-radius: 4px;
-            position: absolute;
-            transition-property: transform;
-            transition-duration: 0.15s;
-            transition-timing-function: ease; }
-        .hamburger-inner::before, .hamburger-inner::after {
-            content: "";
-            display: block; }
-        .hamburger-inner::before {
-            top: -10px; }
-        .hamburger-inner::after {
-            bottom: -10px; }
-
-        /*
-           * 3DX
-           */
-        .hamburger--3dx .hamburger-box {
-            perspective: 80px;
-        }
-
-        .hamburger--3dx .hamburger-inner {
-            transition: transform 0.15s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
-        }
-
-        .hamburger--3dx .hamburger-inner::before, .hamburger--3dx .hamburger-inner::after {
-            transition: transform 0s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
-        }
-
-        .hamburger--3dx.is-active .hamburger-inner {
-            background-color: transparent !important;
-            transform: rotateY(180deg);
-        }
-
-        .hamburger--3dx.is-active .hamburger-inner::before {
-            transform: translate3d(0, 10px, 0) rotate(45deg);
-        }
-
-        .hamburger--3dx.is-active .hamburger-inner::after {
-            transform: translate3d(0, -10px, 0) rotate(-45deg);
+            margin: 0 auto;
+            max-width: 100%;
+            box-shadow: none;
+            position: fixed;
+            height: 50px!important;
+            overflow: hidden;
+            width: 260px;
+            background-color: white;
         }
 
 
-
-
-
-
-
-        .slide-in-tree {
-            position: absolute;
-            z-index: 20;
-            /*overflow: hidden; !* to prevent scrollbar appearing *!*/
-        }
-
-        .slide-in-tree.from-left {
+        .sidebar-menu {
+            height: 100%;
+            position: fixed;
             left: 0;
+            width: 260px;
+            transform: translateX(-260px);
+            transition: transform 250ms ease-in-out;
+            background-color: black;
         }
 
-        .slide-in-tree.from-right {
+        .sidebar-right-tree {
+            height: 100%;
+            position: fixed;
             right: 0;
+            width: 415px;
+            transform: translateX(415px);
+            transition: transform 250ms ease-in-out;
+            z-index: 10;
         }
 
-        .slide-in-content-tree {
-            padding: 0px 0px;
-            transition: all .5s ease; /* our nice transition */
-        }
 
-        .slide-in-tree.from-left .slide-in-content-tree {
-            transform: translateX(-100%);
-            -webkit-transform: translateX(-100%);
-        }
-
-        .slide-in-tree.from-right .slide-in-content-tree {
-            transform: translateX(100%);
-            -webkit-transform: translateX(100%);
-        }
-
-        .slide-in-tree.show .slide-in-content-tree {
+        .sidebar-right-tree.active {
             transform: translateX(0);
-            -webkit-transform: translateX(0);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .sidebar-menu-inner{
+            padding: 50px 40px 40px 0px;
+            margin-top: 0px;
+        }
+
+        .sidebar-menu-inner .sub-horizontal-menu {
+            padding-left:20px;
         }
 
 
-        .slide-in {
-            position: absolute;
-            z-index: 20;
-            /*overflow: hidden; !* to prevent scrollbar appearing *!*/
-        }
-
-        .slide-in.from-left {
-            left: 0;
-        }
-
-        .slide-in.from-right {
-            right: 0;
-        }
-
-        .slide-in-content {
-            padding: 0px 0px;
-            transition: all .5s ease; /* our nice transition */
-        }
-
-
-        .slide-in-content .wholerow {
+        .sidebar-menu-inner .wholerow {
             height: 40px;
             left: 0;
             margin-top: -40px;
             position: absolute;
             width: 100%;
-            z-index: 1; }
+            z-index: 1;
+        }
 
+        .sidebar-menu-inner li a {
+            color: #fff;
+            font-family: arial;
+        }
 
-        .slide-in-content li > .title-wrap {
+        .sidebar-menu-inner li > .title-wrap {
             min-height: 40px;
             position: relative;
             z-index: 2;
         }
-        .slide-in-content li > .title-wrap .title .texture-image {
+
+        .sidebar-menu-inner li > .title-wrap .title .texture-image {
             height: 25px;
             left: 12px;
             position: absolute;
@@ -865,7 +1001,7 @@
             z-index: 2;
         }
 
-        .slide-in-content .title {
+        .sidebar-menu-inner .title {
             cursor: default;
             display: block;
             height: 40px;
@@ -879,7 +1015,7 @@
             z-index: 1;
         }
 
-        .slide-in-content .title .material-icons.icon-action {
+        .sidebar-menu-inner .title .material-icons.icon-action {
             height: 25px;
             left: 12px;
             position: absolute;
@@ -888,44 +1024,145 @@
             z-index: 2;
         }
 
-        .slide-in-content .title .material-icons.icon-action-state {
+        .sidebar-menu-inner .title .material-icons.icon-action-state {
             float: right;
             line-height: 1.5;
         }
 
-        .slide-in-content .focused:not(.selected) > .wholerow {
-            outline: 1px dotted black; }
-
-        .slide-in-content .title-wrap:hover + .wholerow {
-            background: rgba(218, 250, 255, 0.5); }
-
-
-        .slide-in.from-left .slide-in-content {
-            transform: translateX(-100%);
-            -webkit-transform: translateX(-100%);
+        .sidebar-menu-inner .focused:not(.selected) > .wholerow {
+            outline: 1px dotted black;
         }
 
-        .slide-in.from-right .slide-in-content {
-            transform: translateX(100%);
-            -webkit-transform: translateX(100%);
+        .sidebar-menu-inner .title-wrap:hover + .wholerow {
+            background: rgba(218, 250, 255, 0.5);
+            cursor:pointer;
         }
 
-        .slide-in.show .slide-in-content {
+
+
+
+        input[type="checkbox"]:checked ~ #sidebarMenu {
             transform: translateX(0);
-            -webkit-transform: translateX(0);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            background-color: black;
         }
 
 
+        /*input[type=checkbox] {*/
+            /*transition: all 0.3s;*/
+            /*box-sizing: border-box;*/
+            /*display: none;*/
+        /*}*/
+
+        .openSidebarMenu {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        .sidebarIconToggle {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            cursor: pointer;
+            position: absolute;
+            z-index: 99;
+            height: 100%;
+            width: 100%;
+            top: 16px;
+            left: 13px;
+            height: 22px;
+            width: 22px;
+        }
+        .spinner {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            position: absolute;
+            height: 3px;
+            width: 100%;
+            background-color: #aaa;
+        }
+        .horizontal {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            position: relative;
+            float: left;
+            margin-top: 3px;
+        }
+        .diagonal.part-1 {
+            position: relative;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            float: left;
+        }
+        .diagonal.part-2 {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            position: relative;
+            float: left;
+            margin-top: 3px;
+        }
+        input[type=checkbox]:checked ~ .sidebarIconToggle > .horizontal {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            opacity: 0;
+        }
+        input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-1 {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            transform: rotate(135deg);
+            margin-top: 8px;
+        }
+        input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-2 {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            transform: rotate(-135deg);
+            margin-top: -9px;
+        }
 
 
+        .sidebar-right-tree-close {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            cursor: pointer;
+            position: absolute;
+            z-index: 99;
+            top: 19px;
+            height: 22px;
+            width: 22px;
+            right: 15px
+        }
 
-        .close {
-          position: absolute;
-          right: 20px;
-          width: 20px;
-          height: 20px;
-          opacity: 1;
+        .sidebar-right-tree-close  .common-arrow-close {
+            height: 3px;
+            width: 100%;
+            background-color: #aaa;
+            position: relative;
+            float: left;
+        }
+
+        .sidebar-right-tree-close  .tree-close-right {
+            transition: all 0.3s;
+            box-sizing: border-box;
+            transform: rotate(135deg);
+            margin-top: 8px;
+        }
+
+        .sidebar-right-tree-close  .tree-close-horizontal {
+            position: relative;
+            float: left;
+            margin-top: 3px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            opacity: 0;
+        }
+
+        .sidebar-right-tree-close  .tree-close-left {
+            position: relative;
+            float: left;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            transform: rotate(-135deg);
+            margin-top: -9px;
+
         }
 
         .close:hover {
@@ -965,73 +1202,26 @@
       rel="stylesheet">
 
 <div id="viewer-wrapper" class="viewer-full-screen">
-
-
-
     <div style="display:flex;">
-
-
-        <button class="hamburger hamburger--3dx" type="button">
-                 <span class="hamburger-box">
-                    <span class="hamburger-inner"></span>
-                 </span>
-        </button>
-
-        <!--<div class="slide-in from-left">-->
-            <!--<div class="slide-in-content">-->
-                <!--<ul class="mainnav">-->
-                    <!--<li class="hassubs"><a href="#">File</a>-->
-                        <!--<ul class="dropdown">-->
-                            <!--<li class="subs"><a href="#" id="loadModel">Load model</a></li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                    <!--<li class="hassubs"><a href="#">View</a>-->
-                        <!--<ul class="dropdown">-->
-                            <!--<li class="subs"><a href="#" id="toggleMenu">Tree</a></li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                    <!--<li class="hassubs"><a href="#">Result</a>-->
-                        <!--<ul class="dropdown">-->
-                            <!--<li class="subs hassubs"><a href="#">Isolines</a>-->
-                                <!--<ul class="dropdown">-->
-                                    <!--<li class="subs"><a href="#" id="toggleIsolines">Toogle</a></li>-->
-                                    <!--<li class="subs"><select id="selectTexture" name="selectTexture"></select></li>-->
-                                <!--</ul>-->
-                            <!--</li>-->
-                            <!--<li class="subs"><a href="#" id="removeAllResultsBtn">Remove</a></li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                    <!--<li class="hassubs"><a href="#">Nearest</a>-->
-                        <!--<ul class="dropdown">-->
-                            <!--<li class="subs hassubs"><a href="#">Mode</a>-->
-                                <!--<ul class="dropdown">-->
-                                    <!--<li class="subs"><a href="#" id="meshesMode">Meshes</a></li>-->
-                                    <!--<li class="subs"><a href="#" id="linesMode">Lines</a></li>-->
-                                <!--</ul>-->
-                            <!--</li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                <!--</ul>-->
-            <!--</div>-->
-        <!--</div>-->
-
-
-
-        <div class="slide-in from-left">
-            <div class="slide-in-content">
-
-
-                <div class="menu-toolbar">
-                </div>
-                <div class="menu-content">
-                <ul class = "horizontal-menu">
+        <div class="parent">
+            <div id="header" class="header"></div>
+            <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
+            <label for="openSidebarMenu" class="sidebarIconToggle">
+                <div class="spinner diagonal part-1"></div>
+                <div class="spinner horizontal"></div>
+                <div class="spinner diagonal part-2"></div>
+            </label>
+            <div id="sidebarMenu" class="sidebar-menu">
+                <ul class="sidebar-menu-inner">
                     <li>
                         <div class="title-wrap">
-                            <a  class="title" href="#" id="loadModel"><i class="material-icons icon-action">play_for_work</i>Load model</a>
+                            <a class="title" href="#" id="loadModel"><i
+                                    class="material-icons icon-action">play_for_work</i>Load model</a>
                         </div>
                         <div class="wholerow"></div>
                         <div class="title-wrap">
-                            <a  class="title" href="#" id="saveScreenShot"><i class="material-icons icon-action">save</i>Save Screenshot</a>
+                            <a class="title" href="#" id="saveScreenShot"><i class="material-icons icon-action">save</i>Save
+                                Screenshot</a>
                         </div>
                         <div class="wholerow"></div>
                     </li>
@@ -1041,8 +1231,8 @@
                                 list
                             </i>Tree
                                 <i class="material-icons icon-action-state" style="display:none;" id="tree-state-icon">
-                                done
-                            </i></a>
+                                    done
+                                </i></a>
                         </div>
                         <div class="wholerow"></div>
                     </li>
@@ -1064,9 +1254,11 @@
                                 <ul class="sub-horizontal-menu">
                                     <li>
                                         <div class="title-wrap">
-                                            <a class="title" href="#" id="toggleIsolines"><i class="material-icons icon-action">
+                                            <a class="title" href="#" id="toggleIsolines"><i
+                                                    class="material-icons icon-action">
                                                 radio_button_checked
-                                            </i>Toogle <i class="material-icons icon-action-state" id="texture-toggle-icon">
+                                            </i>Toogle <i class="material-icons icon-action-state"
+                                                          id="texture-toggle-icon">
                                                 done
                                             </i></a>
                                         </div>
@@ -1074,7 +1266,8 @@
                                     </li>
                                     <li>
                                         <div class="title-wrap">
-                                            <a class="title" href="#" id="selectTexture"><i class="material-icons icon-action">
+                                            <a class="title" href="#" id="selectTexture"><i
+                                                    class="material-icons icon-action">
                                                 select_all
                                             </i>Select ... </a>
                                         </div>
@@ -1086,7 +1279,8 @@
                             </li>
                             <li>
                                 <div class="title-wrap">
-                                    <a class="title" href="#" id="removeAllResultsBtn"><i class="material-icons icon-action">
+                                    <a class="title" href="#" id="removeAllResultsBtn"><i
+                                            class="material-icons icon-action">
                                         delete
                                     </i>Remove</a>
                                 </div>
@@ -1107,7 +1301,7 @@
                                 <div class="title-wrap">
                                     <a class="title" href="#" id="meshesMode"><i class="material-icons icon-action">
                                         view_carousel
-                                    </i>Meshes<i class="material-icons icon-action-state"  id="nearest-meshes-mode-icon">
+                                    </i>Meshes<i class="material-icons icon-action-state" id="nearest-meshes-mode-icon">
                                         done
                                     </i></a>
                                 </div>
@@ -1128,12 +1322,11 @@
                         </ul>
                     </li>
                 </ul>
-                </div>
             </div>
         </div>
 
 
-        <div class="slide-in-tree from-right">
+        <div id="sidebarRightTree" class="sidebar-right-tree">
             <div class="slide-in-content-tree">
                 <div id="tree-wrapper" class="tree-wrapper">
                     <div class="tree-wrapper-inner">
@@ -1142,7 +1335,11 @@
                                 <div class="action-panel">
                                     <button id="selectAllTree" class="btn">Select All</button>
                                     <button id="deselectAllTree" class="btn">Deselect All</button>
-                                    <a id="closeTree" class="close"></a>
+                                    <div id="closeTree" class="sidebar-right-tree-close">
+                                        <div class="common-arrow-close tree-close-right"></div>
+                                        <div class="common-arrow-close tree-close-horizontal"></div>
+                                        <div class="common-arrow-close tree-close-left"></div>
+                                    </div>
                                 </div>
                                 <div class="action-panel">
                                     <input style="width:50%" type="text" id="search-input"/>
@@ -1161,6 +1358,36 @@
                 </div>
             </div>
         </div>
+        <!---->
+        <!---->
+        <!--<div class="slide-in-tree from-right">-->
+            <!--<div class="slide-in-content-tree">-->
+                <!--<div id="tree-wrapper" class="tree-wrapper">-->
+                    <!--<div class="tree-wrapper-inner">-->
+                        <!--<div class="tree-menu">-->
+                            <!--<div class="tree-menu-panel">-->
+                                <!--<div class="action-panel">-->
+                                    <!--<button id="selectAllTree" class="btn">Select All</button>-->
+                                    <!--<button id="deselectAllTree" class="btn">Deselect All</button>-->
+                                    <!--<a id="closeTree" class="close"></a>-->
+                                <!--</div>-->
+                                <!--<div class="action-panel">-->
+                                    <!--<input style="width:50%" type="text" id="search-input"/>-->
+                                    <!--<button id="select-btn" class="btn">Select</button>-->
+                                    <!--<button id="deselect-btn" class="btn">Deselect</button>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="tree-menu-panel">-->
+                                <!--<input type="radio" name="filterBy" id="all-filter" checked value="ALL"/> All-->
+                                <!--<input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges-->
+                                <!--<input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="tree"></div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
 
         <div class="progress-bar-wrapper">
             <div class="progress-bar-row">
@@ -1222,12 +1449,11 @@
     var tree;
     var toggleTexture = true;
 
-    var $hamburger = $(".hamburger");
-    $hamburger.on("click", function(e) {
-        $hamburger.toggleClass("is-active");
-        $(".slide-in").toggleClass('show');
-    });
-
+//    var $hamburger = $(".hamburger");
+//    $hamburger.on("click", function(e) {
+//        $hamburger.toggleClass("is-active");
+//        $(".slide-in").toggleClass('show');
+//    });
 
 
     var textures = [
@@ -1525,13 +1751,13 @@
     });
 
     $("#toggleMenu").click(function () {
-        $(".slide-in-tree").toggleClass('show');
+        $(".sidebar-right-tree").toggleClass('active');
         $("#tree-state-icon").toggle();
     });
 
 
     $("#closeTree").click(function () {
-        $(".slide-in-tree").removeClass('show');
+        $(".sidebar-right-tree").removeClass('active');
         $("#tree-state-icon").hide();
     });
 
