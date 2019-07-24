@@ -288,7 +288,93 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         return {meshesData: meshesData, modelGroup: modelGroup};
     };
 
+
+    this.createMeshFromCommonFace = function (totalObjectDataElement, geometryElement) {
+
+
+        var pointsTable = totalObjectDataElement.pointsTable;
+        var vertices = totalObjectDataElement.totalObjVertices;
+        var results = totalObjectDataElement.totalObjResults;
+        var maxGeometryResult = totalObjectDataElement.maxGeometryResult;
+        var minGeometryResult = totalObjectDataElement.minGeometryResult;
+        var objectNames = totalObjectDataElement.objectNames;
+        var pointsNumbers = totalObjectDataElement.pointsNumbers;
+        var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
+        var groups = totalObjectDataElement.groups;
+
+
+        var geoCommonMeshGeometry = new THREE.BufferGeometry();
+        geoCommonMeshGeometry.addAttribute('position', new THREE.Float32BufferAttribute(faceCommonDataForMesh.positions, 3));
+        geoCommonMeshGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(faceCommonDataForMesh.normals, 3));
+        geoCommonMeshGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(faceCommonDataForMesh.uvs, 2));
+
+
+        var mesh = new THREE.Mesh(geoCommonMeshGeometry, faceCommonDataForMesh.drawResultsMaterial ?
+            faceCommonDataForMesh.drawResultsMaterial : faceCommonDataForMesh.facesMaterial);
+        mesh.userData.pointsTable = pointsTable;
+        mesh.userData.totalObjVertices = vertices;
+        mesh.userData.totalObjResults = results;
+        mesh.userData.maxGeometryResult = maxGeometryResult;
+        mesh.userData.minGeometryResult = minGeometryResult;
+        mesh.userData.objectNames = objectNames;
+        mesh.userData.pointsNumbers = pointsNumbers;
+        mesh.userData.groups = groups;
+
+        mesh.name = totalObjectDataElement.name;
+        mesh.uniqueId = mesh.uuid;
+        mesh.parentName = totalObjectDataElement.name;
+        mesh.defaultColor = faceCommonDataForMesh.facesMaterial.color.clone();
+        mesh.facesMaterial = faceCommonDataForMesh.facesMaterial;
+        mesh.drawResults = faceCommonDataForMesh.drawResults;
+
+        geometryElement.add(mesh);
+
+        if (!editor.scene.meshes) {
+            editor.scene.meshes = [];
+        }
+        editor.scene.meshes.push(mesh);
+
+        return mesh;
+    };
+
+    this.createLineFromCommonLineData = function (totalObjectDataElement, geometryElement) {
+
+
+        var pointsTable = totalObjectDataElement.pointsTable;
+        var vertices = totalObjectDataElement.totalObjVertices;
+        var results = totalObjectDataElement.totalObjResults;
+        var maxGeometryResult = totalObjectDataElement.maxGeometryResult;
+        var minGeometryResult = totalObjectDataElement.minGeometryResult;
+        var objectNames = totalObjectDataElement.objectNames;
+        var pointsNumbers = totalObjectDataElement.pointsNumbers;
+        var lineCommonDataForLine = totalObjectDataElement.lineCommonDataForLine;
+
+        var geoCommonLineGeometry = new THREE.BufferGeometry();
+        geoCommonLineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(lineCommonDataForLine.positions, 3));
+        var lines = new THREE.LineSegments(geoCommonLineGeometry, lineCommonDataForLine.edgesMaterial);
+        geometryElement.add(lines);
+        // modelGroup.add(lines);
+        lines.userData.pointsTable = pointsTable;
+        lines.parentName = totalObjectDataElement.name;
+        lines.defaultColor = lineCommonDataForLine.edgesMaterial.color.clone();
+        lines.userData.totalObjVertices = vertices;
+        lines.userData.totalObjResults = results;
+        lines.userData.maxGeometryResult = maxGeometryResult;
+        lines.userData.minGeometryResult = minGeometryResult;
+        lines.userData.objectNames = objectNames;
+        lines.userData.pointsNumbers = pointsNumbers;
+        editor.octree.add(lines);
+
+        if (!editor.scene.lines) {
+            editor.scene.lines = [];
+        }
+        editor.scene.lines.push(lines);
+        return lines;
+    };
+
+
     this.createAndAddCommonObjects = function (pictureInfo) {
+        var me = this;
         var result = pictureInfo.geometryObjectData;
         var meshesData = {};
         var modelGroup = new THREE.Object3D();
@@ -299,52 +385,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var geometryElement = new THREE.Object3D();
             var totalObjectDataElement = value;
             var objectGroupElements = totalObjectDataElement.groups;
-            var pointsTable = totalObjectDataElement.pointsTable;
-            var vertices = totalObjectDataElement.totalObjVertices;
-            var results = totalObjectDataElement.totalObjResults;
             var maxGeometryResult = totalObjectDataElement.maxGeometryResult;
             var minGeometryResult = totalObjectDataElement.minGeometryResult;
-            var objectNames = totalObjectDataElement.objectNames;
-            var pointsNumbers = totalObjectDataElement.pointsNumbers;
             var lineCommonDataForLine = totalObjectDataElement.lineCommonDataForLine;
             var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
-            var groups = totalObjectDataElement.groups;
-            var faces = totalObjectDataElement.faces;
 
-
-            var geoCommonMeshGeometry = new THREE.BufferGeometry();
-            geoCommonMeshGeometry.addAttribute('position', new THREE.Float32BufferAttribute(faceCommonDataForMesh.positions, 3));
-            // geoCommonMeshGeometry.addAttribute('color', new THREE.Float32BufferAttribute(faceCommonDataForMesh.colors, 3));
-            geoCommonMeshGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(faceCommonDataForMesh.normals, 3));
-            geoCommonMeshGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(faceCommonDataForMesh.uvs, 2));
-
-
-            var mesh = new THREE.Mesh(geoCommonMeshGeometry, faceCommonDataForMesh.drawResultsMaterial ?
-                faceCommonDataForMesh.drawResultsMaterial : faceCommonDataForMesh.facesMaterial);
-            mesh.userData.pointsTable = pointsTable;
-            mesh.userData.totalObjVertices = vertices;
-            mesh.userData.totalObjResults = results;
-            mesh.userData.maxGeometryResult = maxGeometryResult;
-            mesh.userData.minGeometryResult = minGeometryResult;
-            mesh.userData.objectNames = objectNames;
-            mesh.userData.pointsNumbers = pointsNumbers;
-            mesh.userData.groups = groups;
-
-            mesh.name = totalObjectDataElement.name;
-            mesh.uniqueId = mesh.uuid;
-            mesh.parentName = totalObjectDataElement.name;
-            mesh.defaultColor = faceCommonDataForMesh.facesMaterial.color.clone();
-            mesh.facesMaterial = faceCommonDataForMesh.facesMaterial;
-            mesh.drawResults = faceCommonDataForMesh.drawResults;
-
-            geometryElement.add(mesh);
-
-            if (!editor.scene.meshes) {
-                editor.scene.meshes = [];
-            }
-            editor.scene.meshes.push(mesh);
-
-            editor.octree.add(mesh);
 // TODO move to common geometry
 
             _.forEach(objectGroupElements, function (objElement) {
@@ -380,39 +425,29 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             });
 
+            if (faceCommonDataForMesh.positions.length > 0 && lineCommonDataForLine.positions.length > 0) {
 
-            var geoCommonLineGeometry = new THREE.BufferGeometry();
-            geoCommonLineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(lineCommonDataForLine.positions, 3));
-            var lines = new THREE.LineSegments(geoCommonLineGeometry, lineCommonDataForLine.edgesMaterial);
-            geometryElement.add(lines);
-            // modelGroup.add(lines);
-            lines.userData.pointsTable = pointsTable;
-            lines.parentName = totalObjectDataElement.name;
-            lines.defaultColor = lineCommonDataForLine.edgesMaterial.color.clone();
-            lines.userData.totalObjVertices = vertices;
-            lines.userData.totalObjResults = results;
-            lines.userData.maxGeometryResult = maxGeometryResult;
-            lines.userData.minGeometryResult = minGeometryResult;
-            lines.userData.objectNames = objectNames;
-            lines.userData.pointsNumbers = pointsNumbers;
-            editor.octree.add(lines);
-
-            if (!editor.scene.lines) {
-                editor.scene.lines = [];
-            }
-            editor.scene.lines.push(lines);
-
-            if (geoCommonMeshGeometry.attributes.position.count > 0 && geoCommonLineGeometry.attributes.position.count > 0) {
-                lines.name = totalObjectDataElement.name + ".EDGE";
+                var mesh = me.createMeshFromCommonFace(totalObjectDataElement, geometryElement);
                 mesh.name = totalObjectDataElement.name + ".FACE";
-                meshesData[key].push(lines);
                 meshesData[key].push(mesh);
-            } else if (geoCommonMeshGeometry.attributes.position.count === 0 && geoCommonLineGeometry.attributes.position.count > 0) {
+
+
+                var lines = me.createLineFromCommonLineData(totalObjectDataElement, geometryElement);
+                lines.name = totalObjectDataElement.name + ".EDGE";
+                meshesData[key].push(lines);
+
+            } else if (faceCommonDataForMesh.positions.length === 0 && lineCommonDataForLine.positions.length > 0) {
+
+                var lines = me.createLineFromCommonLineData(totalObjectDataElement, geometryElement);
+
                 if (_.trim(lines.name).length === 0) {
                     lines.name = totalObjectDataElement.name + ".EDGE";
                 }
                 meshesData[key].push(lines);
-            } else if (geoCommonMeshGeometry.attributes.position.count > 0 && geoCommonLineGeometry.attributes.position.count === 0) {
+            } else if (faceCommonDataForMesh.positions.length > 0 && lineCommonDataForLine.positions.length === 0) {
+
+                var mesh = me.createMeshFromCommonFace(totalObjectDataElement, geometryElement);
+
                 if (_.trim(mesh.name).length === 0) {
                     mesh.name = totalObjectDataElement.name + ".FACE";
                 }
