@@ -303,6 +303,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var groups = totalObjectDataElement.groups;
 
 
+        var faces = totalObjectDataElement.faces;
+
+
         var geoCommonMeshGeometry = new THREE.BufferGeometry();
         geoCommonMeshGeometry.addAttribute('position', new THREE.Float32BufferAttribute(faceCommonDataForMesh.positions, 3));
         geoCommonMeshGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(faceCommonDataForMesh.normals, 3));
@@ -319,6 +322,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         mesh.userData.objectNames = objectNames;
         mesh.userData.pointsNumbers = pointsNumbers;
         mesh.userData.groups = groups;
+        mesh.userData.faces = faces;
 
         mesh.name = totalObjectDataElement.name;
         mesh.uniqueId = mesh.uuid;
@@ -1020,6 +1024,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var pointsTable = geometryObject.pointsTable;
         var objectNames = geometryObject.objectNames;
         var pointsNumbers = geometryObject.pointsNumbers;
+        var faces = geometryObject.faces;
+        var groups = geometryObject.groups;
         var vertices = [];
 
         var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
@@ -1074,6 +1080,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.pointsNumbers = pointsNumbers;
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
+        totalGeometryObj.faces = faces;
+        totalGeometryObj.groups  = groups;
 
 
         totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;

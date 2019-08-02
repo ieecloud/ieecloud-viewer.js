@@ -151,8 +151,8 @@ Editor.prototype = {
                 var maxResult = resultInfo.maxResult;
                 var minResult = resultInfo.minResult;
 
-                var maxChanged = maxGeometryResult >= maxResult ||  me.loader.pretenderMaxs.size === 0;
-                var minChanged = minGeometryResult <= minResult ||  me.loader.pretenderMins.size === 0;
+                var maxChanged = maxGeometryResult >= maxResult || !maxResult;
+                var minChanged = minGeometryResult <= minResult || !minResult;
                 me.loader.pretenderMaxs.add(maxGeometryResult);
                 if (maxChanged) {
                     maxResult = maxGeometryResult;
@@ -163,14 +163,12 @@ Editor.prototype = {
                 }
 
                 if (maxChanged || minChanged) {
-                    if (!me.modeAllVisible) {
-                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, resultInfo.maxResult,
-                            resultInfo.minResult, function (oNode) {
-                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
-                        });
-                        me.setIntermediateMinMaxResult(minResult, maxResult);
-                    }
                     me.setMinMaxResult(minResult, maxResult);
+                    if (!me.modeAllVisible) {
+                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
+                        });
+                    }
                 }
             }
         }
@@ -211,7 +209,7 @@ Editor.prototype = {
         return me.loader.getV(result, newMaxResult, newMinResult);
     },
 
-    recalculateUvs: function (aTree, newMaxResult, newMinResult, oldMaxResult, oldMinResult, fCompair) {
+    recalculateUvs: function (aTree, newMaxResult, newMinResult, fCompair) {
 
 
         var me = this;
@@ -228,21 +226,40 @@ Editor.prototype = {
         while (aInnerTree.length > 0) {
             oNode = aInnerTree.pop();
             if (fCompair(oNode)) {
-                var currentUvs = oNode.object.geometry.attributes.uv.array;
-                var newUvs = [];
+                var groups = oNode.object.userData.groups;
+                var faceGroups = oNode.object.userData.faces;
+                var results = oNode.object.userData.totalObjResults;
 
-                for (var k = 0; k < currentUvs.length; k+=6) {
-                    newUvs.push(
-                        0.0,
-                        me.getNewUv(currentUvs[k + 1], newMaxResult, newMinResult, oldMaxResult, oldMinResult),
-                        0.0,
-                        me.getNewUv(currentUvs[k + 3], newMaxResult, newMinResult, oldMaxResult, oldMinResult),
-                        0.0,
-                        me.getNewUv(currentUvs[k + 5], newMaxResult, newMinResult, oldMaxResult, oldMinResult));
+                var uvs = [];
 
+                if(_.isUndefined(groups)){
+                    continue;
                 }
-                oNode.object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(newUvs, 2));
 
+                for (var j = 0; j < groups.length; j++) {
+                    var faces = faceGroups[j];
+                    var offset = 0;
+                    while (offset < faces.length) {
+                        uvs.push(
+                            0.0,
+                            me.loader.getV(results[faces[offset]], newMaxResult, newMinResult),
+                            0.0,
+                            me.loader.getV(results[faces[offset + 1]], newMaxResult, newMinResult),
+                            0.0,
+                            me.loader.getV(results[faces[offset + 2]], newMaxResult, newMinResult));
+
+
+                        uvs.push(
+                            0.0,
+                            me.loader.getV(results[faces[offset]], newMaxResult, newMinResult),
+                            0.0,
+                            me.loader.getV(results[faces[offset + 2]], newMaxResult, newMinResult),
+                            0.0,
+                            me.loader.getV(results[faces[offset + 1]], newMaxResult, newMinResult));
+                        offset = offset + 3;
+                    }
+                }
+                oNode.object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             } else {
                 for (var keysNode in oNode) {
                     if (oNode[keysNode] instanceof Array) {
@@ -267,21 +284,13 @@ Editor.prototype = {
 
         // recalculate for Whole model not for every geometry object
         if (me.loader.DRAW_RESULTS) {
-
             var resultInfo = me.getResultInfo();
-            var oldMinResult = resultInfo.initialMinResult;
-            var oldMaxResult =  resultInfo.initialMaxResult;
 
-            if(resultInfo.intermediateMinResult && resultInfo.intermediateMaxResult){
-                oldMinResult = resultInfo.intermediateMinResult;
-                oldMaxResult =  resultInfo.intermediateMaxResult;
-            }
-            me.recalculateUvs(this.loader.objectsTree, resultInfo.maxResult, resultInfo.minResult,
-                oldMaxResult,
-                oldMinResult, function (oNode) {
-                    if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
-                });
-            me.setIntermediateMinMaxResult(resultInfo.minResult, resultInfo.maxResult);
+            var maxResult = resultInfo.maxResult;
+            var minResult = resultInfo.minResult;
+            me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                if (oNode.object && oNode.object instanceof THREE.Mesh /*&& oNode.object.isSimpleShape === false*/) return true;
+            });
         }
         this.signals.objectChanged.dispatch(this.lastModel)
 
@@ -336,14 +345,12 @@ Editor.prototype = {
                 }
 
                 if (maxChanged || minChanged) {
-                    if (!me.modeAllVisible) {
-                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, resultInfo.maxResult,
-                            resultInfo.minResult, function (oNode) {
-                            if (oNode.object && oNode.object instanceof THREE.Mesh) return true;
-                        });
-                        me.setIntermediateMinMaxResult(minResult, maxResult);
-                    }
                     me.setMinMaxResult(minResult, maxResult);
+                    if (!me.modeAllVisible) {
+                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                            if (oNode.object && oNode.object instanceof THREE.Mesh /*&& oNode.object.isSimpleShape === false*/) return true;
+                        });
+                    }
 
                 }
             }
