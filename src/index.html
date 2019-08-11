@@ -914,6 +914,25 @@
             /*-webkit-transform: translateX(0);*/
             /*box-shadow: 0 0 10px rgba(0,0,0,0.5);*/
         /*}*/
+        /* width */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
 
 
 
@@ -945,6 +964,7 @@
             transform: translateX(-260px);
             transition: transform 250ms ease-in-out;
             background-color: black;
+            overflow-y: auto;
         }
 
         .sidebar-right-tree {
