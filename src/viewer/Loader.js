@@ -946,6 +946,20 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             geometryObject.edgesMaterial = simpleLinesMaterial;
 
+            var groupsObjects = [];
+            for (var j = 0; j < geometryObject.groups.length; j++) {  // tmp for simple shapes only common model view
+
+                var groupElement  = {};
+                groupElement.simpleShapes  = [];
+                groupElement.name  = geometryObject.groups[j];
+                if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
+                    scope.parseSimpleShapes(geometryObject.simpleShapes, j, groupElement, vertices);
+                }
+
+                groupsObjects.push(groupElement);
+            }
+            geometryObject.groups  = groupsObjects;
+
         } else {
 
             for (var j = 0; j < geometryObject.groups.length; j++) {  //reading edges and faces by groups
@@ -1003,7 +1017,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
 
 
-                // TODO : fix it for common geometry
                 geometryObject.groups[j].simpleShapes = [];  //Simple shapes
                 if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
                     scope.parseSimpleShapes(geometryObject.simpleShapes, j, geometryObject.groups[j], vertices);
@@ -1081,7 +1094,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
         totalGeometryObj.faces = faces;
-        totalGeometryObj.groups  = groups;
+        totalGeometryObj.groups  = geometryObject.groups;
 
 
         totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;
