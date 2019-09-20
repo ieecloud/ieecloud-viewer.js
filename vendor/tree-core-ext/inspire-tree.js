@@ -2982,6 +2982,7 @@ var TreeNode = function () {
 
             baseStateChange('checked', true, 'checked', this, deep);
 
+            this._tree.emit('node.ouUserChecked', this, false);
             // Reset indeterminate state
             this.state('indeterminate', false);
 
@@ -4418,6 +4419,7 @@ var TreeNode = function () {
 
             baseStateChange('checked', false, 'unchecked', this, deep);
 
+            this._tree.emit('node.ouUserUnchecked', this, false);
             // Reset indeterminate state
             this.state('indeterminate', false);
 

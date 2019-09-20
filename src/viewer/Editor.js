@@ -50,8 +50,6 @@ var Editor = function (options) {
     this.searchNearestPointMode = options.searchNearestPointMode;
     this.resultDigits = options.resultDigits;
 
-    this.modeAllVisible = false;
-
     this.loader = new Loader(this, options.textureUrl, options.textureBase64, options.texture, options.textures);
 
     this.scene = new THREE.Scene();
@@ -164,11 +162,6 @@ Editor.prototype = {
 
                 if (maxChanged || minChanged) {
                     me.setMinMaxResult(minResult, maxResult);
-                    if (!me.modeAllVisible) {
-                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
-                        });
-                    }
                 }
             }
         }
@@ -177,13 +170,23 @@ Editor.prototype = {
 
     showObject: function (object) {
         var me = this;
-        me.modeAllVisible = false;
         if (object !== null) {
             me.preShowObject(object);
-            if(object.parent && !object.parent.isModelContainerObj){
-                this.signals.objectChanged.dispatch(object);
-            }
         }
+    },
+
+    updateModelTexture: function(object){
+        var me = this;
+
+        var resultInfo = me.getResultInfo();
+
+        var maxResult = resultInfo.maxResult;
+        var minResult = resultInfo.minResult;
+
+        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
+        });
+        this.signals.objectChanged.dispatch(object);
     },
 
     selectTree: function (object) {
@@ -272,14 +275,8 @@ Editor.prototype = {
         }
     },
 
-    setAllSelectableMode: function(){
-        this.modeAllVisible = true;
-
-    },
-
     toggleWholeModel: function(visible){
         var me = this;
-        this.modeAllVisible = true;
         this.lastModel.visible = visible;
 
         // recalculate for Whole model not for every geometry object
@@ -346,12 +343,6 @@ Editor.prototype = {
 
                 if (maxChanged || minChanged) {
                     me.setMinMaxResult(minResult, maxResult);
-                    if (!me.modeAllVisible) {
-                        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                            if (oNode.object && oNode.object instanceof THREE.Mesh /*&& oNode.object.isSimpleShape === false*/) return true;
-                        });
-                    }
-
                 }
             }
         }
@@ -359,12 +350,8 @@ Editor.prototype = {
 
     hideObject: function (object) {
         var me = this;
-        me.modeAllVisible = false;
         if (object !== null) {
             me.preHideObject(object);
-            if(object.parent && !object.parent.isModelContainerObj){
-                this.signals.objectChanged.dispatch(object);
-            }
         }
     },
 

@@ -148,10 +148,6 @@ function Viewer(target, options) {
         this.threeEditor.toggleWholeModel(objData);
     };
 
-    Viewer.prototype.turnAllMode = function () {
-        this.threeEditor.setAllSelectableMode();
-    };
-
     Viewer.prototype.selectObject = function (objData) {
         this.threeEditor.loader.selectObject(objData);
     };
@@ -167,6 +163,10 @@ function Viewer(target, options) {
 
     Viewer.prototype.showObject = function (objData) {
         this.threeEditor.loader.showObject(objData);
+    };
+
+    Viewer.prototype.updateModelTexture = function (objData) {
+        this.threeEditor.updateModelTexture(objData);
     };
 
     Viewer.prototype.preHideObject = function (objData) {

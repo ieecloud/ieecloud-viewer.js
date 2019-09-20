@@ -147,15 +147,6 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         this.addMinMaxResults();
     };
 
-    var rotObjectMatrix;
-
-
-    var rotateAroundObjectAxis = function (object, axis, radians) {
-        rotObjectMatrix = new THREE.Matrix4();
-        rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
-        object.matrix.multiply(rotObjectMatrix);
-        object.rotation.setFromRotationMatrix(object.matrix);
-    };
 
     this.init = function () {
 
