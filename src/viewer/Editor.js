@@ -175,17 +175,36 @@ Editor.prototype = {
         }
     },
 
-    updateModelTexture: function(object){
+    updateModelTexture: function (object, isObjectShow) {
         var me = this;
 
         var resultInfo = me.getResultInfo();
 
         var maxResult = resultInfo.maxResult;
         var minResult = resultInfo.minResult;
+        var textureNeedToRecalculate = resultInfo.dirty;
 
-        me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
-        });
+
+        if (textureNeedToRecalculate) {
+            // need recalculate the whole tree
+            me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
+            });
+            resultInfo.dirty = false;
+        } else {
+            // need recalculate only object to show with untouched max/min
+            if(isObjectShow){
+                me.loader.traverseTree(object, function (child) {
+                    if (child instanceof THREE.Mesh) {
+                        var groups = child.userData.groups;
+                        if (!_.isUndefined(groups)) {
+                            me.recalculateMeshUvs(child, maxResult, minResult);
+                        }
+                    }
+                });
+            }
+        }
+
         this.signals.objectChanged.dispatch(object);
     },
 
@@ -212,6 +231,40 @@ Editor.prototype = {
         return me.loader.getV(result, newMaxResult, newMinResult);
     },
 
+    recalculateMeshUvs: function (object, maxResult, minResult) {
+        var me = this;
+        var groups = object.userData.groups;
+        var faceGroups = object.userData.faces;
+        var results = object.userData.totalObjResults;
+
+        var uvs = [];
+
+        for (var j = 0; j < groups.length; j++) {
+            var faces = faceGroups[j];
+            var offset = 0;
+            while (offset < faces.length) {
+                uvs.push(
+                    0.0,
+                    me.loader.getV(results[faces[offset]], maxResult, minResult),
+                    0.0,
+                    me.loader.getV(results[faces[offset + 1]], maxResult, minResult),
+                    0.0,
+                    me.loader.getV(results[faces[offset + 2]], maxResult, minResult));
+
+
+                uvs.push(
+                    0.0,
+                    me.loader.getV(results[faces[offset]], maxResult, minResult),
+                    0.0,
+                    me.loader.getV(results[faces[offset + 2]], maxResult, minResult),
+                    0.0,
+                    me.loader.getV(results[faces[offset + 1]], maxResult, minResult));
+                offset = offset + 3;
+            }
+        }
+        object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    },
+
     recalculateUvs: function (aTree, newMaxResult, newMinResult, fCompair) {
 
 
@@ -219,7 +272,7 @@ Editor.prototype = {
         var aInnerTree = [];
         var oNode;
 
-        if(_.isUndefined(newMinResult) || _.isUndefined(newMaxResult)){
+        if (_.isUndefined(newMinResult) || _.isUndefined(newMaxResult)) {
             return;
         }
 
@@ -230,39 +283,11 @@ Editor.prototype = {
             oNode = aInnerTree.pop();
             if (fCompair(oNode)) {
                 var groups = oNode.object.userData.groups;
-                var faceGroups = oNode.object.userData.faces;
-                var results = oNode.object.userData.totalObjResults;
 
-                var uvs = [];
-
-                if(_.isUndefined(groups)){
+                if (_.isUndefined(groups)) {
                     continue;
                 }
-
-                for (var j = 0; j < groups.length; j++) {
-                    var faces = faceGroups[j];
-                    var offset = 0;
-                    while (offset < faces.length) {
-                        uvs.push(
-                            0.0,
-                            me.loader.getV(results[faces[offset]], newMaxResult, newMinResult),
-                            0.0,
-                            me.loader.getV(results[faces[offset + 1]], newMaxResult, newMinResult),
-                            0.0,
-                            me.loader.getV(results[faces[offset + 2]], newMaxResult, newMinResult));
-
-
-                        uvs.push(
-                            0.0,
-                            me.loader.getV(results[faces[offset]], newMaxResult, newMinResult),
-                            0.0,
-                            me.loader.getV(results[faces[offset + 2]], newMaxResult, newMinResult),
-                            0.0,
-                            me.loader.getV(results[faces[offset + 1]], newMaxResult, newMinResult));
-                        offset = offset + 3;
-                    }
-                }
-                oNode.object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+                me.recalculateMeshUvs(oNode.object, newMaxResult, newMinResult);
             } else {
                 for (var keysNode in oNode) {
                     if (oNode[keysNode] instanceof Array) {
@@ -600,19 +625,9 @@ Editor.prototype = {
         this.resultInfo =  this.resultInfo || {};
         this.resultInfo.minResult = minResult;
         this.resultInfo.maxResult = maxResult;
+        this.resultInfo.dirty  = true;
     },
 
-    setInitialMinMaxResult: function (minResult, maxResult) {
-        this.resultInfo =  this.resultInfo || {};
-        this.resultInfo.initialMinResult = minResult;
-        this.resultInfo.initialMaxResult = maxResult;
-    },
-
-    setIntermediateMinMaxResult: function (minResult, maxResult) {
-        this.resultInfo =  this.resultInfo || {};
-        this.resultInfo.intermediateMinResult = minResult;
-        this.resultInfo.intermediateMaxResult = maxResult;
-    },
 
     toggleIsolines: function (showFlag) {
 

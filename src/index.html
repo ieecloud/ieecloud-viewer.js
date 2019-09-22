@@ -1402,14 +1402,14 @@
 
                 tree.on('node.ouUserChecked', function(node, event) {
                     if(node.object){
-                        $("#viewer").ieecloudEditor("updateModelTexture", node.object);
+                        $("#viewer").ieecloudEditor("updateModelTexture", node.object, true);
                     }
 
                 });
 
                 tree.on('node.ouUserUnchecked', function(node, event) {
                     if(node.object){
-                        $("#viewer").ieecloudEditor("updateModelTexture", node.object);
+                        $("#viewer").ieecloudEditor("updateModelTexture", node.object, false);
                     }
 
                 });

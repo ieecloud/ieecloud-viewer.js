@@ -165,8 +165,8 @@ function Viewer(target, options) {
         this.threeEditor.loader.showObject(objData);
     };
 
-    Viewer.prototype.updateModelTexture = function (objData) {
-        this.threeEditor.updateModelTexture(objData);
+    Viewer.prototype.updateModelTexture = function (objData, isObjectShow) {
+        this.threeEditor.updateModelTexture(objData, isObjectShow);
     };
 
     Viewer.prototype.preHideObject = function (objData) {
