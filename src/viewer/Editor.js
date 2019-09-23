@@ -181,6 +181,7 @@ Editor.prototype = {
         var resultInfo = me.getResultInfo();
 
         if (_.isUndefined(resultInfo)) {
+            this.signals.objectChanged.dispatch(object);
             return;
         }
 
