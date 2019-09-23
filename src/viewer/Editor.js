@@ -180,6 +180,10 @@ Editor.prototype = {
 
         var resultInfo = me.getResultInfo();
 
+        if (_.isUndefined(resultInfo)) {
+            return;
+        }
+
         var maxResult = resultInfo.maxResult;
         var minResult = resultInfo.minResult;
         var textureNeedToRecalculate = resultInfo.dirty;
