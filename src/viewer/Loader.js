@@ -952,6 +952,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var groupElement  = {};
                 groupElement.simpleShapes  = [];
                 groupElement.name  = geometryObject.groups[j];
+                groupElement.facesMaterial = simpleFacesMaterial;
                 if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
                     scope.parseSimpleShapes(geometryObject.simpleShapes, j, groupElement, vertices);
                 }
