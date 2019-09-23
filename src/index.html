@@ -1021,7 +1021,45 @@
           transform: rotate(-45deg);
         }
 
+        .inspire-tree [type="checkbox"]{
+            opacity: 0;
+        }
 
+        .inspire-tree [type="checkbox"] + a:before {
+            content: '';
+            margin-right: 10px;
+            display: inline-block;
+            vertical-align: text-top;
+            width: 20px;
+            height: 20px;
+            background: white;
+        }
+
+
+        .inspire-tree [type="checkbox"]:checked + a:after {
+            content: '';
+            position: absolute;
+            left: 29px;
+            top: 12px;
+            background: white;
+            width: 2px;
+            height: 2px;
+            box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 white;
+            -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        .inspire-tree [type="checkbox"]:checked + a:before {
+            background: #0000FF;
+        }
+
+        .inspire-tree [type="checkbox"]:hover + a:before {
+            background: #0000FF;
+        }
+
+        .inspire-tree .title {
+            padding-left: 50px;
+        }
 
     </style>
 </head>
