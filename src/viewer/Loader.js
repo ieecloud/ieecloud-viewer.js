@@ -740,6 +740,24 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                                 newModelGroup.add(prevNode.object);
                             }
+                            // TODO:refactor with above
+                            if(i ===  (obj.length  - 1)){
+                                var currentNode = obj[i];
+                                if (currentNode.children && currentNode.children.length > 0) {
+                                    var upperNodeContainer = new THREE.Object3D();
+                                    for (var k = 0; k < currentNode.children.length; k++) {
+                                        if (currentNode.children[k].object) {
+                                            upperNodeContainer.add(currentNode.children[k].object);
+                                        }
+                                    }
+                                    currentNode.object = upperNodeContainer;
+                                    if(currentNode.object){
+                                        currentNode.object.isModelContainerObj = true;
+                                    }
+                                }
+
+                                newModelGroup.add(currentNode.object);
+                            }
 
                         }
                         traverse(obj[i]);
