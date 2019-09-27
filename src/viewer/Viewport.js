@@ -1015,12 +1015,12 @@ var Viewport = function (editor) {
                 if (resultIndex !== undefined) {
                     resultVal = results[resultIndex];
 
-                    if(pointsNumbers) {
+                    if (pointsNumbers) {
                         var numberSum = 0;
-                        for(var i=0; i < pointsNumbers.length; i++) {
+                        for (var i = 0; i < pointsNumbers.length; i++) {
                             numberSum = numberSum + pointsNumbers[i];
-                            if(resultIndex < numberSum) {
-                                if(objectNames[i]) {
+                            if (resultIndex < numberSum) {
+                                if (objectNames[i]) {
                                     objectName = objectNames[i];
                                 }
                                 break;
@@ -1028,6 +1028,28 @@ var Viewport = function (editor) {
                         }
                     }
                 }
+
+                // parse intersection object name and notify UI
+                var intersectionName = intersect.object.name;
+                if (intersectionName) {
+                    var intersectionNameArray = intersectionName.split('[');
+                    var objProperties = {};
+                    var objectType = intersectionNameArray[0];
+                    objProperties.type = objectType;
+                    let regexp = /\[(.*?)\]/g;
+                    let matchAll = intersectionName.matchAll(regexp);
+                    matchAll = Array.from(matchAll);
+                    for (var k = 0; k < matchAll.length; k++) {
+                        var matchElement = matchAll[k];
+                        var propInBracket = matchElement[1];
+                        var propInBracketWords = propInBracket.split(/(\s+)/).filter(e => e.trim().length > 0);
+                        objProperties[propInBracketWords[0]] = propInBracketWords[1];
+
+                    }
+                    editor.onFindNearestObject(objProperties);
+                }
+
+
                 resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : 0;
                 var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
                 info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal + ', objectName = ' + objectName);

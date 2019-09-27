@@ -90,6 +90,11 @@ function Viewer(target, options) {
             }
         });
 
+        $this.threeEditor.signals.onFindNearestObject.add(function (objProperties) {
+            if ($this.options.onFindNearestObject) {
+                $this.options.onFindNearestObject(objProperties);
+            }
+        });
     };
 
 

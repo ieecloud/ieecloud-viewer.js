@@ -24,6 +24,7 @@ var Editor = function (options) {
         startRender: new SIGNALS.Signal(),
         onPrintScreenDone: new SIGNALS.Signal(),
         onZipUpdateStatus: new SIGNALS.Signal(),
+        onFindNearestObject: new SIGNALS.Signal(),
         showRuler: new SIGNALS.Signal(),
         showVProtractor: new SIGNALS.Signal(),
         showHProtractor: new SIGNALS.Signal(),
@@ -106,6 +107,10 @@ Editor.prototype = {
 
     onPrintScreenDone: function (urlRenderer) {
         this.signals.onPrintScreenDone.dispatch(urlRenderer);
+    },
+
+    onFindNearestObject: function (objProperties) {
+        this.signals.onFindNearestObject.dispatch(objProperties);
     },
 
     onTreeLoad: function (tree) {

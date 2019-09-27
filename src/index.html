@@ -101,18 +101,23 @@
         }
 
         .tree-wrapper{
-            /*width: 415px;*/
-            /*position: relative;*/
-            /*z-index: 20;*/
             background-color: black;
             opacity: 0.7;
             color: white;
-            /*display:none;*/
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         .tree-wrapper  .tree-wrapper-inner{
-            padding-top: 8px;
-            padding-bottom: 8px;
+            height: 100%;
+        }
+
+        .tree-wrapper  .object-properties{
+            height: 100%;
+            display:none;
+            border-top: 1px solid #ffffff;
+            overflow-y: auto;
         }
 
         .tree-wrapper  .tree-wrapper-inner  .tree-menu .tree-menu-panel{
@@ -204,7 +209,7 @@
 
         .tree-wrapper  .tree-wrapper-inner  .tree {
             overflow-y: auto;
-            height: calc(100vh - 100px);
+            height: calc(100% - 95px);
         }
 
         .viewer-full-screen .btn-wrapper .buttons, .viewer-full-screen .tree-wrapper .buttons{
@@ -961,7 +966,7 @@
             cursor: pointer;
             position: absolute;
             z-index: 99;
-            top: 19px;
+            top: 12px;
             height: 22px;
             width: 22px;
             right: 15px
@@ -1061,6 +1066,87 @@
             padding-left: 50px;
         }
 
+
+
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        .container * {
+            box-sizing: border-box;
+        }
+
+        .flex-outer,
+        .flex-inner {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .flex-outer {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .flex-outer li,
+        .flex-inner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .flex-inner {
+            padding: 0 8px;
+            justify-content: space-between;
+        }
+
+        .flex-outer li label,
+        .flex-outer li p {
+            padding: 8px;
+        }
+
+        .flex-outer > li > label,
+        .flex-outer li p {
+            flex: 1 0 20px;
+            max-width: 100px;
+            font-weight: 600;
+        }
+
+        .flex-outer > li > label + *,
+        .flex-inner {
+            flex: 1 0 40px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .flex-outer li p {
+            margin: 0;
+        }
+
+        .flex-outer li input:not([type='checkbox']),
+        .flex-outer li textarea {
+            border: none;
+        }
+
+        .flex-outer li button {
+            margin-left: auto;
+            padding: 8px 16px;
+            border: none;
+            background: #333;
+            color: #f2f2f2;
+            text-transform: uppercase;
+            letter-spacing: .09em;
+            border-radius: 2px;
+        }
+
+        .flex-inner li {
+            width: 100px;
+        }
+
+
+
     </style>
 </head>
 <body id="body" class="full-screen">
@@ -1109,6 +1195,18 @@
                                 </i></a>
                         </div>
                         <div class="wholerow"></div>
+                        <ul class="sub-horizontal-menu">
+                            <li>
+                                <div class="title-wrap">
+                                    <a class="title" href="#" id="toggleObjectPropertiesMode"><i class="material-icons icon-action">
+                                        view_carousel
+                                    </i>Object Properties<i class="material-icons icon-action-state"  style="display:none;"  id="object-properties-mode-icon">
+                                        done
+                                    </i></a>
+                                </div>
+                                <div class="wholerow"></div>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <div class="title-wrap">
@@ -1229,40 +1327,16 @@
                         </div>
                         <div class="tree"></div>
                     </div>
+                    <div class="object-properties">
+
+                        <div class="container">
+                                <ul id="object-properties-container" class="flex-outer">
+                                </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <!---->
-        <!---->
-        <!--<div class="slide-in-tree from-right">-->
-            <!--<div class="slide-in-content-tree">-->
-                <!--<div id="tree-wrapper" class="tree-wrapper">-->
-                    <!--<div class="tree-wrapper-inner">-->
-                        <!--<div class="tree-menu">-->
-                            <!--<div class="tree-menu-panel">-->
-                                <!--<div class="action-panel">-->
-                                    <!--<button id="selectAllTree" class="btn">Select All</button>-->
-                                    <!--<button id="deselectAllTree" class="btn">Deselect All</button>-->
-                                    <!--<a id="closeTree" class="close"></a>-->
-                                <!--</div>-->
-                                <!--<div class="action-panel">-->
-                                    <!--<input style="width:50%" type="text" id="search-input"/>-->
-                                    <!--<button id="select-btn" class="btn">Select</button>-->
-                                    <!--<button id="deselect-btn" class="btn">Deselect</button>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<div class="tree-menu-panel">-->
-                                <!--<input type="radio" name="filterBy" id="all-filter" checked value="ALL"/> All-->
-                                <!--<input type="radio" name="filterBy" id="edges-filter" value="EDGE"/> Edges-->
-                                <!--<input type="radio" name="filterBy" id="faces-filter" value="FACE"/> Faces-->
-                            <!--</div>-->
-                        <!--</div>-->
-                        <!--<div class="tree"></div>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
-
         <div class="progress-bar-wrapper">
             <div class="progress-bar-row">
                 <div class="progress-bar">
@@ -1270,43 +1344,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-        <!--<button id="showTree" class="btn">Show Tree</button>-->
-        <!--<button id="hideTree" class="btn">Hide Tree</button>-->
-
-
-        <!--<button id="loadModel" class="btn">Load Model</button>-->
-        <!--<button id="removeModel" class="btn">Remove Model</button>-->
-
-        <!--<button id="showRulerBtn" class="btn">Ruler</button>-->
-        <!--<button id="showProtractorVBtn" class="btn">Protractor V</button>-->
-        <!--<button id="showProtractorHBtn" class="btn">Protractor H</button>-->
-        <!--<button id="exitFromFullScreen" class="btn">Exit from full screen</button>-->
-        <!--<button id="addIsolines" class="btn">Add Isolines </button>-->
-        <!--<button id="removeIsolines" class="btn">Remove Isolines </button>-->
-        <!--<select id="selectMode" name="selectMode">-->
-        <!--<option value=""></option>-->
-        <!--<option value="MESHES" selected='selected'>MESHES</option>-->
-        <!--<option value="LINES">LINES</option>-->
-        <!--</select>-->
-        <!--<select id="selectTexture" name="selectTexture"></select>-->
-        <!--<button id="setSearchNearestModeOctreeBtn" class="btn">Search Nearest Mode Octree</button>-->
-        <!--<button id="setSearchNearestModeSimpleBtn" class="btn">Search Nearest Mode Simple</button>-->
-        <!--<button id="takeScreenShort" class="btn">Take Screen Shot</button>-->
-        <!--<button id="saveScreenShot" class="btn">Save Screen Shot</button>-->
-        <!--<button id="returnToImageViewBtn" class="btn">Return to image view</button>-->
-        <!--<button id="changeImageBtn" class="btn">Change Image</button>-->
-        <!--<input id="modeInput"/>-->
-        <!--<button id="setModeBtn" class="btn">Set Mode</button>-->
-        <!--<button id="attachToNewDiv" class="btn">Attach to new div</button>-->
-        <!--<button id="removeAllResultsBtn" class="btn">Remove Selected Results</button>-->
-        <!--<button id="saveModelPositionBtn" class="btn">Save Model Position</button>-->
-
 
 </div>
 
@@ -1398,6 +1435,19 @@
         //rotationScale: {fov:0.35082010187266344, position: {x: 35.06093200951128, y: -87.23789463891883, z: 136.7042316558606}},
         rotationScale: getRotationScale("rotationScale", {fov:0.35082010187266344, position: {x: 35.06093200951128, y: -87.23789463891883, z: 136.7042316558606}}),
         detailModelView: getParameterValue("detailModelView", false),
+        onFindNearestObject: function (objProperties) {
+            $('#object-properties-container li').remove();
+            if (objProperties) {
+                var $propContainer = $('#object-properties-container');
+                for (key in objProperties) {
+                    $propContainer.append(
+                        $('<li>').append(
+                            $('<label>').append(key)
+                        ).append($('<span>').attr('title', objProperties[key]).append(objProperties[key])));
+                }
+            }
+        },
+
         onZipUpdateStatus:function(status, percent){
             if (percent) {
                 bar.animate(percent);
@@ -1657,6 +1707,12 @@
             }
         }
 
+    });
+
+
+    $("#toggleObjectPropertiesMode").click(function () {
+        $(".object-properties").toggle();
+        $("#object-properties-mode-icon").toggle();
     });
 
 
