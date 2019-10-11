@@ -111,6 +111,8 @@
 
         .tree-wrapper  .tree-wrapper-inner{
             height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .tree-wrapper  .object-properties{
@@ -207,9 +209,9 @@
             user-select: none;
         }
 
-        .tree-wrapper  .tree-wrapper-inner  .tree {
+        .tree-wrapper .tree-wrapper-inner .tree {
             overflow-y: auto;
-            height: calc(100% - 95px);
+            height: 100%;
         }
 
         .viewer-full-screen .btn-wrapper .buttons, .viewer-full-screen .tree-wrapper .buttons{
@@ -1103,7 +1105,7 @@
 
         .flex-outer li label,
         .flex-outer li p {
-            padding: 8px;
+            padding: 4px;
         }
 
         .flex-outer > li > label,

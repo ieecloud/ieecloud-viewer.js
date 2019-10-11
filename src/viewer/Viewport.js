@@ -1034,10 +1034,20 @@ var Viewport = function (editor) {
                 if (intersectionName) {
                     var intersectionNameArray = intersectionName.split('[');
                     var objProperties = {};
-                    var objectType = intersectionNameArray[0];
-                    objProperties.type = objectType;
-                    let regexp = /\[(.*?)\]/g;
+                    var objectNameType = intersectionNameArray[0];
+                    var objectNameTypeArray  = objectNameType.split('{');
+                    objProperties.name = objectNameTypeArray[0];
+
+                    let regexp = /\{(.*?)\}/g;
                     let matchAll = intersectionName.matchAll(regexp);
+                    matchAll = Array.from(matchAll);
+                    if (matchAll.length > 0) {
+                        let matchElement = matchAll[0];
+                        let propInBracket = matchElement[1];
+                        objProperties.type = propInBracket;
+                    }
+                    regexp = /\[(.*?)\]/g;
+                    matchAll = intersectionName.matchAll(regexp);
                     matchAll = Array.from(matchAll);
                     for (var k = 0; k < matchAll.length; k++) {
                         var matchElement = matchAll[k];
