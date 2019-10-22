@@ -75,6 +75,10 @@ var Editor = function (options) {
         overlapPct: 0.15
     });
 
+
+    this.selectionMaterial = new THREE.CustomSelectionMaterial({});
+
+
     this.object = {};
     this.geometries = {};
     this.materials = {};
@@ -621,6 +625,11 @@ Editor.prototype = {
         this.isolineMaterial = texture.isolineMaterial;
         this.isolineSpriteMaterial = texture.isolineSpriteMaterial;
         this.toggleIsolines(true);
+
+
+        this.selectionMaterial.setSourceTexture(colorMapTexture);
+        this.selectionMaterial.setCover(THREE.ImageUtils.loadTexture( "cover.png" ));
+
         return colorMapTexture;
     },
 

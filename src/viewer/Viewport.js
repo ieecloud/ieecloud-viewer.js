@@ -68,6 +68,7 @@ var Viewport = function (editor) {
     var clearColor = editor.options.backgroundColor;
     var objects = [];
     var unRotatedObjects = [];
+    var highlightedGeometryObjects = [];
     var staticTexts = [];
     var center = new THREE.Vector3();
 
@@ -965,6 +966,22 @@ var Viewport = function (editor) {
     };
 
 
+    scope.highlightObject = function (object) {
+        if (object !== null) {
+            object.defaultMaterial = object.material;
+            object.material = editor.selectionMaterial;
+            highlightedGeometryObjects.push(object)
+        }
+    };
+
+    scope.unHighlightHighlightedObjects = function () {
+        for (var i = 0; i < highlightedGeometryObjects.length; i++) {
+            highlightedGeometryObjects[i].material = highlightedGeometryObjects[i].defaultMaterial;
+        }
+        highlightedGeometryObjects = [];
+    };
+
+
 
 
 
@@ -1031,6 +1048,12 @@ var Viewport = function (editor) {
 
                 // parse intersection object name and notify UI
                 var intersectionName = intersect.object.name;
+
+
+                scope.unHighlightHighlightedObjects();
+
+                scope.highlightObject(intersect.object);
+
                 if (intersectionName) {
                     var intersectionNameArray = intersectionName.split('[');
                     var objProperties = {};
