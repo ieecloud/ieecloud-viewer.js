@@ -1049,9 +1049,6 @@ var Viewport = function (editor) {
                 // parse intersection object name and notify UI
                 var intersectionName = intersect.object.name;
 
-
-                scope.unHighlightHighlightedObjects();
-
                 scope.highlightObject(intersect.object);
 
                 if (intersectionName) {
@@ -1121,6 +1118,12 @@ var Viewport = function (editor) {
                 var intersects = getIntersects(event, objects);
                 console.log('get getIntersects time:' + (Date.now() - startTime));
                 startTime = Date.now();
+                if (highlightedGeometryObjects.length > 0) {
+                    scope.unHighlightHighlightedObjects();
+                    render();
+                    editor.onFindNearestObject({});
+                }
+
                 if (intersects.length > 0) {
                     runNearestAlgorithm(intersects);
                 }
