@@ -10,9 +10,10 @@ THREE.CustomSelectionMaterial = function (parameters) {
     this.defines = {};
     this.defines["USE_MAP"] = "";
     this.uniforms = {};
-
     this.fog = false;
     this.lights = true;
+    this.extensions.derivatives = true;
+    this.color = new THREE.Color( 0.6, 0.6, 0.6 ); // diffuse
 
     this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
     this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
@@ -116,13 +117,15 @@ THREE.CustomSelectionMaterial = function (parameters) {
             "	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
             "	vec3 totalEmissiveRadiance = emissive;",
             THREE.ShaderChunk["logdepthbuf_fragment"],
-            "vec2 vUv2 = vec2(0.5, 0.55);",
-            "vec4 mapCoverTexel = texture2D(mapCover, vUv2);",
-            "vec4 mapTexel = texture2D(map, vUv);",
-            "vec3 texel = mapCoverTexel.rgb * mapCoverTexel.a + mapTexel.rgb * mapTexel.a * (1.0 - mapCoverTexel.a);",
-            "vec4 texelColor = vec4( texel, 1.0 );",
-            "texelColor = mapTexelToLinear( texelColor );",
-            "diffuseColor *= texelColor;",
+            THREE.ShaderChunk["map_fragment"],
+            // TODO alternative
+            // "vec2 vUv2 = vec2(0.5, 0.6);",
+            // "vec4 mapCoverTexel = texture2D(mapCover, vUv2);",
+            // "vec4 mapTexel = texture2D(map, vUv);",
+            // "vec3 texel = mapCoverTexel.rgb * mapCoverTexel.a + mapTexel.rgb * mapTexel.a * (1.0 - mapCoverTexel.a);",
+            // "vec4 texelColor = vec4( texel, 1.0 );",
+            // "texelColor = mapTexelToLinear( texelColor );",
+            // "diffuseColor *= texelColor;",
             THREE.ShaderChunk["color_fragment"],
             THREE.ShaderChunk["alphamap_fragment"],
             THREE.ShaderChunk["alphatest_fragment"],
@@ -176,4 +179,4 @@ THREE.CustomSelectionMaterial = function (parameters) {
 
 
 THREE.CustomSelectionMaterial.prototype = Object.create(THREE.ShaderMaterial.prototype);
-
+THREE.CustomSelectionMaterial.prototype.isMeshLambertMaterial = true;

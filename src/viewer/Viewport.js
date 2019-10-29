@@ -1120,6 +1120,7 @@ var Viewport = function (editor) {
                 startTime = Date.now();
                 if (highlightedGeometryObjects.length > 0) {
                     scope.unHighlightHighlightedObjects();
+                    nearestPoint.hide();
                     render();
                     editor.onFindNearestObject({});
                 }
@@ -1879,6 +1880,14 @@ var Viewport = function (editor) {
             resultScale.setResultInfo(editor.getResultInfo());
             resultScale.show();
         }
+
+        render();
+
+    });
+
+
+    signals.unHighlightGeometryObjects.add(function () {
+        scope.unHighlightHighlightedObjects();
         render();
 
     });

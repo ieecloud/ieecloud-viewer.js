@@ -35,6 +35,7 @@ var Editor = function (options) {
         resetCameraRotation: new SIGNALS.Signal(),
         printScreen: new SIGNALS.Signal(),
         materialChanged: new SIGNALS.Signal(),
+        unHighlightGeometryObjects: new SIGNALS.Signal(),
         setMode: new SIGNALS.Signal(),
         setSearchNearestPointMode: new SIGNALS.Signal(),
         objectShow: new SIGNALS.Signal(),
@@ -624,12 +625,12 @@ Editor.prototype = {
 
         this.isolineMaterial = texture.isolineMaterial;
         this.isolineSpriteMaterial = texture.isolineSpriteMaterial;
-        this.toggleIsolines(true);
-
-
         this.selectionMaterial.setSourceTexture(colorMapTexture);
         this.selectionMaterial.setCover(THREE.ImageUtils.loadTexture( "cover.png" ));
 
+        this.signals.unHighlightGeometryObjects.dispatch();
+
+        this.toggleIsolines(true);
         return colorMapTexture;
     },
 
