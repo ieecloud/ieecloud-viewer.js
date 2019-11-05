@@ -916,6 +916,28 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     };
 
+
+    function generateTexture(color) {
+
+        // draw a circle in the center of the canvas
+        var size = 256;
+
+        // create canvas
+        var canvas = document.createElement( 'canvas' );
+        canvas.width = size;
+        canvas.height = size;
+
+        // get context
+        var context = canvas.getContext( '2d' );
+
+        // draw background
+        context.fillStyle = color;
+        context.fillRect( 0, 0, size, size );
+
+        return canvas;
+
+    }
+
     this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices) {
 
         var results = geometryObject.results; // results
@@ -930,13 +952,16 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
         var transparencyValue = objectSettings.transparancy > 0 ? true : false;
         var opacityValue = objectSettings.transparancy > 0 ? (1 - objectSettings.transparancy) : 1;
+
+
+        var texture = new THREE.Texture( generateTexture(objectSettings.faceColor) );
+        texture.needsUpdate = true; // important
+
         var simpleFacesMaterial = new THREE.MeshLambertMaterial({
-            color: objectSettings.faceColor,
+            map: texture,
             flatShading: true,
             side: THREE.FrontSide,
-            transparent: transparencyValue,
-            opacity: opacityValue
-
+            color : new THREE.Color( 1, 1, 1 ) // diffuse
         });
 
         var simpleLinesMaterial = new THREE.LineBasicMaterial({

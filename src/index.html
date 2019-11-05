@@ -1253,6 +1253,26 @@
                             </li>
                             <li>
                                 <div class="title-wrap">
+                                    <a class="title" href="#" id="changeResultsDigits"><i
+                                            class="material-icons icon-action">
+                                        add
+                                    </i>Digits
+                                        <select style="padding-left: 30px;margin-left: 10px;"  id="resultsDigitsSelect">
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3" selected="selected">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                        </select>
+                                    </a>
+                                </div>
+                                <div class="wholerow"></div>
+                            </li>
+                            <li>
+                                <div class="title-wrap">
                                     <a class="title" href="#" id="removeAllResultsBtn"><i
                                             class="material-icons icon-action">
                                         delete
@@ -1871,6 +1891,10 @@
         if($(this).prop('checked') && scroll >= 50){
             header.addClass("header-alt");
         }
+    });
+
+    $("#resultsDigitsSelect").change(function (e) {
+        $("#viewer").ieecloudEditor('setResultDigits', $(this).val());
     });
 
 

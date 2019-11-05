@@ -32,6 +32,7 @@ var Editor = function (options) {
         toggleSearchNearestMode: new SIGNALS.Signal(),
         saveModelPosition: new SIGNALS.Signal(),
         removeSelectedResults: new SIGNALS.Signal(),
+        changeResultDigits: new SIGNALS.Signal(),
         resetCameraRotation: new SIGNALS.Signal(),
         printScreen: new SIGNALS.Signal(),
         materialChanged: new SIGNALS.Signal(),
@@ -75,10 +76,6 @@ var Editor = function (options) {
         // helps insert objects that lie over more than one node
         overlapPct: 0.15
     });
-
-
-    this.selectionMaterial = new THREE.CustomSelectionMaterial({});
-
 
     this.object = {};
     this.geometries = {};
@@ -479,6 +476,11 @@ Editor.prototype = {
         this.signals.setSearchNearestPointMode.dispatch();
     },
 
+    setResultDigits: function (resultDigits) {
+        this.resultDigits = resultDigits;
+        this.signals.changeResultDigits.dispatch();
+    },
+
     setOptions: function (newOptions) {
         this.options = newOptions;
         this.id = newOptions.id;
@@ -625,8 +627,6 @@ Editor.prototype = {
 
         this.isolineMaterial = texture.isolineMaterial;
         this.isolineSpriteMaterial = texture.isolineSpriteMaterial;
-        this.selectionMaterial.setSourceTexture(colorMapTexture);
-        this.selectionMaterial.setCover(THREE.ImageUtils.loadTexture( "cover.png" ));
 
         this.signals.unHighlightGeometryObjects.dispatch();
 

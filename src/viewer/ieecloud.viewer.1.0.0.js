@@ -249,6 +249,10 @@ function Viewer(target, options) {
         this.threeEditor.setSearchNearestPointMode(mode);
     };
 
+    Viewer.prototype.setResultDigits = function (resultDigits) {
+        this.threeEditor.setResultDigits(resultDigits);
+    };
+
     init(this);
 }
 

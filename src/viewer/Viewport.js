@@ -780,6 +780,7 @@ var Viewport = function (editor) {
 
 
         var resultVal = nearestPoint.userData.result;
+        var originalResultValue = nearestPoint.userData.originalResultValue;
 
         if(_.isUndefined(resultVal)){
             return false;
@@ -795,7 +796,8 @@ var Viewport = function (editor) {
 
 
         var textResultMesh = new THREE.ResultTextObject3d(camera,  {
-            value: resultVal,
+            value: originalResultValue,
+            resultDigits: editor.resultDigits,
             color: editor.options.resultTextColor
         });
 
@@ -968,15 +970,14 @@ var Viewport = function (editor) {
 
     scope.highlightObject = function (object) {
         if (object !== null) {
-            object.defaultMaterial = object.material;
-            object.material = editor.selectionMaterial;
+            object.material.color.set( new THREE.Color( 0.6, 0.6, 0.6 ));
             highlightedGeometryObjects.push(object)
         }
     };
 
     scope.unHighlightHighlightedObjects = function () {
         for (var i = 0; i < highlightedGeometryObjects.length; i++) {
-            highlightedGeometryObjects[i].material = highlightedGeometryObjects[i].defaultMaterial;
+            highlightedGeometryObjects[i].material.color.set(new THREE.Color(1, 1, 1));
         }
         highlightedGeometryObjects = [];
     };
@@ -1079,13 +1080,14 @@ var Viewport = function (editor) {
                     editor.onFindNearestObject(objProperties);
                 }
 
-
+                var originalResultValue = resultVal;
                 resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : 0;
                 var point = list[0].clone().multiplyScalar(editor.loader.coordFactor);
                 info.setValue('x = ' + point.x + ' , y = ' + point.y + ' , z =  ' + point.z + ', result =  ' + resultVal + ', objectName = ' + objectName);
                 var position = new THREE.Vector3(list[0].x, list[0].y, list[0].z);
                 nearestPoint.position.copy(position);
                 nearestPoint.userData.result = resultVal;
+                nearestPoint.userData.originalResultValue = originalResultValue;
                 nearestPoint.update();
                 render();
             }
@@ -2004,6 +2006,16 @@ var Viewport = function (editor) {
 
         render();
 
+    });
+
+
+    signals.changeResultDigits.add(function () {
+        var objectToDispose = [];
+        for (var key in selectedResultPoints) {
+           textResults[key].setResultDigits(editor.resultDigits);
+            textResults[key].update(container.dom);
+        }
+        render();
     });
 
     signals.resetCameraRotation.add(function () {

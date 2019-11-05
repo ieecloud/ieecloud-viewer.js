@@ -77,10 +77,12 @@ THREE.ResultTextObject3d = function (camera, params) {
 
     this.init = function () {
 
-
+        this.value = params.value;
+        this.resultDigits = params.resultDigits;
+        this.color = params.color;
         var size = 0.5;
-        var canvas = createTextCanvas(params.value, params.color, null, 256);
-
+        var valueToRender  = this.getValueToRender();
+        var canvas = createTextCanvas(valueToRender, this.color, null, 256);
 
         var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
         var tex = new THREE.Texture(canvas);
@@ -118,6 +120,31 @@ THREE.ResultTextObject3d = function (camera, params) {
 
     this.leftCorner = function () {
         return this.children[0].geometry.vertices[0].x * this.scale.y;
+    };
+
+    this.getValueToRender = function () {
+        if (this.resultDigits === 0) {
+            return Math.floor(value);
+        }
+        return this.value && !isNaN(this.value) ? this.value.round(this.resultDigits) : 0;
+    };
+
+    this.setResultDigits = function (resultDigits){
+        var size = 256;
+        console.log(this.material, resultDigits)
+        console.log(this.material.map)
+        this.resultDigits = resultDigits;
+        var valueToRender  = this.getValueToRender();
+        var canvas = createTextCanvas(valueToRender, this.color, null, 256);
+        var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * 0.5, 0.5);
+        var newTexture = new THREE.Texture(canvas);
+        newTexture.needsUpdate = true;
+        this.material = new THREE.ResultTextObject3dMaterial({
+            map: newTexture,
+            color: 0xffffff
+        });
+        plane.applyMatrix(new THREE.Matrix4().makeTranslation(-plane.attributes.position.array[0] + 0.1, 0, 0));
+        this.geometry = plane;
     };
 
     this.update = function (domElement){
