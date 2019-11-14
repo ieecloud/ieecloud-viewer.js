@@ -40,7 +40,8 @@ var Editor = function (options) {
         setMode: new SIGNALS.Signal(),
         setSearchNearestPointMode: new SIGNALS.Signal(),
         objectShow: new SIGNALS.Signal(),
-        objectHide: new SIGNALS.Signal()
+        objectHide: new SIGNALS.Signal(),
+        toggleMinMaxResults: new SIGNALS.Signal()
     };
 
     this.MODE_FACES_EDGES = "faces_and_nodes";
@@ -156,8 +157,8 @@ Editor.prototype = {
                 var maxResult = resultInfo.maxResult;
                 var minResult = resultInfo.minResult;
 
-                var maxChanged = maxGeometryResult >= maxResult || !maxResult;
-                var minChanged = minGeometryResult <= minResult || !minResult;
+                var maxChanged = maxGeometryResult.value >= maxResult.value || !maxResult.value;
+                var minChanged = minGeometryResult.value <= minResult.value || !minResult.value;
                 me.loader.pretenderMaxs.add(maxGeometryResult);
                 if (maxChanged) {
                     maxResult = maxGeometryResult;
@@ -192,8 +193,8 @@ Editor.prototype = {
             return;
         }
 
-        var maxResult = resultInfo.maxResult;
-        var minResult = resultInfo.minResult;
+        var maxResult = resultInfo.maxResult.value;
+        var minResult = resultInfo.minResult.value;
         var textureNeedToRecalculate = resultInfo.dirty;
 
 
@@ -320,8 +321,8 @@ Editor.prototype = {
         if (me.loader.DRAW_RESULTS) {
             var resultInfo = me.getResultInfo();
 
-            var maxResult = resultInfo.maxResult;
-            var minResult = resultInfo.minResult;
+            var maxResult = resultInfo.maxResult.value;
+            var minResult = resultInfo.minResult.value;
             me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
                 if (oNode.object && oNode.object instanceof THREE.Mesh /*&& oNode.object.isSimpleShape === false*/) return true;
             });
@@ -358,12 +359,12 @@ Editor.prototype = {
                 var maxResult = resultInfo.maxResult;
                 var minResult = resultInfo.minResult;
 
-                var maxChanged = maxGeometryResult === maxResult;
-                var minChanged = minGeometryResult === minResult;
+                var maxChanged = maxGeometryResult.value === maxResult.value;
+                var minChanged = minGeometryResult.value === minResult.value;
                 if (me.loader.pretenderMaxs.has(maxGeometryResult)) {
                     me.loader.pretenderMaxs.delete(maxGeometryResult);
                 }
-                me.loader.pretenderMaxs = new Set(_.orderBy(Array.from(me.loader.pretenderMaxs), null, 'asc'));
+                me.loader.pretenderMaxs = new Set(_.orderBy(Array.from(me.loader.pretenderMaxs), ['value'], 'asc'));
 
                 if (maxChanged) {
                     maxResult = _.last(Array.from(me.loader.pretenderMaxs)) || maxGeometryResult;
@@ -372,7 +373,7 @@ Editor.prototype = {
                 if (me.loader.pretenderMins.has(minGeometryResult)) {
                     me.loader.pretenderMins.delete(minGeometryResult);
                 }
-                me.loader.pretenderMins = new Set(_.orderBy(Array.from(me.loader.pretenderMins), null, 'desc'));
+                me.loader.pretenderMins = new Set(_.orderBy(Array.from(me.loader.pretenderMins), ['value'], 'desc'));
 
                 if (minChanged) {
                     minResult = _.last(Array.from(me.loader.pretenderMins)) || minGeometryResult;
@@ -670,6 +671,10 @@ Editor.prototype = {
 
         this.signals.materialChanged.dispatch();
 
+    },
+
+    toggleMinMaxResults: function () {
+        this.signals.toggleMinMaxResults.dispatch();
     },
 
 

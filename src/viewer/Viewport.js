@@ -763,6 +763,51 @@ var Viewport = function (editor) {
         return +(Math.round(this + "e+" + places) + "e-" + places);
     };
 
+    scope.toggleMinMaxResultOnTheScene = function (resultVal, originalResultValue, position) {
+        if(_.isUndefined(resultVal)){
+            return false;
+        }
+
+        var textResultObjByName = scope.getSceneObjectByName("result-" + resultVal + position.x + position.y + position.z);
+        if (textResultObjByName) {
+            var textResultSphereObjByName = scope.getSceneObjectByName("sphereResult-" + resultVal + position.x + position.y + position.z);
+            sceneHelpers.remove(textResultObjByName);
+            sceneHelpers.remove(textResultSphereObjByName);
+            return false;
+        }
+
+
+        var textResultMesh = new THREE.ResultTextObject3d(camera,  {
+            value: originalResultValue,
+            resultDigits: editor.resultDigits,
+            color: editor.options.resultTextColor
+        });
+
+        textResultMesh.name = "result-" + resultVal + position.x + position.y + position.z;
+        var textResultPosition = new THREE.Vector3(0, 0, 0);
+        textResultPosition.x = position.x;
+        textResultPosition.y = position.y;
+        textResultPosition.z = position.z;
+        textResultMesh.position.copy(textResultPosition);
+        unRotatedObjects.push(textResultMesh);
+        var key = THREE.Math.generateUUID();
+        textResults[key] = textResultMesh;
+        textResultMesh.update(container.dom);
+        sceneHelpers.add(textResultMesh);
+        var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {
+            material: {color: editor.options.resultPointColor},
+            size: editor.options.resultPointSize
+        });
+        selectedResultPoint.name = "sphereResult-" + resultVal + position.x + position.y + position.z;
+        selectedResultPoint.position.copy(position);
+        selectedResultPoints[key] = selectedResultPoint;
+
+        sceneHelpers.add(selectedResultPoint);
+        selectedResultPoint.update();
+
+
+    };
+
 
     scope.onMouseDblClickViewerHandler = function (event) {
         var rect = container.dom.getBoundingClientRect();
@@ -778,50 +823,8 @@ var Viewport = function (editor) {
             }
         }
 
-
-        var resultVal = nearestPoint.userData.result;
-        var originalResultValue = nearestPoint.userData.originalResultValue;
-
-        if(_.isUndefined(resultVal)){
-            return false;
-        }
-
-        var textResultObjByName = scope.getSceneObjectByName("result-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z);
-        if (textResultObjByName) {
-            var textResultSphereObjByName = scope.getSceneObjectByName("sphereResult-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z);
-            sceneHelpers.remove(textResultObjByName);
-            sceneHelpers.remove(textResultSphereObjByName);
-            return false;
-        }
-
-
-        var textResultMesh = new THREE.ResultTextObject3d(camera,  {
-            value: originalResultValue,
-            resultDigits: editor.resultDigits,
-            color: editor.options.resultTextColor
-        });
-
-        textResultMesh.name = "result-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z;
-        var textResultPosition = new THREE.Vector3(0, 0, 0);
-        textResultPosition.x = nearestPoint.position.x;
-        textResultPosition.y = nearestPoint.position.y;
-        textResultPosition.z = nearestPoint.position.z;
-        textResultMesh.position.copy(textResultPosition);
-        unRotatedObjects.push(textResultMesh);
-        var key = THREE.Math.generateUUID();
-        textResults[key] = textResultMesh;
-        textResultMesh.update(container.dom);
-        sceneHelpers.add(textResultMesh);
-        var selectedResultPoint = new THREE.NearestPointObject3d(camera, container.dom, {
-            material: {color: editor.options.resultPointColor},
-            size: editor.options.resultPointSize
-        });
-        selectedResultPoint.name = "sphereResult-" + resultVal + nearestPoint.position.x + nearestPoint.position.y + nearestPoint.position.z;
-        selectedResultPoint.position.copy(nearestPoint.position);
-        selectedResultPoints[key] = selectedResultPoint;
-
-        sceneHelpers.add(selectedResultPoint);
-        selectedResultPoint.update();
+        scope.toggleMinMaxResultOnTheScene(nearestPoint.userData.result,
+            nearestPoint.userData.originalResultValue, nearestPoint.position);
 
         render();
     };
@@ -1708,6 +1711,31 @@ var Viewport = function (editor) {
     });
 
 
+    signals.toggleMinMaxResults.add(function () {
+        var resultInfo = editor.getResultInfo();
+
+        var resultVal = resultInfo.maxResult.value;
+        var originalResultValue = resultInfo.maxResult.value;
+        var resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : 0;
+
+
+        scope.toggleMinMaxResultOnTheScene(resultVal,
+            originalResultValue, resultInfo.maxResult.position);
+
+
+
+        resultVal = resultInfo.minResult.value;
+        originalResultValue = resultInfo.minResult.value;
+        resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : 0;
+
+
+        scope.toggleMinMaxResultOnTheScene(resultVal,
+            originalResultValue, resultInfo.minResult.position);
+
+        render();
+    });
+
+
     signals.objectAdded.add(function (object) {
         // var startDate   = new Date();
         var materialsNeedUpdate = false;
@@ -1754,7 +1782,7 @@ var Viewport = function (editor) {
         var resultInfo = editor.getResultInfo();
 
 
-        if(editor.loader.DRAW_RESULTS && resultInfo.maxResult > resultInfo.minResult){
+        if(editor.loader.DRAW_RESULTS && resultInfo && resultInfo.maxResult.value > resultInfo.minResult.value){
             resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
             resultScale.setResultInfo(editor.getResultInfo());
             resultScale.show();
@@ -1779,7 +1807,7 @@ var Viewport = function (editor) {
 
         var resultInfo = editor.getResultInfo();
 
-        if(editor.loader.DRAW_RESULTS && resultInfo.maxResult > resultInfo.minResult){
+        if(editor.loader.DRAW_RESULTS && resultInfo && resultInfo.maxResult.value > resultInfo.minResult.value){
             resultScale.setResultInfo(editor.getResultInfo());
         }
 

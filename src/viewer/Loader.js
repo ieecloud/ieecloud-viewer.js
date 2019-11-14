@@ -295,8 +295,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var pointsTable = totalObjectDataElement.pointsTable;
         var vertices = totalObjectDataElement.totalObjVertices;
         var results = totalObjectDataElement.totalObjResults;
-        var maxGeometryResult = totalObjectDataElement.maxGeometryResult;
-        var minGeometryResult = totalObjectDataElement.minGeometryResult;
+        var maxGeometryResult = totalObjectDataElement.pretenderMaxElement.value;
+        var minGeometryResult = totalObjectDataElement.pretenderMinElement.value;
         var objectNames = totalObjectDataElement.objectNames;
         var pointsNumbers = totalObjectDataElement.pointsNumbers;
         var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
@@ -347,8 +347,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var pointsTable = totalObjectDataElement.pointsTable;
         var vertices = totalObjectDataElement.totalObjVertices;
         var results = totalObjectDataElement.totalObjResults;
-        var maxGeometryResult = totalObjectDataElement.maxGeometryResult;
-        var minGeometryResult = totalObjectDataElement.minGeometryResult;
+        var maxGeometryResult = totalObjectDataElement.pretenderMaxElement.value;
+        var minGeometryResult = totalObjectDataElement.pretenderMinElement.value;
         var objectNames = totalObjectDataElement.objectNames;
         var pointsNumbers = totalObjectDataElement.pointsNumbers;
         var lineCommonDataForLine = totalObjectDataElement.lineCommonDataForLine;
@@ -389,8 +389,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var geometryElement = new THREE.Object3D();
             var totalObjectDataElement = value;
             var objectGroupElements = totalObjectDataElement.groups;
-            var maxGeometryResult = totalObjectDataElement.maxGeometryResult;
-            var minGeometryResult = totalObjectDataElement.minGeometryResult;
+            var maxGeometryResult = totalObjectDataElement.pretenderMaxElement.value;
+            var minGeometryResult = totalObjectDataElement.pretenderMinElement.value;
             var lineCommonDataForLine = totalObjectDataElement.lineCommonDataForLine;
             var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
 
@@ -462,8 +462,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
             geometryElement.userData.extremumResultData = {};
-            geometryElement.userData.extremumResultData.minGeometryResult = minGeometryResult;
-            geometryElement.userData.extremumResultData.maxGeometryResult = maxGeometryResult;
+            geometryElement.userData.extremumResultData.minGeometryResult =  totalObjectDataElement.pretenderMinElement;
+            geometryElement.userData.extremumResultData.maxGeometryResult =  totalObjectDataElement.pretenderMaxElement;
 
         });
 
@@ -1144,8 +1144,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;
         totalGeometryObj.faceCommonDataForMesh = faceCommonDataForMesh;
 
-        totalGeometryObj.maxGeometryResult = geometryObject.maxResult;
-        totalGeometryObj.minGeometryResult = geometryObject.minResult;
+        totalGeometryObj.pretenderMinElement = {position: vertices[geometryObject.minResultIndex],
+            value: geometryObject.minResult};
+
+        totalGeometryObj.pretenderMaxElement = {position: vertices[geometryObject.maxResultIndex],
+            value: geometryObject.maxResult};
 
         totalGeometryObj.name = name;
 
@@ -1227,7 +1230,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             editor.addTextures(scope.textures);
             var currentTextureName = scope.texture ? scope.texture : this.getDefaultTexture(textures);
             colorMapTexture = editor.setTexture(currentTextureName);
-            editor.setMinMaxResult(minResult, maxResult);
             // editor.addTexture(colorMapTexture, minResult, maxResult);
         }
 
@@ -1235,12 +1237,14 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
-            scope.pretenderMins.add(pictureInfo.geometryObjectData[i].minGeometryResult);
-            scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].maxGeometryResult);
+            scope.pretenderMins.add(pictureInfo.geometryObjectData[i].pretenderMinElement);
+            scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].pretenderMaxElement);
         }
 
-        scope.pretenderMins = new Set(_.orderBy(Array.from(scope.pretenderMins), null, 'desc'));
-        scope.pretenderMaxs = new Set(_.orderBy(Array.from(scope.pretenderMaxs), null, 'asc'));
+        scope.pretenderMins = new Set(_.orderBy(Array.from(scope.pretenderMins), ['value'], 'desc'));
+        scope.pretenderMaxs = new Set(_.orderBy(Array.from(scope.pretenderMaxs), ['value'], 'asc'));
+
+        editor.setMinMaxResult(_.last(Array.from(scope.pretenderMins)), _.last(Array.from(scope.pretenderMaxs)));
 
         return pictureInfo;
     }

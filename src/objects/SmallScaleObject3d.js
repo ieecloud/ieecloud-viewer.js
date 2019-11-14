@@ -95,8 +95,8 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         var number = -1;
         var maxZ = 120;
         var minZ = -132;
-        var minResult = this.resultInfo.minResult;
-        var maxResult = this.resultInfo.maxResult;
+        var minResult = this.resultInfo.minResult.value;
+        var maxResult = this.resultInfo.maxResult.value;
         for (var i = 0; i <= maxSizeDelimiters; i += 1) {
             var result = minResult + i*(maxResult - minResult)/maxSizeDelimiters;
             var valueWithoutE = result.toString().split('e');
@@ -154,8 +154,10 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
 
         this.resultInfo  = {};
         this.textResults = {};
-        this.resultInfo.maxResult = 1;
-        this.resultInfo.minResult = 0;
+        this.resultInfo.maxResult = {};
+        this.resultInfo.maxResult.value = 1;
+        this.resultInfo.minResult = {};
+        this.resultInfo.minResult.value = 0;
 
         this.rectangleMesh = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
         this.rectangleMesh.scale.set( 13, 260, 0 );

@@ -233,6 +233,10 @@ function Viewer(target, options) {
         this.threeEditor.toggleIsolines(value);
     };
 
+    Viewer.prototype.toggleMinMaxResults = function (value) {
+        this.threeEditor.toggleMinMaxResults(value);
+    };
+
     Viewer.prototype.setTexture = function (textureName) {
         this.threeEditor.setTexture(textureName);
     };
