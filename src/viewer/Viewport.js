@@ -763,8 +763,8 @@ var Viewport = function (editor) {
         return +(Math.round(this + "e+" + places) + "e-" + places);
     };
 
-    scope.toggleMinMaxResultOnTheScene = function (resultVal, originalResultValue, position) {
-        if(_.isUndefined(resultVal)){
+    scope.updateMinMaxResultOnTheScene = function (resultVal, originalResultValue, position) {
+        if(_.isUndefined(resultVal) || _.isUndefined(position)){
             return false;
         }
 
@@ -823,7 +823,7 @@ var Viewport = function (editor) {
             }
         }
 
-        scope.toggleMinMaxResultOnTheScene(nearestPoint.userData.result,
+        scope.updateMinMaxResultOnTheScene(nearestPoint.userData.result,
             nearestPoint.userData.originalResultValue, nearestPoint.position);
 
         render();
@@ -1711,7 +1711,7 @@ var Viewport = function (editor) {
     });
 
 
-    signals.toggleMinMaxResults.add(function () {
+    signals.updateMinMaxResults.add(function () {
         var resultInfo = editor.getResultInfo();
 
         var resultVal = resultInfo.maxResult.value;
@@ -1719,7 +1719,7 @@ var Viewport = function (editor) {
         var resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : 0;
 
 
-        scope.toggleMinMaxResultOnTheScene(resultVal,
+        scope.updateMinMaxResultOnTheScene(resultVal,
             originalResultValue, resultInfo.maxResult.position);
 
 
@@ -1729,7 +1729,7 @@ var Viewport = function (editor) {
         resultVal = resultVal && !isNaN(resultVal) ? resultVal.round(editor.resultDigits) : 0;
 
 
-        scope.toggleMinMaxResultOnTheScene(resultVal,
+        scope.updateMinMaxResultOnTheScene(resultVal,
             originalResultValue, resultInfo.minResult.position);
 
         render();
@@ -1898,9 +1898,9 @@ var Viewport = function (editor) {
         if (materialsNeedUpdate === true) {
             updateMaterials();
         }
-        if (renderer && (renderer.info.memory.geometries || renderer.info.memory.programs || renderer.info.memory.textures)) {
-            // console.log("geometries=" + renderer.info.memory.geometries + " programs=" + renderer.info.memory.programs + " textures=" +renderer.info.memory.textures);
-        }
+        // if (renderer && (renderer.info.memory.geometries || renderer.info.memory.programs || renderer.info.memory.textures)) {
+        //     // console.log("geometries=" + renderer.info.memory.geometries + " programs=" + renderer.info.memory.programs + " textures=" +renderer.info.memory.textures);
+        // }
     });
 
 

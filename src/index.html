@@ -1922,9 +1922,12 @@
         $("#viewer").ieecloudEditor('setSearchNearestPointMode', "LINES");
     });
 
+    var showToggleValue  = false;
+
     $("#toggleMinMaxResultBtn").click(function () {
-        $("#min-max-result-toggle-icon").toggle();
-        $("#viewer").ieecloudEditor('toggleMinMaxResults');
+       var result =  $("#min-max-result-toggle-icon").toggle();
+        showToggleValue = !showToggleValue;
+        $("#viewer").ieecloudEditor('toggleMinMaxResults', showToggleValue);
     });
 
     function getCurrentTexture(textures, reqParamTextureName) {

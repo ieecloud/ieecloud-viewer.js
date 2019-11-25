@@ -41,7 +41,7 @@ var Editor = function (options) {
         setSearchNearestPointMode: new SIGNALS.Signal(),
         objectShow: new SIGNALS.Signal(),
         objectHide: new SIGNALS.Signal(),
-        toggleMinMaxResults: new SIGNALS.Signal()
+        updateMinMaxResults: new SIGNALS.Signal()
     };
 
     this.MODE_FACES_EDGES = "faces_and_nodes";
@@ -88,6 +88,7 @@ var Editor = function (options) {
     this.lastModel = null;
     this.helpers = {};
     this.showIsolinesFlag = false;
+    this.showMinMaxFlag = false;
     this.mapTextureNameToDetails = {};
     // this.sumTime = 0;
     // this.startDate = new Date();
@@ -197,12 +198,15 @@ Editor.prototype = {
         var minResult = resultInfo.minResult.value;
         var textureNeedToRecalculate = resultInfo.dirty;
 
-
+         // means max/min changed
         if (textureNeedToRecalculate) {
             // need recalculate the whole tree
             me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
                 if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
             });
+            if (me.showMinMaxFlag) {
+                me.updateMinMaxResults();
+            }
             resultInfo.dirty = false;
         } else {
             // need recalculate only object to show with untouched max/min
@@ -673,8 +677,26 @@ Editor.prototype = {
 
     },
 
-    toggleMinMaxResults: function () {
-        this.signals.toggleMinMaxResults.dispatch();
+    toggleMinMaxResults: function (show) {
+        var me = this;
+        me.showMinMaxFlag  = show;
+        if (me.showMinMaxFlag) {
+            me.updateMinMaxResults();
+        } else {
+            me.hideMinMaxResults();
+        }
+
+    },
+
+
+    updateMinMaxResults: function () {
+        this.signals.removeSelectedResults.dispatch();
+        this.signals.updateMinMaxResults.dispatch();
+
+    },
+
+   hideMinMaxResults: function () {
+        this.signals.removeSelectedResults.dispatch();
     },
 
 
