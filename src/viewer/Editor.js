@@ -537,11 +537,21 @@ Editor.prototype = {
             var obj = this.scene.children[i];
             if (obj.parent !== undefined && !(obj instanceof THREE.Light) && !(obj instanceof THREE.PerspectiveCamera )) {
                 objsToRemove.push(obj);
-                obj.parent.remove(obj);
+                // obj.parent.remove(obj);
             }
         }
         this.lastModel = null;
+        this.isolineMaterial = null;
+        this.isolineSpriteMaterial = null;
+        if (this.getDefaultTexture()) {
+            this.getDefaultTexture().isolineMaterial = null;
+            this.getDefaultTexture().isolineSpriteMaterial = null;
+            this.getDefaultTexture().colorMapTexture = null;
+        }
         delete this.lastModel;
+        delete this.isolineMaterial;
+        delete this.isolineSpriteMaterial;
+
         this.signals.objectsRemoved.dispatch(objsToRemove, this.scene, true);
         this.signals.sceneGraphChanged.dispatch();
 
