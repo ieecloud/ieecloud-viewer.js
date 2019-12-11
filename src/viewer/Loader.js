@@ -664,13 +664,18 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     this.loadBinaryModel = function (url) {
         var me = this;
         editor.onZipUpdateStatus("loading binary model content ...");
-        JSZipUtils.getBinaryContent(url, function(err, data) {
-            if(err) {
-                throw err; // or handle err
+        JSZipUtils.getBinaryContent(url, {
+            progress: function(e) {
+                editor.onZipUpdateStatus("loading binary model content " + e.percent +  "% loaded");
+            },
+            callback: function (err, data) {
+                if(err) {
+                    throw err; // or handle err
+                }
+                JSZip.loadAsync(data).then(function (zip) {
+                    me.loadZipModel(zip);
+                });
             }
-            JSZip.loadAsync(data).then(function (zip) {
-                me.loadZipModel(zip);
-            });
         });
     };
 
