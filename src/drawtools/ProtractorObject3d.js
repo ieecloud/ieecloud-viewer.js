@@ -189,7 +189,8 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
         this.userData.totalObjVertices = [];
         this.frontSide = new THREE.Object3D();
 
-        var geometry = new THREE.RingGeometry(1.8, 3, 100, 100, 0, Math.PI * 2);
+        // TODO: use another geometry instead of ring
+        var geometry = new THREE.RingGeometry(1.8, 3, 1, 1, 0, Math.PI * 2);
         var material = new THREE.ProtractorMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
         this.protractorMeshFront = new THREE.Mesh(geometry, material);
 
@@ -203,8 +204,8 @@ THREE.Protractor = function (camera, domElement, mode, highlighterProtractor) {
 
 
         this.backSide = new THREE.Object3D();
-
-        var geometry = new THREE.RingGeometry(1.8, 3, 100, 100, 0, Math.PI * 2);
+        // TODO: use another geometry instead of ring
+        var geometry = new THREE.RingGeometry(1.8, 3, 1, 1, 0, Math.PI * 2);
         var material = new THREE.ProtractorMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
         this.protractorMeshBack = new THREE.Mesh(geometry, material);
         this.backSide.add(this.protractorMeshBack);

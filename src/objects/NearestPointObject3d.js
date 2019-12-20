@@ -42,7 +42,7 @@ THREE.NearestPointObject3d = function (camera, domElement, params) {
 
         var sphereMat = new THREE.NearestPointObject3dMaterial(params.material);
         var size = params.size ? params.size : 0.007;
-        var nearestPointMesh = new THREE.Mesh(new THREE.SphereGeometry(size, 100, 100), sphereMat);
+        var nearestPointMesh = new THREE.Mesh(new THREE.SphereGeometry(size), sphereMat);
 
 
         this.add(nearestPointMesh);
