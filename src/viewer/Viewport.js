@@ -973,7 +973,7 @@ var Viewport = function (editor) {
 
     scope.highlightObject = function (object) {
         if (object !== null) {
-            object.material.color.set( new THREE.Color( 0.6, 0.6, 0.6 ));
+            object.material.color.set( new THREE.Color( 0.5, 0.5, 0.5 ));
             highlightedGeometryObjects.push(object)
         }
     };

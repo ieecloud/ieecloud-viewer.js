@@ -666,7 +666,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         editor.onZipUpdateStatus("loading binary model content ...");
         JSZipUtils.getBinaryContent(url, {
             progress: function(e) {
-                editor.onZipUpdateStatus("loading binary model content " + e.percent +  "% loaded");
+                editor.onZipUpdateStatus("loading binary model content " + Math.round(e.percent) +  " % loaded");
             },
             callback: function (err, data) {
                 if(err) {
