@@ -1894,6 +1894,8 @@ var Viewport = function (editor) {
             });
 
             scene.remove(obj);
+            scene.meshes = [];
+            scene.lines = [];
         }
         if (materialsNeedUpdate === true) {
             updateMaterials();
