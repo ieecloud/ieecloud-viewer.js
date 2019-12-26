@@ -413,9 +413,13 @@ Editor.prototype = {
     },
 
     addModelGroup: function (object) {
+        var me = this;
         this.scene.add(object);
 
         this.signals.objectAdded.dispatch(object);
+        if (me.showMinMaxFlag) {
+            me.updateMinMaxResults();
+        }
         this.signals.sceneGraphChanged.dispatch();
         this.lastModel = object;
     },
@@ -445,6 +449,7 @@ Editor.prototype = {
 
     removeSelectedResults: function () {
         this.signals.removeSelectedResults.dispatch();
+        this.signals.sceneGraphChanged.dispatch();
     },
 
     resetCameraRotation: function () {
@@ -551,7 +556,7 @@ Editor.prototype = {
         delete this.lastModel;
         delete this.isolineMaterial;
         delete this.isolineSpriteMaterial;
-
+        this.signals.removeSelectedResults.dispatch();
         this.signals.objectsRemoved.dispatch(objsToRemove, this.scene, true);
         this.signals.sceneGraphChanged.dispatch();
 
@@ -695,6 +700,7 @@ Editor.prototype = {
         } else {
             me.hideMinMaxResults();
         }
+        this.signals.sceneGraphChanged.dispatch();
 
     },
 
@@ -702,11 +708,12 @@ Editor.prototype = {
     updateMinMaxResults: function () {
         this.signals.removeSelectedResults.dispatch();
         this.signals.updateMinMaxResults.dispatch();
-
+        this.signals.sceneGraphChanged.dispatch();
     },
 
    hideMinMaxResults: function () {
         this.signals.removeSelectedResults.dispatch();
+        this.signals.sceneGraphChanged.dispatch();
     },
 
 

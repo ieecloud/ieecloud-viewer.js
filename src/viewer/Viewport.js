@@ -2030,10 +2030,6 @@ var Viewport = function (editor) {
         }
         nearestPoint.hide();
         editor.signals.objectsRemoved.dispatch(objectToDispose, sceneHelpers, false);
-
-
-        render();
-
     });
 
 
