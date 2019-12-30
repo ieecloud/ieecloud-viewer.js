@@ -130,12 +130,12 @@ function Viewer(target, options) {
         this.threeEditor.loader.reloadModel(modelJsn);
     };
 
-    Viewer.prototype.loadBinaryModel = function (zipModelUrl) {
-        this.threeEditor.loader.loadBinaryModel(zipModelUrl);
+    Viewer.prototype.loadBinaryModel = function (zipModelUrl, withSaveTreeState) {
+        this.threeEditor.loader.loadBinaryModel(zipModelUrl, withSaveTreeState);
     };
 
-    Viewer.prototype.loadBase64Model = function (zipModelUrl) {
-        this.threeEditor.loader.loadBase64Model(zipModelUrl);
+    Viewer.prototype.loadBase64Model = function (zipModelUrl, withSaveTreeState) {
+        this.threeEditor.loader.loadBase64Model(zipModelUrl, withSaveTreeState);
     };
 
     Viewer.prototype.changeRotationScale = function (rotationScale) {

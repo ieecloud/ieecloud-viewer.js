@@ -1852,6 +1852,18 @@ var Viewport = function (editor) {
                     if (child.geometry) {
                         child.geometry.dispose();
                     }
+                    if(child.userData){
+                        child.userData.pointsTable = [];
+                        child.userData.name = [];
+                        child.userData.totalObjVertices = [];
+                        child.userData.totalObjResults = [];
+                        child.userData.objectNames = [];
+                        child.userData.pointsNumbers = [];
+
+                        child.userData = null;
+                        delete this.lastModel;
+                    }
+
                     if (child.material) {
                         if (child.material instanceof THREE.MeshFaceMaterial || child.material instanceof THREE.MultiMaterial) {
                             child.material.materials.forEach(function (mtrl, idx) {

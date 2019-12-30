@@ -591,16 +591,16 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         editor.removeAllObjects();
     };
 
-    this.reloadModel = function (data) {
+    this.reloadModel = function (data, withSaveTreeState) {
         editor.removeAllObjects();
-        scope.handleJSONData(data);
+        scope.handleJSONData(data, withSaveTreeState);
         data = null;
         delete data;
         editor.onZipUpdateStatus("stop", 1.0);
     };
 
 
-    this.loadZipModel = function (zip) {
+    this.loadZipModel = function (zip, withSaveTreeState) {
         var me = this;
         editor.onZipUpdateStatus("loading model configuration...", 0.1);
         var filterResults = zip.filter(function (relativePath, file) {
@@ -646,7 +646,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 }
 
                 Promise.all(promises).then(function (object) {
-                    setTimeout(function() { editor.onZipUpdateStatus("loading model...", 0.9); me.reloadModel(data) }, 0);
+                    setTimeout(function() { editor.onZipUpdateStatus("loading model...", 0.9); me.reloadModel(data, withSaveTreeState) }, 0);
                 });
             });
         }
@@ -661,7 +661,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         });
     };
 
-    this.loadBinaryModel = function (url) {
+    this.loadBinaryModel = function (url, withSaveTreeState) {
         var me = this;
         editor.onZipUpdateStatus("loading binary model content ...");
         JSZipUtils.getBinaryContent(url, {
@@ -673,18 +673,18 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     throw err; // or handle err
                 }
                 JSZip.loadAsync(data).then(function (zip) {
-                    me.loadZipModel(zip);
+                    me.loadZipModel(zip, withSaveTreeState);
                 });
             }
         });
     };
 
 
-    this.handleJSONData = function (data) {
+    this.handleJSONData = function (data, withSaveTreeState) {
         editor.onRenderStart();
 
 
-        var pictureInfo = this.parseModel(data);
+        var pictureInfo = this.parseModel(data, withSaveTreeState);
 
         var result;
         var resultCommon;
@@ -701,6 +701,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var newModelGroup = new THREE.Object3D();
 
         newModelGroup.add(modelGroup);
+
+
+        console.log("     console.log(data.tree)     console.log(data.tree)", data.tree)
+        console.log("    scope.objectsTree     scope.objectsTree", scope.objectsTree);
 
         var traverse = function (obj) {
             if (obj instanceof Array) {
@@ -799,16 +803,22 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             }
         };
 
-        traverse(data.tree);
+
+        if (!withSaveTreeState) {
+            traverse(data.tree);
 
 
-        editor.addModelGroup(newModelGroup);
-        // editor.addModelGroup(modelGroup);
+            editor.addModelGroup(newModelGroup);
+            // editor.addModelGroup(modelGroup);
 
-        data.tree.uniqueId = THREE.Math.generateUUID();
+            data.tree.uniqueId = THREE.Math.generateUUID();
 
-        scope.objectsTree = [data.tree];
-        editor.onTreeLoad(data.tree);
+            scope.objectsTree = [data.tree];
+            editor.onTreeLoad(data.tree);
+        }else if(scope.objectsTree) {
+            traverse(scope.objectsTree);
+        }
+
 
         // TODO: improve
         scope.computeBoundingBox(pictureInfo.modelRotation);
@@ -1208,7 +1218,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         }
     };
 
-    this.parseModel = function (json) {
+    this.parseModel = function (json, withSaveTreeState) {
         var pictureData = json.pictureData; // reading array for all geometry objects
         var minResult = json.minResult;
         var maxResult = json.maxResult;
@@ -1227,8 +1237,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         pictureInfo.minResult = minResult;
         pictureInfo.maxResult = maxResult;
 
-        scope.pretenderMins = new Set();
-        scope.pretenderMaxs = new Set();
+        scope.pretenderMins = withSaveTreeState ? scope.pretenderMins: new Set();
+        scope.pretenderMaxs = withSaveTreeState ? scope.pretenderMaxs: new Set();
 
         var colorMapTexture;
         if (scope.DRAW_RESULTS && scope.textures) {
@@ -1242,8 +1252,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
-            scope.pretenderMins.add(pictureInfo.geometryObjectData[i].pretenderMinElement);
-            scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].pretenderMaxElement);
+            if(!withSaveTreeState){
+                scope.pretenderMins.add(pictureInfo.geometryObjectData[i].pretenderMinElement);
+                scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].pretenderMaxElement);
+            }
         }
 
         scope.pretenderMins = new Set(_.orderBy(Array.from(scope.pretenderMins), ['value'], 'desc'));
