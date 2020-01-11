@@ -702,7 +702,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
         newModelGroup.add(modelGroup);
 
-
+        console.log("   result", result)
         console.log("     console.log(data.tree)     console.log(data.tree)", data.tree)
         console.log("    scope.objectsTree     scope.objectsTree", scope.objectsTree);
 
@@ -710,7 +710,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             if (obj instanceof Array) {
                 for (var i = 0; i < obj.length; i++) {
                     if (typeof obj[i] == "object" && obj[i] && !(obj[i] instanceof THREE.Mesh) && !(obj[i] instanceof THREE.LineSegments)
-                        && !(obj[i] instanceof THREE.Object3D)) {
+                        && !(obj[i] instanceof THREE.Object3D)
+                        && !( obj[i] instanceof InspireTree) ) {
                         var node = obj[i];
                         if (node.index != -1) {
                             if (result[node.index]) {
@@ -722,8 +723,14 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                 node.children = treeNodes;
                                 node.uniqueId = THREE.Math.generateUUID();
                                 node.text = node.name;
+                                var oldNodeObject = node.object;
+                                var oldNodeObjectVisibility = true;
+                                if(oldNodeObject){
+                                    oldNodeObjectVisibility = oldNodeObject.visible;
+                                }
                                 node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
-                                if(node.object){
+                                if (node.object) {
+                                    node.object.visible = oldNodeObjectVisibility;
                                     node.object.isModelContainerObj = true;
                                     newModelGroup.add(node.object);
                                 }
@@ -741,8 +748,16 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                             upperNodeContainer.add(prevNode.children[k].object);
                                         }
                                     }
+
+                                    var oldNodeObject = prevNode.object;
+                                    var oldNodeObjectVisibility = true;
+                                    if (oldNodeObject) {
+                                        oldNodeObjectVisibility = oldNodeObject.visible;
+                                    }
+
                                     prevNode.object = upperNodeContainer;
                                     if(prevNode.object){
+                                        prevNode.object.visible = oldNodeObjectVisibility;
                                         prevNode.object.isModelContainerObj = true;
                                     }
                                 }
@@ -759,8 +774,17 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                             upperNodeContainer.add(currentNode.children[k].object);
                                         }
                                     }
+
+                                    var oldNodeObject = currentNode.object;
+                                    var oldNodeObjectVisibility = true;
+                                    if (oldNodeObject) {
+                                        oldNodeObjectVisibility = oldNodeObject.visible;
+                                    }
+
+
                                     currentNode.object = upperNodeContainer;
                                     if(currentNode.object){
+                                        currentNode.object.visible = oldNodeObjectVisibility;
                                         currentNode.object.isModelContainerObj = true;
                                     }
                                 }
@@ -776,7 +800,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             } else {
                 for (var prop in obj) {
                     if (typeof obj[prop] == "object" && obj[prop] && !(obj[prop] instanceof THREE.Mesh) && !(obj[prop] instanceof THREE.LineSegments)
-                        && !(obj[prop] instanceof THREE.Object3D)) {
+                        && !(obj[prop] instanceof THREE.Object3D)
+                        && prop != "itree") {
                         var node = obj[prop];
                         if (node.index != -1) {
                             if (result[node.index]) {
@@ -789,7 +814,15 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                                 node.children = treeNodes;
                                 node.text = node.name;
+
+                                var oldNodeObject = node.object;
+                                var oldNodeObjectVisibility = true;
+                                if(oldNodeObject){
+                                    oldNodeObjectVisibility = oldNodeObject.visible;
+                                }
+
                                 node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
+                                node.object.visible = oldNodeObjectVisibility;
                                 node.object.isModelContainerObj = true;
                                 node.uniqueId = THREE.Math.generateUUID();
                             }
@@ -816,7 +849,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             scope.objectsTree = [data.tree];
             editor.onTreeLoad(data.tree);
         }else if(scope.objectsTree) {
+
+            console.log("RECALCULATE MODEL BY EXISTI NG TREEE")
             traverse(scope.objectsTree);
+            editor.addModelGroup(newModelGroup);
         }
 
 
