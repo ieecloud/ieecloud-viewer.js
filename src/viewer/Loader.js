@@ -732,6 +732,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                 if (node.object) {
                                     node.object.visible = oldNodeObjectVisibility;
                                     node.object.isModelContainerObj = true;
+                                    if(!oldNodeObjectVisibility){
+                                        _.forEach(treejsNodes, function(value, key) {
+                                            editor.preHideObject(value);
+                                        });
+                                    }
                                     newModelGroup.add(node.object);
                                 }
                             }
@@ -759,6 +764,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                     if(prevNode.object){
                                         prevNode.object.visible = oldNodeObjectVisibility;
                                         prevNode.object.isModelContainerObj = true;
+                                        if(!oldNodeObjectVisibility){
+                                            _.forEach(prevNode.object.children, function(value, key) {
+                                                editor.preHideObject(value);
+                                            });
+                                        }
                                     }
                                 }
 
@@ -785,7 +795,14 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                                     currentNode.object = upperNodeContainer;
                                     if(currentNode.object){
                                         currentNode.object.visible = oldNodeObjectVisibility;
+
                                         currentNode.object.isModelContainerObj = true;
+                                        if(!oldNodeObjectVisibility){
+                                            // editor.preHideObject(currentNode.object);
+                                            _.forEach(currentNode.object.children, function(value, key) {
+                                                editor.preHideObject(value);
+                                            });
+                                        }
                                     }
                                 }
 
@@ -823,8 +840,15 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                                 node.object = treejsNodes[0] ? treejsNodes[0].parent : undefined;
                                 node.object.visible = oldNodeObjectVisibility;
+
                                 node.object.isModelContainerObj = true;
                                 node.uniqueId = THREE.Math.generateUUID();
+                                if(!oldNodeObjectVisibility){
+                                    // editor.preHideObject(node.object);
+                                    _.forEach(treejsNodes, function (value, key) {
+                                        editor.preHideObject(value);
+                                    });
+                                }
                             }
                         }else{
                             node.text = node.name;
@@ -1195,12 +1219,20 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;
         totalGeometryObj.faceCommonDataForMesh = faceCommonDataForMesh;
 
-        totalGeometryObj.pretenderMinElement = {position: vertices[geometryObject.minResultIndex],
-            value: geometryObject.minResult};
+        // if (geometryObject.minResultIndex != -1) {
+            totalGeometryObj.pretenderMinElement = {
+                position: vertices[geometryObject.minResultIndex],
+                value: geometryObject.minResult
+            };
+        // }
 
-        totalGeometryObj.pretenderMaxElement = {position: vertices[geometryObject.maxResultIndex],
-            value: geometryObject.maxResult};
 
+        // if (geometryObject.maxResultIndex != -1) {
+            totalGeometryObj.pretenderMaxElement = {
+                position: vertices[geometryObject.maxResultIndex],
+                value: geometryObject.maxResult
+            };
+        // }
         totalGeometryObj.name = name;
 
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
@@ -1258,7 +1290,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var pictureData = json.pictureData; // reading array for all geometry objects
         var minResult = json.minResult;
         var maxResult = json.maxResult;
-        this.coordFactor  = json.coordFactor;
+        this.coordFactor = json.coordFactor;
         scope.DRAW_RESULTS = (!(/^(false|0)$/i).test(json.drawResults) && !!json.drawResults) || editor.options.drawResults
             && maxResult > minResult;
         this.modelRotation = json.modelRotation;
@@ -1273,8 +1305,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         pictureInfo.minResult = minResult;
         pictureInfo.maxResult = maxResult;
 
-        scope.pretenderMins = withSaveTreeState ? scope.pretenderMins: new Set();
-        scope.pretenderMaxs = withSaveTreeState ? scope.pretenderMaxs: new Set();
+        scope.pretenderMins = new Set();
+        scope.pretenderMaxs = new Set();
 
         var colorMapTexture;
         if (scope.DRAW_RESULTS && scope.textures) {
@@ -1288,17 +1320,24 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
-            if(!withSaveTreeState){
+            // if(!withSaveTreeState){
+
+
+            // if (scope.DRAW_RESULTS) {
                 scope.pretenderMins.add(pictureInfo.geometryObjectData[i].pretenderMinElement);
                 scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].pretenderMaxElement);
-            }
+            // }
+
         }
 
-        scope.pretenderMins = new Set(_.orderBy(Array.from(scope.pretenderMins), ['value'], 'desc'));
-        scope.pretenderMaxs = new Set(_.orderBy(Array.from(scope.pretenderMaxs), ['value'], 'asc'));
+        // if (scope.DRAW_RESULTS) {
+            var mins = Array.from(scope.pretenderMins);
+            scope.pretenderMins = new Set(_.orderBy(mins, ['value'], 'desc'));
+            var maxs = Array.from(scope.pretenderMaxs);
+            scope.pretenderMaxs = new Set(_.orderBy(maxs, ['value'], 'asc'));
 
-        editor.setMinMaxResult(_.last(Array.from(scope.pretenderMins)), _.last(Array.from(scope.pretenderMaxs)));
-
+            editor.setMinMaxResult(_.last(mins), _.last(maxs));
+        // }
         return pictureInfo;
     }
 };

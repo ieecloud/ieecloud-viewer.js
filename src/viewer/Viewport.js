@@ -1859,6 +1859,7 @@ var Viewport = function (editor) {
                         child.userData.totalObjResults = [];
                         child.userData.objectNames = [];
                         child.userData.pointsNumbers = [];
+                        child.userData.extremumResultData = {};
 
                         child.userData = null;
                         delete this.lastModel;
