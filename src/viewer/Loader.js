@@ -873,10 +873,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             scope.objectsTree = [data.tree];
             editor.onTreeLoad(data.tree);
         }else if(scope.objectsTree) {
-
-            console.log("RECALCULATE MODEL BY EXISTI NG TREEE")
             traverse(scope.objectsTree);
             editor.addModelGroup(newModelGroup);
+            editor.onTreeLoad(scope.objectsTree[0]);
         }
 
 
@@ -1219,20 +1218,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;
         totalGeometryObj.faceCommonDataForMesh = faceCommonDataForMesh;
 
-        // if (geometryObject.minResultIndex != -1) {
-            totalGeometryObj.pretenderMinElement = {
-                position: vertices[geometryObject.minResultIndex],
-                value: geometryObject.minResult
-            };
-        // }
+        totalGeometryObj.pretenderMinElement = {position: vertices[geometryObject.minResultIndex],
+            value: geometryObject.minResult};
 
+        totalGeometryObj.pretenderMaxElement = {position: vertices[geometryObject.maxResultIndex],
+            value: geometryObject.maxResult};
 
-        // if (geometryObject.maxResultIndex != -1) {
-            totalGeometryObj.pretenderMaxElement = {
-                position: vertices[geometryObject.maxResultIndex],
-                value: geometryObject.maxResult
-            };
-        // }
         totalGeometryObj.name = name;
 
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
@@ -1320,24 +1311,15 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
-            // if(!withSaveTreeState){
-
-
-            // if (scope.DRAW_RESULTS) {
-                scope.pretenderMins.add(pictureInfo.geometryObjectData[i].pretenderMinElement);
-                scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].pretenderMaxElement);
-            // }
-
+            scope.pretenderMins.add(pictureInfo.geometryObjectData[i].pretenderMinElement);
+            scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].pretenderMaxElement);
         }
 
-        // if (scope.DRAW_RESULTS) {
-            var mins = Array.from(scope.pretenderMins);
-            scope.pretenderMins = new Set(_.orderBy(mins, ['value'], 'desc'));
-            var maxs = Array.from(scope.pretenderMaxs);
-            scope.pretenderMaxs = new Set(_.orderBy(maxs, ['value'], 'asc'));
+        scope.pretenderMins = new Set(_.orderBy(Array.from(scope.pretenderMins), ['value'], 'desc'));
+        scope.pretenderMaxs = new Set(_.orderBy(Array.from(scope.pretenderMaxs), ['value'], 'asc'));
 
-            editor.setMinMaxResult(_.last(mins), _.last(maxs));
-        // }
+        editor.setMinMaxResult(_.last(Array.from(scope.pretenderMins)), _.last(Array.from(scope.pretenderMaxs)));
+
         return pictureInfo;
     }
 };

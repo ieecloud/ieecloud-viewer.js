@@ -1861,7 +1861,7 @@ var Viewport = function (editor) {
                         child.userData.pointsNumbers = [];
                         child.userData.extremumResultData = {};
 
-                        child.userData = null;
+                        // child.userData = null;
                         delete this.lastModel;
                     }
 
