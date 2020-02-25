@@ -233,6 +233,10 @@ function Viewer(target, options) {
         this.threeEditor.toggleIsolines(value);
     };
 
+    Viewer.prototype.setMinMaxUserInput = function (min,max) {
+        this.threeEditor.setMinMaxUserInput(min,max);
+    };
+
     Viewer.prototype.toggleMinMaxResults = function (value) {
         this.threeEditor.toggleMinMaxResults(value);
     };

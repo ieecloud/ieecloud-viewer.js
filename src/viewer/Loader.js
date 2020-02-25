@@ -1217,6 +1217,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             && maxResult > minResult;
         this.modelRotation = json.modelRotation;
 
+        editor.minUserInput = undefined;
+        editor.maxUserInput = undefined;
+
         var names = [];
         var links = [];
         var pictureInfo = {};

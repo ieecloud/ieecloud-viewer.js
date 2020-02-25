@@ -1273,6 +1273,15 @@
                             </li>
                             <li>
                                 <div class="title-wrap">
+                                    <a class="title" href="#" id="changeMinMaxRange"><i
+                                            class="material-icons icon-action">
+                                        import_export
+                                    </i>Set Min Max</a>
+                                </div>
+                                <div class="wholerow"></div>
+                            </li>
+                            <li>
+                                <div class="title-wrap">
                                     <a class="title" href="#" id="toggleMinMaxResultBtn"><i
                                             class="material-icons icon-action">
                                         radio_button_checked
@@ -1931,6 +1940,37 @@
        var result =  $("#min-max-result-toggle-icon").toggle();
         showToggleValue = !showToggleValue;
         $("#viewer").ieecloudEditor('toggleMinMaxResults', showToggleValue);
+    });
+
+    var minMax = "";
+    $("#changeMinMaxRange").click(function () {
+        minMax = prompt('Input min and max with ";" as separator (Example: min and max "0.001;0.1" only max ";0.1" only min "0.1;")', minMax);
+        if(minMax) {
+            var arrayOfStrings = minMax.split(";");
+            if(arrayOfStrings.length != 2) {
+                alert("Неверный формат");
+                return;
+            }
+
+            if(arrayOfStrings[0]!="" && isNaN(parseFloat(arrayOfStrings[0]))){
+                alert("Min is not number");
+                return;
+            }
+
+            if(arrayOfStrings[1]!="" && isNaN(parseFloat(arrayOfStrings[1]))){
+                alert("Max is not number");
+                return;
+            }
+
+            var min = parseFloat(arrayOfStrings[0]);
+            var max = parseFloat(arrayOfStrings[1]);
+
+            min = isNaN(min) ? undefined : min;
+            max = isNaN(max) ? undefined : max;
+
+            $("#viewer").ieecloudEditor('setMinMaxUserInput', min, max);
+            $("#viewer").ieecloudEditor('toggleIsolines', toggleTexture);
+        }
     });
 
     function getCurrentTexture(textures, reqParamTextureName) {

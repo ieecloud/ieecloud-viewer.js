@@ -93,6 +93,9 @@ var Editor = function (options) {
     // this.sumTime = 0;
     // this.startDate = new Date();
 
+    this.minUserInput = undefined;
+    this.maxUserInput = undefined;
+
 };
 
 Editor.prototype = {
@@ -151,26 +154,10 @@ Editor.prototype = {
                     return;
                 }
 
-                var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
-                var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
-                var resultInfo = me.getResultInfo();
-
-                var maxResult = resultInfo.maxResult;
-                var minResult = resultInfo.minResult;
-
-                var maxChanged = maxGeometryResult.value >= maxResult.value || !maxResult.value;
-                var minChanged = minGeometryResult.value <= minResult.value || !minResult.value;
-                me.loader.pretenderMaxs.add(maxGeometryResult);
-                if (maxChanged) {
-                    maxResult = maxGeometryResult;
-                }
-                me.loader.pretenderMins.add(minGeometryResult);
-                if (minChanged) {
-                    minResult = minGeometryResult;
-                }
-
-                if (maxChanged || minChanged) {
-                    me.setMinMaxResult(minResult, maxResult);
+                if(typeof object.drawResults2 === 'undefined' || object.drawResults2) {
+                    var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
+                    var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
+                    me.addMinMax(minGeometryResult, maxGeometryResult);
                 }
             }
         }
@@ -356,35 +343,10 @@ Editor.prototype = {
                     return;
                 }
 
-                var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
-                var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
-                var resultInfo = me.getResultInfo();
-
-                var maxResult = resultInfo.maxResult;
-                var minResult = resultInfo.minResult;
-
-                var maxChanged = maxGeometryResult.value === maxResult.value;
-                var minChanged = minGeometryResult.value === minResult.value;
-                if (me.loader.pretenderMaxs.has(maxGeometryResult)) {
-                    me.loader.pretenderMaxs.delete(maxGeometryResult);
-                }
-                me.loader.pretenderMaxs = new Set(_.orderBy(Array.from(me.loader.pretenderMaxs), ['value'], 'asc'));
-
-                if (maxChanged) {
-                    maxResult = _.last(Array.from(me.loader.pretenderMaxs)) || maxGeometryResult;
-                }
-
-                if (me.loader.pretenderMins.has(minGeometryResult)) {
-                    me.loader.pretenderMins.delete(minGeometryResult);
-                }
-                me.loader.pretenderMins = new Set(_.orderBy(Array.from(me.loader.pretenderMins), ['value'], 'desc'));
-
-                if (minChanged) {
-                    minResult = _.last(Array.from(me.loader.pretenderMins)) || minGeometryResult;
-                }
-
-                if (maxChanged || minChanged) {
-                    me.setMinMaxResult(minResult, maxResult);
+                if(typeof object.drawResults2 === 'undefined' || object.drawResults2) {
+                    var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
+                    var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
+                    me.deleteMinMax(minGeometryResult, maxGeometryResult);
                 }
             }
         }
@@ -668,6 +630,66 @@ Editor.prototype = {
         this.resultInfo.dirty  = true;
     },
 
+    addMinMax: function (minGeometryResult, maxGeometryResult) {
+        var me = this;
+        var resultInfo = me.getResultInfo();
+
+        var maxResult = resultInfo.maxResult;
+        var minResult = resultInfo.minResult;
+
+        var maxChanged = maxGeometryResult.value >= maxResult.value || !maxResult.value;
+        var minChanged = minGeometryResult.value <= minResult.value || !minResult.value;
+        me.loader.pretenderMaxs.add(maxGeometryResult);
+        if (maxChanged) {
+            maxResult = maxGeometryResult;
+        }
+        me.loader.pretenderMins.add(minGeometryResult);
+        if (minChanged) {
+            minResult = minGeometryResult;
+        }
+
+        if (maxChanged || minChanged) {
+            me.setMinMaxResult(minResult, maxResult);
+        }
+
+        return maxChanged || minChanged;
+    },
+
+    deleteMinMax: function (minGeometryResult, maxGeometryResult) {
+        var me = this;
+        //var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
+        //var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
+        var resultInfo = me.getResultInfo();
+
+        var maxResult = resultInfo.maxResult;
+        var minResult = resultInfo.minResult;
+
+        var maxChanged = maxGeometryResult.value === maxResult.value;
+        var minChanged = minGeometryResult.value === minResult.value;
+        if (me.loader.pretenderMaxs.has(maxGeometryResult)) {
+            me.loader.pretenderMaxs.delete(maxGeometryResult);
+        }
+        me.loader.pretenderMaxs = new Set(_.orderBy(Array.from(me.loader.pretenderMaxs), ['value'], 'asc'));
+
+        if (maxChanged) {
+            maxResult = _.last(Array.from(me.loader.pretenderMaxs)) || maxGeometryResult;
+        }
+
+        if (me.loader.pretenderMins.has(minGeometryResult)) {
+            me.loader.pretenderMins.delete(minGeometryResult);
+        }
+        me.loader.pretenderMins = new Set(_.orderBy(Array.from(me.loader.pretenderMins), ['value'], 'desc'));
+
+        if (minChanged) {
+            minResult = _.last(Array.from(me.loader.pretenderMins)) || minGeometryResult;
+        }
+
+        if (maxChanged || minChanged) {
+            me.setMinMaxResult(minResult, maxResult);
+        }
+
+        return maxChanged || minChanged;
+    },
 
     toggleIsolines: function (showFlag) {
 
@@ -682,14 +704,62 @@ Editor.prototype = {
             return;
         }
 
+        var minOrMaxIsChanged = false;
         for (var i = 0; i < this.scene.meshes.length; i++) {
             if (this.scene.meshes[i].drawResults) {
-                this.scene.meshes[i].material = this.showIsolinesFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
+
+                var mesh = this.scene.meshes[i];
+
+                var me = this;
+
+                var meshMin = mesh.parent.userData.extremumResultData.minGeometryResult;
+                var meshMax = mesh.parent.userData.extremumResultData.maxGeometryResult;
+                if((this.minUserInput && meshMin.value < this.minUserInput) ||
+                    (this.maxUserInput && meshMax.value > this.maxUserInput)) {
+
+                    mesh.drawResults2 = false;
+                    mesh.material = this.scene.meshes[i].facesMaterial;
+                    var deleteMinMaxResult = this.deleteMinMax(meshMin, meshMax);
+                    minOrMaxIsChanged = minOrMaxIsChanged || deleteMinMaxResult;
+
+                } else {
+
+                    mesh.drawResults2 = true;
+                    mesh.material = this.showIsolinesFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
+                    var addMinMaxResult = this.addMinMax(meshMin, meshMax);
+                    minOrMaxIsChanged = minOrMaxIsChanged || addMinMaxResult;
+                }
             }
+        }
+
+        if(minOrMaxIsChanged) {
+            var resultInfo = me.getResultInfo();
+            var maxResult = resultInfo.maxResult.value;
+            var minResult = resultInfo.minResult.value;
+            var textureNeedToRecalculate = resultInfo.dirty;
+
+            // means max/min changed
+            if (textureNeedToRecalculate) {
+                // need recalculate the whole tree
+                me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
+                    if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
+                });
+                if (me.showMinMaxFlag) {
+                    me.updateMinMaxResults();
+                }
+                resultInfo.dirty = false;
+            }
+
+
         }
 
         this.signals.materialChanged.dispatch();
 
+    },
+
+    setMinMaxUserInput: function (minIn, maxIn) {
+        this.minUserInput = minIn;
+        this.maxUserInput = maxIn;
     },
 
     toggleMinMaxResults: function (show) {
