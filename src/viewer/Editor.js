@@ -637,18 +637,22 @@ Editor.prototype = {
 
             texture.colorMapTexture = colorMapTexture;
 
-            texture.isolineMaterial = new THREE.MeshLambertMaterial({
+            texture.isolineMaterial = new THREE.CustomSelectionMaterial({
                 map: colorMapTexture,
                 flatShading: true,
                 side: THREE.FrontSide
 
             });
 
+            texture.isolineMaterial .setSourceTexture(colorMapTexture);
+            texture.isolineMaterial .setUvsLimits(new THREE.Vector2(this.minUVy, this.maxUVy));
+
             texture.isolineSpriteMaterial = new THREE.SpriteMaterial({map: colorMapTexture});
             texture.isolineSpriteMaterial.nColors = texture.nColors;
         }
 
         this.isolineMaterial = texture.isolineMaterial;
+        this.isolineMaterial .setUvsLimits(new THREE.Vector2(this.minUVy, this.maxUVy));
         this.isolineSpriteMaterial = texture.isolineSpriteMaterial;
 
         this.signals.unHighlightGeometryObjects.dispatch();
@@ -701,8 +705,8 @@ Editor.prototype = {
         let resultInfo = me.getResultInfo();
         let maxResult = resultInfo.maxResult;
         let minResult = resultInfo.minResult;
-        let minUVy = (this.minUserInput - minResult.value) / (maxResult.value - minResult.value);
-        let maxUVy = (this.maxUserInput - minResult.value) / (maxResult.value - minResult.value);
+        this.minUVy = (this.minUserInput - minResult.value) / (maxResult.value - minResult.value);
+        this.maxUVy = (this.maxUserInput - minResult.value) / (maxResult.value - minResult.value);
 
 
         if (!this.options.drawResults || !this.scene.meshes) {
@@ -713,7 +717,7 @@ Editor.prototype = {
             if (this.scene.meshes[i].drawResults) {
 
                 if( this.scene.meshes[i].material instanceof  THREE.CustomSelectionMaterial){
-                    this.scene.meshes[i].material.setUvsLimits(new THREE.Vector2(minUVy, maxUVy));
+                    this.scene.meshes[i].material.setUvsLimits(new THREE.Vector2(this.minUVy, this.maxUVy));
                 }
             }
         }
