@@ -245,6 +245,10 @@ function Viewer(target, options) {
         this.threeEditor.setTexture(textureName);
     };
 
+    Viewer.prototype.reloadTexture = function () {
+        this.threeEditor.reloadTexture();
+    };
+
     Viewer.prototype.printScreen = function (toFileName) {
         this.threeEditor.printScreen(toFileName);
     };

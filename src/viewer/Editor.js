@@ -154,11 +154,11 @@ Editor.prototype = {
                     return;
                 }
 
-                if(typeof object.drawResults2 === 'undefined' || object.drawResults2) {
+                //if(typeof object.drawResults2 === 'undefined' || object.drawResults2) {
                     var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                     var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
                     me.addMinMax(minGeometryResult, maxGeometryResult);
-                }
+                //}
             }
         }
     },
@@ -343,11 +343,11 @@ Editor.prototype = {
                     return;
                 }
 
-                if(typeof object.drawResults2 === 'undefined' || object.drawResults2) {
+                //if(typeof object.drawResults2 === 'undefined' || object.drawResults2) {
                     var maxGeometryResult = object.parent.userData.extremumResultData.maxGeometryResult;
                     var minGeometryResult = object.parent.userData.extremumResultData.minGeometryResult;
                     me.deleteMinMax(minGeometryResult, maxGeometryResult);
-                }
+                //}
             }
         }
     },
@@ -556,6 +556,10 @@ Editor.prototype = {
 
     setTexture: function (textureName) {
 
+        if((typeof this.minUserInput !== 'undefined' && this.minUserInput != null) || (typeof this.maxUserInput !== 'undefined' && this.maxUserInput != null)) {
+            return this.setTexture2(textureName);
+        }
+
         var texture = this.mapTextureNameToDetails[textureName] ? this.mapTextureNameToDetails[textureName] : this.getDefaultTexture();
         if (!texture) {
             console.log('Texture is not defined: ' + ': ' + texture);
@@ -615,6 +619,187 @@ Editor.prototype = {
         this.toggleIsolines(true);
         return colorMapTexture;
     },
+
+    reloadTexture: function() {
+        if(this.isolineMaterial) {
+            this.setTexture2(this.isolineMaterial);
+        }
+    },
+
+    setTexture2: function(textureName) {
+
+        var texture = this.mapTextureNameToDetails[textureName] ? this.mapTextureNameToDetails[textureName] : this.getDefaultTexture();
+        if (!texture) {
+            console.log('Texture is not defined: ' + ': ' + texture);
+            throw new Error('Texture is not defined: ' + ': ' + texture);
+        }
+
+        //if (!texture.isolineMaterial) {
+
+        var colorMapTexture;
+
+        var self = this;
+
+        var image = new Image();
+        image.setAttribute('crossorigin', 'anonymous');
+        image.width = 255;
+        image.height = 255;
+
+
+        colorMapTexture = new THREE.Texture();
+        colorMapTexture.image = image;
+
+        var me = this;
+        var resultInfo = me.getResultInfo();
+
+        var maxResult = resultInfo.maxResult;
+        var minResult = resultInfo.minResult;
+
+        self.drawImage2(texture.data, function (imageData) {
+
+            image.src = imageData;
+            //image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAP8AAAD/CAIAAACxapedAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xNkRpr/UAAAQqSURBVHhe7dMxiBAEGIbhN8ELlZQUjRQsLDRMsNAwycJCCSGHCxRyMLgoCSEHA4UcFBQMukEJwYYbFAxsuCHBwEAHGwwMMjC4QKGLDAwUMjBQv26/+eDge+GZ3uVfvp+3iNSJN4jUifVE6sQrROrEy0TqxCoideIFInXieSJ14lkidWIJkTrxFJE6MZ9InZhHpE7MIVInHidSJ2YQqRPMmPgAqRIzI5ViVqRSPBGpFE9GKsXCSKVYHKkUSyOVYlmkUiyPVIqVkUqxOlIp1kQqxbpIpXgtUik2RirFpkileDtSKd6JVIrBSKXYFqkU70Uqxc5IpRiKVIoPI5Xi40il+CRSKfZGKsW+SKX4LFIpDkYqxeFIpTgaqRRfRJoWhieVKTVxjmORSvFlpFKcjFSKkUilOBWpFGcileJspFKMRirFt5FKcT5SKS5EKsXFSKW4HKkUVyKV4mqkUvwcqRTXI5ViLFIpbkQqxe+RSvFnpFLcjlSKO5FK8U+kUtyPVIoHkUrx6KFUivwnlSL/SqXIXakU+VsqRf6SSpFxqdIfE+u/KZUiv0mlyK9SKfKLVIr8JJUiP0qlyA9SKXJJKkW+l0qR76RS5JxUioxKpcg3UinytVSKnJZKkRGpFPlKKkVOSKXIcakUGZZKkc+lUuSIVIockkqRA1Ipsl8qRfZKpcgeqRTZLZUiu6RS5AOpFHlfKkV2SKXIdqkUeVcqRbZKpcgWqRTZJJUib0qlyOtSKbJeKkXWSqXIS1IpskoqRVZIpchzUinyjFSKLJFKkUVSKbJAKkXmSaXIHKkUGZBKkRlSqccilWIg0rQwc1KZasyOVIq5kUoxP1IpFkUqxeJIpVgaqRTLIpViRaRSvBipFKsjlWJNpEZrJ9b/aqRSbIhUio2RSrE5Uim2RCrF1kilGIxUiu2RSrEjUil2RirFUKRS7IpUit2RSrEnUik+jVSK/ZFKcSBSKQ5GKsXhSKU4GqkUw5FKcSxSKU5EKsXJSKUYiVSKU5FKcSZSKc5GKsVopFKci1SK85FKcSFSKS5GKsXlSKW4EqkUVyOV4lqkUlyPVIqxSKW4EakU45FKcStSKW5HKsXdSNPCnUllqnEvUinuRyrFw0dSKR49kEqR+1Ipck8qRe5KpchtqRS5JZUi41IpclMqRcakUuS6VIpck0qRq1IpckUqRS5LpcglqRS5IJUi56VS5JxUioxKpchZqRQ5I5Uip6VSZEQqRU5KpcgJqRQ5LpUiw1IpclQqRY5IpcghqRQ5IJUi+6RSZK9UiuyRSpHdUinykVSKDEmlyE6pFNkhlSLbpFJkUCpFtkqlyBapFNkslSIbpVJkg1SKrJNKkTVSKbJaKkVWSqXIcqkUWSaVIkulUuRpqRRZKJUiC6TpYf6kMsXIXKkUmSVVmj2x/gGp0gD/A8JXBneznKjMAAAAAElFTkSuQmCC';
+
+            image.onload = function () {
+                colorMapTexture.needsUpdate = true;
+                self.reRender();
+            };
+
+        }, minResult.value, maxResult.value, this.minUserInput, this.maxUserInput);
+
+        colorMapTexture.magFilter = THREE.NearestFilter;
+        colorMapTexture.minFilter = THREE.LinearFilter;
+
+        texture.colorMapTexture = colorMapTexture;
+
+        texture.isolineMaterial = new THREE.MeshLambertMaterial({
+            map: colorMapTexture,
+            flatShading: true,
+            side: THREE.FrontSide
+
+        });
+
+        texture.isolineSpriteMaterial = new THREE.SpriteMaterial({map: colorMapTexture});
+        texture.isolineSpriteMaterial.nColors = texture.nColors;
+        //}
+
+        this.isolineMaterial = texture.isolineMaterial;
+        this.isolineSpriteMaterial = texture.isolineSpriteMaterial;
+
+        this.signals.unHighlightGeometryObjects.dispatch();
+
+        this.toggleIsolines(true);
+        return colorMapTexture;
+    },
+
+    drawImage: function(url, callback, modelMin, modelMax, userInputMin, userInputMax) {
+        //var canvas = document.getElementById('canvas');
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        var img1 = new Image();
+        img1.setAttribute('crossorigin', 'anonymous');
+
+        img1.onload = function() {
+            canvas.width = 255;//img1.width;
+            canvas.height = 255;//img1.height*2;
+            //img2.src = 'http://static.ieecloud.com/images/cs-red-gray.png';
+
+            var grayOnTopHeight = 0;
+            if(typeof userInputMax !== 'undefined' && userInputMax != null) {
+                grayOnTopHeight =  modelMax - userInputMax;
+            }
+
+            var grayOnBottomHeight = 0;
+            if(typeof userInputMin !== 'undefined' && userInputMin != null) {
+                grayOnBottomHeight =  userInputMin - modelMin;
+            }
+
+            var percentOfTop = (grayOnTopHeight / (modelMax - modelMin));
+            var percentOfBottom = (grayOnBottomHeight / (modelMax - modelMin));
+            var percentOfMiddle = 1 - percentOfTop - percentOfBottom;
+
+            // draw gray on top
+            context.fillStyle="gray";
+            context.fillRect(0, 0, 255, 255);
+            context.stroke();
+
+            // draw middle
+            img1.height = img1.height * percentOfMiddle;
+            context.drawImage(img1, 0, 255 * percentOfTop, 255, img1.height);
+
+            //console.log(canvas.toDataURL("image/png"));
+
+            callback(canvas.toDataURL("image/png"));
+
+            canvas.remove();
+        };
+
+        img1.src = url;
+        //img1.src = 'http://static.ieecloud.com/images/cs-red.png';
+    },
+
+    drawImage2: function(url, callback, modelMin, modelMax, userInputMin, userInputMax) {
+        // var canvas = document.getElementById('canvas');
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        var img1 = new Image();
+        img1.setAttribute('crossorigin', 'anonymous');
+
+        img1.onload = function() {
+            // canvas.width = 1000; // img1.width;
+            // canvas.height = 1000; //img1.height;
+            //img2.src = 'http://static.ieecloud.com/images/cs-red-gray.png';
+
+            var grayOnTopHeight = 0;
+            if(typeof userInputMax !== 'undefined' && userInputMax != null) {
+                grayOnTopHeight =  modelMax - userInputMax;
+            }
+
+            var grayOnBottomHeight = 0;
+            if(typeof userInputMin !== 'undefined' && userInputMin != null) {
+                grayOnBottomHeight =  userInputMin - modelMin;
+            }
+
+            var percentOfTop = (grayOnTopHeight / (modelMax - modelMin));
+            var percentOfBottom = (grayOnBottomHeight / (modelMax - modelMin));
+            var percentOfMiddle = 1 - percentOfTop - percentOfBottom;
+
+            var imgHeight = 1000;
+
+            // var top = percentOfTop * img1.height / percentOfMiddle;
+            var top = percentOfTop * imgHeight / percentOfMiddle;
+            // var bottom = percentOfBottom * img1.height / percentOfMiddle;
+            var bottom = percentOfBottom * imgHeight / percentOfMiddle;
+
+            canvas.width = 100; // img1.width + top + bottom;
+            canvas.height = imgHeight;//img1.height + top + bottom;
+
+            // draw gray on top
+            context.fillStyle="gray";
+            // context.fillRect(0, 0, img1.width + top + bottom, img1.height + top + bottom);
+            context.fillRect(0, 0, 100, imgHeight);
+            //context.fillRect(0, 0, 50, 5000);
+            //context.fillRect(0, 0, 255, 255);
+            context.stroke();
+
+            // draw middle
+            //img1.height = img1.height * percentOfMiddle;
+            //context.drawImage(img1, 0, img1.height + top, img1.width, img1.height);
+            //context.drawImage(img1, 0, img1.height + top, canvas.width, img1.height);
+
+            //img1.height = percentOfMiddle * imgHeight;
+
+            //context.drawImage(img1, 0, img1.height + top, canvas.width, img1.height);
+            context.drawImage(img1, 0, top, canvas.width, percentOfMiddle * imgHeight);
+
+            callback(canvas.toDataURL("image/png"));
+
+            canvas.remove();
+        };
+
+        img1.src = url;
+    },
+
 
     addTextures: function (textures) {
         for (var i = 0; i < textures.length; i++) {
@@ -704,53 +889,10 @@ Editor.prototype = {
             return;
         }
 
-        var minOrMaxIsChanged = false;
         for (var i = 0; i < this.scene.meshes.length; i++) {
             if (this.scene.meshes[i].drawResults) {
-
-                var mesh = this.scene.meshes[i];
-
-                var me = this;
-
-                var meshMin = mesh.parent.userData.extremumResultData.minGeometryResult;
-                var meshMax = mesh.parent.userData.extremumResultData.maxGeometryResult;
-                if((this.minUserInput && meshMin.value < this.minUserInput) ||
-                    (this.maxUserInput && meshMax.value > this.maxUserInput)) {
-
-                    mesh.drawResults2 = false;
-                    mesh.material = this.scene.meshes[i].facesMaterial;
-                    var deleteMinMaxResult = this.deleteMinMax(meshMin, meshMax);
-                    minOrMaxIsChanged = minOrMaxIsChanged || deleteMinMaxResult;
-
-                } else {
-
-                    mesh.drawResults2 = true;
-                    mesh.material = this.showIsolinesFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
-                    var addMinMaxResult = this.addMinMax(meshMin, meshMax);
-                    minOrMaxIsChanged = minOrMaxIsChanged || addMinMaxResult;
-                }
+                this.scene.meshes[i].material = this.showIsolinesFlag && this.isolineMaterial ? this.isolineMaterial : this.scene.meshes[i].facesMaterial;
             }
-        }
-
-        if(minOrMaxIsChanged) {
-            var resultInfo = me.getResultInfo();
-            var maxResult = resultInfo.maxResult.value;
-            var minResult = resultInfo.minResult.value;
-            var textureNeedToRecalculate = resultInfo.dirty;
-
-            // means max/min changed
-            if (textureNeedToRecalculate) {
-                // need recalculate the whole tree
-                me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
-                    if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
-                });
-                if (me.showMinMaxFlag) {
-                    me.updateMinMaxResults();
-                }
-                resultInfo.dirty = false;
-            }
-
-
         }
 
         this.signals.materialChanged.dispatch();
