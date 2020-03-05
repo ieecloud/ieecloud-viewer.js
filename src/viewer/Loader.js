@@ -976,12 +976,38 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         });
 
 
-        var drawResultsMaterial = drawResults ? new THREE.MeshLambertMaterial({
+        var drawResultsMaterial = drawResults ? new THREE.CustomSelectionMaterial({
             map: colorMapTexture,
             flatShading: true,
             side: THREE.FrontSide
 
         }) : null;
+
+        if(drawResultsMaterial){
+            drawResultsMaterial.setSourceTexture(colorMapTexture);
+        }
+
+        //
+        // drawResultsMaterial.onBeforeCompile = function ( shader ) {
+        //
+        //     shader.uniforms.limitUvs = { value: new THREE.Vector2( 0.0, 1.0 ) };
+        //
+        //     shader.fragmentShader = 'uniform vec2 limitUvs;\n' + shader.vertexShader;
+        //     shader.fragmentShader = shader.fragmentShader.replace(
+        //         '#include <begin_vertex>',
+        //         [
+        //             "vec4 texelColor = texture2D( map, vUv );",
+        //             "if( vUv.y > limitUvs.x && vUv.y < limitUvs.y )",
+        //             "texelColor = mapTexelToLinear( texelColor );",
+        //             "else",
+        //             "texelColor = vec4( color, 1.0 );",
+        //             "diffuseColor *= texelColor;",
+        //         ].join( '\n' )
+        //     );
+        //
+        //     drawResultsMaterial = shader;
+        //
+        // };
 
 
         if (!editor.options.detailModelView) {
