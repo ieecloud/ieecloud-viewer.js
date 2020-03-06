@@ -13,7 +13,7 @@ THREE.CustomSelectionMaterial = function (parameters) {
     this.fog = false;
     this.lights = true;
     this.extensions.derivatives = true;
-    this.color = new THREE.Color( 0.6, 0.6, 0.6 ); // diffuse
+    this.color = new THREE.Color( 1, 1, 1); // diffuse
 
     this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
     this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
@@ -125,7 +125,7 @@ THREE.CustomSelectionMaterial = function (parameters) {
             // THREE.ShaderChunk["map_fragment"],
 
             "vec4 texelColor = texture2D( map, vUv );",
-            "if( vUv.y > limitUvs.x && vUv.y < limitUvs.y )",
+           "if( vUv.y >= limitUvs.x && vUv.y <= limitUvs.y )",
             "texelColor = mapTexelToLinear( texelColor );",
             "else",
             "texelColor = vec4( color, 1.0 );",

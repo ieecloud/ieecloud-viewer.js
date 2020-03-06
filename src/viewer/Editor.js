@@ -573,20 +573,6 @@ Editor.prototype = {
         return this.resultInfo;
     },
 
-
-    addTexture: function (texture, minResult, maxResult) {
-        this.isolineMaterial = new THREE.MeshLambertMaterial({
-            map: texture,
-            flatShading: true,
-            side: THREE.FrontSide
-
-        });
-        this.isolineSpriteMaterial = new THREE.SpriteMaterial({map: texture});
-        this.resultInfo = this.resultInfo || {};
-        this.resultInfo.minResult = minResult;
-        this.resultInfo.maxResult = maxResult;
-    },
-
     getDefaultTexture: function () {
         for (var key in this.mapTextureNameToDetails) {
             if (this.mapTextureNameToDetails[key].default) {
@@ -645,14 +631,14 @@ Editor.prototype = {
             });
 
             texture.isolineMaterial .setSourceTexture(colorMapTexture);
-            texture.isolineMaterial .setUvsLimits(new THREE.Vector2(this.minUVy, this.maxUVy));
-
             texture.isolineSpriteMaterial = new THREE.SpriteMaterial({map: colorMapTexture});
+            // texture.isolineSpriteMaterial .setSourceTexture(colorMapTexture);
+
+
             texture.isolineSpriteMaterial.nColors = texture.nColors;
         }
 
         this.isolineMaterial = texture.isolineMaterial;
-        this.isolineMaterial .setUvsLimits(new THREE.Vector2(this.minUVy, this.maxUVy));
         this.isolineSpriteMaterial = texture.isolineSpriteMaterial;
 
         this.signals.unHighlightGeometryObjects.dispatch();
@@ -700,27 +686,15 @@ Editor.prototype = {
 
     setMinMaxUserInput: function (minIn, maxIn) {
         let me = this;
-        this.minUserInput = minIn;
-        this.maxUserInput = maxIn;
-        let resultInfo = me.getResultInfo();
-        let maxResult = resultInfo.maxResult;
-        let minResult = resultInfo.minResult;
-        this.minUVy = (this.minUserInput - minResult.value) / (maxResult.value - minResult.value);
-        this.maxUVy = (this.maxUserInput - minResult.value) / (maxResult.value - minResult.value);
-
+        me.minUserInput = minIn;
+        me.maxUserInput = maxIn;
 
         if (!this.options.drawResults || !this.scene.meshes) {
             return;
         }
-
-        for (var i = 0; i < this.scene.meshes.length; i++) {
-            if (this.scene.meshes[i].drawResults) {
-
-                if( this.scene.meshes[i].material instanceof  THREE.CustomSelectionMaterial){
-                    this.scene.meshes[i].material.setUvsLimits(new THREE.Vector2(this.minUVy, this.maxUVy));
-                }
-            }
-        }
+        me.recalculateUvs(this.loader.objectsTree, me.maxUserInput, me.minUserInput, function (oNode) {
+            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
+        });
 
         this.signals.materialChanged.dispatch();
     },
