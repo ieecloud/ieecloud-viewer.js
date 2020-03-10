@@ -1264,7 +1264,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             editor.addTextures(scope.textures);
             var currentTextureName = scope.texture ? scope.texture : this.getDefaultTexture(textures);
             colorMapTexture = editor.setTexture(currentTextureName);
-            // editor.addTexture(colorMapTexture, minResult, maxResult);
         }
 
         for (var i = 0; i < pictureData.length; i++) {

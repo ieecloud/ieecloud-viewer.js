@@ -1053,8 +1053,7 @@ var Viewport = function (editor) {
                 // parse intersection object name and notify UI
                 var intersectionName = intersect.object.name;
 
-                //TODO: reimplement
-                //scope.highlightObject(intersect.object);
+                // scope.highlightObject(intersect.object);
 
                 if (intersectionName) {
                     var intersectionNameArray = intersectionName.split('[');
