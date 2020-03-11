@@ -41,7 +41,8 @@ var Editor = function (options) {
         setSearchNearestPointMode: new SIGNALS.Signal(),
         objectShow: new SIGNALS.Signal(),
         objectHide: new SIGNALS.Signal(),
-        updateMinMaxResults: new SIGNALS.Signal()
+        updateMinMaxResults: new SIGNALS.Signal(),
+        updateCurrentScaleLimits: new SIGNALS.Signal()
     };
 
     this.MODE_FACES_EDGES = "faces_and_nodes";
@@ -188,18 +189,25 @@ Editor.prototype = {
     },
 
     updateModelTexture: function (object, isObjectShow) {
-        var me = this;
+        let me = this;
 
-        var resultInfo = me.getResultInfo();
+        let resultInfo = me.getResultInfo();
 
         if (_.isUndefined(resultInfo)) {
             this.signals.objectChanged.dispatch(object);
             return;
         }
 
-        var maxResult = resultInfo.maxResult.value;
-        var minResult = resultInfo.minResult.value;
-        var textureNeedToRecalculate = resultInfo.dirty;
+        let maxResult = resultInfo.maxResult.value;
+        let minResult = resultInfo.minResult.value;
+        let textureNeedToRecalculate = resultInfo.dirty;
+
+        if (me.userMinMaxLimitInfo) {
+            maxResult = maxResult > me.userMinMaxLimitInfo.maxResult ? me.userMinMaxLimitInfo.maxResult : maxResult;
+            minResult = minResult < me.userMinMaxLimitInfo.minResult ? me.userMinMaxLimitInfo.minResult : minResult;
+        }
+
+        this.signals.updateCurrentScaleLimits.dispatch(minResult, maxResult);
 
          // means max/min changed
         if (textureNeedToRecalculate) {
@@ -321,15 +329,18 @@ Editor.prototype = {
     },
 
     toggleWholeModel: function(visible){
-        var me = this;
+        let me = this;
         this.lastModel.visible = visible;
 
         // recalculate for Whole model not for every geometry object
         if (me.loader.DRAW_RESULTS) {
-            var resultInfo = me.getResultInfo();
+            let resultInfo = me.getResultInfo();
 
-            var maxResult = resultInfo.maxResult.value;
-            var minResult = resultInfo.minResult.value;
+            let maxResult = resultInfo.maxResult.value;
+            let minResult = resultInfo.minResult.value;
+
+            this.signals.updateCurrentScaleLimits.dispatch(minResult, maxResult);
+
             me.recalculateUvs(this.loader.objectsTree, maxResult, minResult, function (oNode) {
                 if (oNode.object && oNode.object instanceof THREE.Mesh /*&& oNode.object.isSimpleShape === false*/) return true;
             });
@@ -573,6 +584,10 @@ Editor.prototype = {
         return this.resultInfo;
     },
 
+    getUserMinMaxLimitInfo: function () {
+        return this.userMinMaxLimitInfo;
+    },
+
     getDefaultTexture: function () {
         for (var key in this.mapTextureNameToDetails) {
             if (this.mapTextureNameToDetails[key].default) {
@@ -630,11 +645,8 @@ Editor.prototype = {
 
             });
 
-            texture.isolineMaterial .setSourceTexture(colorMapTexture);
+            texture.isolineMaterial.setSourceTexture(colorMapTexture);
             texture.isolineSpriteMaterial = new THREE.SpriteMaterial({map: colorMapTexture});
-            // texture.isolineSpriteMaterial .setSourceTexture(colorMapTexture);
-
-
             texture.isolineSpriteMaterial.nColors = texture.nColors;
         }
 
@@ -659,6 +671,12 @@ Editor.prototype = {
         this.resultInfo.minResult = minResult;
         this.resultInfo.maxResult = maxResult;
         this.resultInfo.dirty  = true;
+    },
+
+    setUserMinMaxLimit: function (minResult, maxResult) {
+        this.userMinMaxLimitInfo =  this.userMinMaxLimitInfo || {};
+        this.userMinMaxLimitInfo.minResult = minResult;
+        this.userMinMaxLimitInfo.maxResult = maxResult;
     },
 
     toggleIsolines: function (showFlag) {
@@ -686,16 +704,16 @@ Editor.prototype = {
 
     setMinMaxUserInput: function (minIn, maxIn) {
         let me = this;
-        me.minUserInput = minIn;
-        me.maxUserInput = maxIn;
 
+        me.setUserMinMaxLimit(minIn, maxIn);
         if (!this.options.drawResults || !this.scene.meshes) {
             return;
         }
-        me.recalculateUvs(this.loader.objectsTree, me.maxUserInput, me.minUserInput, function (oNode) {
+        me.recalculateUvs(this.loader.objectsTree, maxIn, minIn, function (oNode) {
             if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
         });
 
+        this.signals.updateCurrentScaleLimits.dispatch(minIn, maxIn);
         this.signals.materialChanged.dispatch();
     },
 
