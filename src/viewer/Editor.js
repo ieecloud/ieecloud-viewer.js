@@ -203,9 +203,27 @@ Editor.prototype = {
         let textureNeedToRecalculate = resultInfo.dirty;
 
         if (me.userMinMaxLimitInfo) {
-            maxResult = maxResult > me.userMinMaxLimitInfo.maxResult ? me.userMinMaxLimitInfo.maxResult : maxResult;
-            minResult = minResult < me.userMinMaxLimitInfo.minResult ? me.userMinMaxLimitInfo.minResult : minResult;
+
+            if (minResult > me.userMinMaxLimitInfo.maxResult || maxResult < me.userMinMaxLimitInfo.minResult) {  // means no intersection.
+                maxResult = me.userMinMaxLimitInfo.maxResult;
+                minResult = me.userMinMaxLimitInfo.minResult;
+            } else if (me.userMinMaxLimitInfo.minResult < minResult && minResult < me.userMinMaxLimitInfo.maxResult && maxResult > me.userMinMaxLimitInfo.maxResult) { // means there are intersection.
+                maxResult = me.userMinMaxLimitInfo.maxResult;
+                minResult = resultInfo.minResult.value;
+            } else if (maxResult > me.userMinMaxLimitInfo.minResult && maxResult < me.userMinMaxLimitInfo.maxResult && minResult < me.userMinMaxLimitInfo.minResult) {
+                maxResult = resultInfo.maxResult.value;
+                minResult = me.userMinMaxLimitInfo.minResult;
+            } else if (maxResult > me.userMinMaxLimitInfo.minResult && maxResult < me.userMinMaxLimitInfo.maxResult
+                && minResult > me.userMinMaxLimitInfo.minResult && minResult < me.userMinMaxLimitInfo.maxResult) {
+                maxResult = resultInfo.maxResult.value;
+                minResult = resultInfo.minResult.value;
+            } else if (me.userMinMaxLimitInfo.minResult > minResult && me.userMinMaxLimitInfo.minResult < maxResult
+                && me.userMinMaxLimitInfo.maxResult > minResult && me.userMinMaxLimitInfo.maxResult < maxResult) {
+                maxResult = me.userMinMaxLimitInfo.maxResult;
+                minResult = me.userMinMaxLimitInfo.minResult;
+            }
         }
+
 
         this.signals.updateCurrentScaleLimits.dispatch(minResult, maxResult);
 
