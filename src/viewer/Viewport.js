@@ -1784,7 +1784,7 @@ var Viewport = function (editor) {
 
         if(editor.loader.DRAW_RESULTS && resultInfo && resultInfo.maxResult.value > resultInfo.minResult.value){
             resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
-            resultScale.setResultInfo(editor.getResultInfo());
+            resultScale.addMinMaxResults(resultInfo.minResult.value, resultInfo.maxResult.value);
             resultScale.show();
         }
 
@@ -1803,12 +1803,6 @@ var Viewport = function (editor) {
 
             // updateInfo();
 
-        }
-
-        var resultInfo = editor.getResultInfo();
-
-        if(editor.loader.DRAW_RESULTS && resultInfo && resultInfo.maxResult.value > resultInfo.minResult.value){
-            resultScale.setResultInfo(editor.getResultInfo());
         }
 
         render();
@@ -1906,10 +1900,18 @@ var Viewport = function (editor) {
     });
 
 
+
+    signals.updateCurrentScaleLimits.add(function (minResult, maxResult) {
+        if(editor.loader.DRAW_RESULTS){
+            resultScale.addMinMaxResults(minResult, maxResult);
+            resultScale.show();
+        }
+    });
+
+
     signals.materialChanged.add(function (material) {
         if(editor.loader.DRAW_RESULTS){
             resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
-            resultScale.setResultInfo(editor.getResultInfo());
             resultScale.show();
         }
 

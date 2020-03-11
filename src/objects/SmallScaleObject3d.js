@@ -91,25 +91,24 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         return +(Math.round(this + "e+" + places) + "e-" + places);
     };
 
-    this.createScaleDelimiters = function (maxSizeDelimiters) {
-        var number = -1;
-        var maxZ = 120;
-        var minZ = -132;
-        var minResult = this.resultInfo.minResult.value;
-        var maxResult = this.resultInfo.maxResult.value;
-        for (var i = 0; i <= maxSizeDelimiters; i += 1) {
-            var result = minResult + i*(maxResult - minResult)/maxSizeDelimiters;
-            var valueWithoutE = result.toString().split('e');
-            var expPartStr = valueWithoutE[1];
-            var expPartNum = Number(expPartStr);
-            var toShow = 'unknown'
+    this.createScaleDelimiters = function (maxSizeDelimiters, from, to) {
+        let maxZ = 120;
+        let minZ = -132;
+        let minResult = from;
+        let maxResult = to;
+        for (let i = 0; i <= maxSizeDelimiters; i += 1) {
+            let result = minResult + i*(maxResult - minResult)/maxSizeDelimiters;
+            let valueWithoutE = result.toString().split('e');
+            let expPartStr = valueWithoutE[1];
+            let expPartNum = Number(expPartStr);
+            let toShow = 'unknown'
             if (_.isNaN(expPartNum)) {
                 toShow = result.round(resultDigits)
             } else {
                 toShow = decimalAdjust('round', result, expPartNum)
             }
-            var textObject = reBuildText(toShow);
-            var textResultMesh = new THREE.Sprite(textObject.material);
+            let textObject = reBuildText(toShow);
+            let textResultMesh = new THREE.Sprite(textObject.material);
             me.add(textResultMesh);
             textResultMesh.position.copy(new THREE.Vector3(44, 0, minZ + i * (maxZ - minZ)/maxSizeDelimiters));
             textResultMesh.scale.set(textObject.canvas.width - 12, textObject.canvas.height -12, 1);
@@ -132,21 +131,15 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         this.rectangleMesh.material = material;
     };
 
-    this.addMinMaxResults = function(){
-       this.removeAllDelimiters();
-       var nColors = 0;
-       if(this.rectangleMesh.material.nColors){
-           nColors = this.rectangleMesh.material.nColors;
-       }
-       this.createScaleDelimiters(nColors);
+    this.addMinMaxResults = function (from, to) {
+        this.removeAllDelimiters();
+        let nColors = 0;
+        if (this.rectangleMesh.material.nColors) {
+            nColors = this.rectangleMesh.material.nColors;
+        }
+
+        this.createScaleDelimiters(nColors, from, to);
     };
-
-
-    this.setResultInfo = function (resultInfo) {
-        this.resultInfo = resultInfo;
-        this.addMinMaxResults();
-    };
-
 
     this.init = function () {
 
