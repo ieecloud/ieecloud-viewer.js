@@ -16,13 +16,13 @@ THREE.ResultTextObject3dMaterial = function (parameters) {
 THREE.ResultTextObject3dMaterial.prototype = Object.create(THREE.MeshBasicMaterial.prototype);
 
 THREE.ResultTextObject3d = function (camera, params) {
-    var worldPosition = new THREE.Vector3();
-    var camPosition = new THREE.Vector3();
-    var worldRotation = new THREE.Euler(0, 0, 1);
-    var camRotation = new THREE.Euler();
-    var distance;
-    var radius;
-    var me = this;
+    let worldPosition = new THREE.Vector3();
+    let camPosition = new THREE.Vector3();
+    let worldRotation = new THREE.Euler(0, 0, 1);
+    let camRotation = new THREE.Euler();
+    let distance;
+    let radius;
+    let me = this;
 
     var createTextCanvas = function (text, color, font, size, backColor) {
 
@@ -80,16 +80,16 @@ THREE.ResultTextObject3d = function (camera, params) {
         this.value = params.value;
         this.resultDigits = params.resultDigits;
         this.color = params.color;
-        var size = 0.5;
-        var valueToRender  = this.getValueToRender();
-        var canvas = createTextCanvas(valueToRender, this.color, null, 256);
+        let size = 0.5;
+        let valueToRender  = this.getValueToRender();
+        let canvas = createTextCanvas(valueToRender, this.color, null, 256);
 
-        var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
-        var tex = new THREE.Texture(canvas);
+        let plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
+        let tex = new THREE.Texture(canvas);
 
         tex.needsUpdate = true;
 
-        var planeMat = new THREE.ResultTextObject3dMaterial({
+        let planeMat = new THREE.ResultTextObject3dMaterial({
             map: tex,
             color: 0xffffff
         });
@@ -100,7 +100,7 @@ THREE.ResultTextObject3d = function (camera, params) {
         this.quaternion.copy(camera.quaternion);
 
 
-        var tempMatrix = new THREE.Matrix4();
+        let tempMatrix = new THREE.Matrix4();
         worldPosition.setFromMatrixPosition(this.matrixWorld);
         worldRotation.setFromRotationMatrix(tempMatrix.extractRotation(this.matrixWorld));
 
@@ -110,11 +110,11 @@ THREE.ResultTextObject3d = function (camera, params) {
 
         distance = worldPosition.distanceTo(camPosition);
 
-        var boundingBox = new THREE.Box3().setFromObject(this);
-        var subVector = new THREE.Vector3(0, 0, 0);
+        let boundingBox = new THREE.Box3().setFromObject(this);
+        let subVector = new THREE.Vector3(0, 0, 0);
         subVector.subVectors(boundingBox.min, boundingBox.max);
 
-        var height = subVector.length();
+        let height = subVector.length();
         radius = height / 2;
     };
 
@@ -130,14 +130,11 @@ THREE.ResultTextObject3d = function (camera, params) {
     };
 
     this.setResultDigits = function (resultDigits){
-        var size = 256;
-        console.log(this.material, resultDigits)
-        console.log(this.material.map)
         this.resultDigits = resultDigits;
-        var valueToRender  = this.getValueToRender();
-        var canvas = createTextCanvas(valueToRender, this.color, null, 256);
-        var plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * 0.5, 0.5);
-        var newTexture = new THREE.Texture(canvas);
+        let valueToRender  = this.getValueToRender();
+        let canvas = createTextCanvas(valueToRender, this.color, null, 256);
+        let plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * 0.5, 0.5);
+        let newTexture = new THREE.Texture(canvas);
         newTexture.needsUpdate = true;
         this.material = new THREE.ResultTextObject3dMaterial({
             map: newTexture,
@@ -148,11 +145,11 @@ THREE.ResultTextObject3d = function (camera, params) {
     };
 
     this.update = function (domElement){
-        var vFOV = camera.fov * Math.PI / 180;
-        var height = 2 * Math.tan(vFOV / 2) * distance;
-        var fraction = 0.5 / height;
-        var heightInPixels = domElement.offsetHeight * fraction;
-        var scaleFactorH = 598 / heightInPixels;
+        let vFOV = camera.fov * Math.PI / 180;
+        let height = 2 * Math.tan(vFOV / 2) * distance;
+        let fraction = 0.5 / height;
+        let heightInPixels = domElement.offsetHeight * fraction;
+        let scaleFactorH = 598 / heightInPixels;
         this.scale.x = scaleFactorH * 0.05;
         this.scale.y = scaleFactorH * 0.05;
         this.quaternion.copy(camera.quaternion);
