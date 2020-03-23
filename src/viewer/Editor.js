@@ -254,6 +254,14 @@ Editor.prototype = {
         this.signals.objectChanged.dispatch(object);
     },
 
+    reloadResultSet: function(resultMetaData){
+        let me = this;
+        console.log("reloadResultSet------", resultMetaData);
+        me.reLoadResultAndUvs(this.loader.objectsTree, resultMetaData, function (oNode) {
+            if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
+        });
+    },
+
     selectTree: function (object) {
         this.signals.selectTree.dispatch(object, true);
     },
@@ -276,6 +284,61 @@ Editor.prototype = {
         var result = prevUv * (prevMaxResult - prevMinResult) + prevMinResult;
         return me.loader.getV(result, newMaxResult, newMinResult);
     },
+
+    reLoadMeshResultAndUvs: function (object, resutsMetadata) {
+        var me = this;
+
+        var geometryObjectResultMetadata  = resutsMetadata.pictureData;
+
+
+        let geometryObjectUUID = object.userData.geometryObjectUUID;
+
+        if(_.isUndefined(geometryObjectUUID)){
+            return;
+        }
+
+        let currentSceneObjResultMetadata =
+            _.find(geometryObjectResultMetadata, function (o) {
+                return o.uuid === geometryObjectUUID;
+            });
+
+
+
+        if(!_.isUndefined(currentSceneObjResultMetadata)){
+            object.userData.totalObjResults = currentSceneObjResultMetadata.results;
+            // object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(object.userData.uvs, 2));
+        }
+
+
+        // var uvs = [];
+
+        // for (var j = 0; j < groups.length; j++) {
+        //     var faces = faceGroups[j];
+        //     var offset = 0;
+        //     while (offset < faces.length) {
+        //         uvs.push(
+        //             0.0,
+        //             me.loader.getV(results[faces[offset]], maxResult, minResult),
+        //             0.0,
+        //             me.loader.getV(results[faces[offset + 1]], maxResult, minResult),
+        //             0.0,
+        //             me.loader.getV(results[faces[offset + 2]], maxResult, minResult));
+        //
+        //
+        //         uvs.push(
+        //             0.0,
+        //             me.loader.getV(results[faces[offset]], maxResult, minResult),
+        //             0.0,
+        //             me.loader.getV(results[faces[offset + 2]], maxResult, minResult),
+        //             0.0,
+        //             me.loader.getV(results[faces[offset + 1]], maxResult, minResult));
+        //         offset = offset + 3;
+        //     }
+        // }
+        // object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    },
+
+
 
     recalculateMeshUvs: function (object, maxResult, minResult) {
         var me = this;
@@ -334,6 +397,33 @@ Editor.prototype = {
                     continue;
                 }
                 me.recalculateMeshUvs(oNode.object, newMaxResult, newMinResult);
+            } else {
+                for (var keysNode in oNode) {
+                    if (oNode[keysNode] instanceof Array) {
+                        for (var i = 0; i < oNode[keysNode].length; i++) {
+                            aInnerTree.push(oNode[keysNode][i]);
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+
+    reLoadResultAndUvs: function (aTree, resutsMetadata, fCompair) {
+
+
+        var me = this;
+        var aInnerTree = [];
+        var oNode;
+
+        for (var keysTree in aTree) {
+            aInnerTree.push(aTree[keysTree]);
+        }
+        while (aInnerTree.length > 0) {
+            oNode = aInnerTree.pop();
+            if (fCompair(oNode)) {
+                me.reLoadMeshResultAndUvs(oNode.object, resutsMetadata);
             } else {
                 for (var keysNode in oNode) {
                     if (oNode[keysNode] instanceof Array) {

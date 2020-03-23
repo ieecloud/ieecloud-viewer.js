@@ -134,6 +134,10 @@ function Viewer(target, options) {
         this.threeEditor.loader.loadBinaryModel(zipModelUrl);
     };
 
+    Viewer.prototype.loadBinaryResults = function (zipResultsUrl) {
+        this.threeEditor.loader.loadBinaryResults(zipResultsUrl);
+    };
+
     Viewer.prototype.loadBase64Model = function (zipModelUrl) {
         this.threeEditor.loader.loadBase64Model(zipModelUrl);
     };

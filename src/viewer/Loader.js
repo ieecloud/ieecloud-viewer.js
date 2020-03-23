@@ -323,13 +323,17 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         mesh.userData.pointsNumbers = pointsNumbers;
         mesh.userData.groups = groups;
         mesh.userData.faces = faces;
-
+        mesh.userData.geometryObjectUUID = totalObjectDataElement.uuid;
         mesh.name = totalObjectDataElement.name;
         mesh.uniqueId = mesh.uuid;
         mesh.parentName = totalObjectDataElement.name;
         mesh.defaultColor = faceCommonDataForMesh.facesMaterial.color.clone();
         mesh.facesMaterial = faceCommonDataForMesh.facesMaterial;
         mesh.drawResults = faceCommonDataForMesh.drawResults;
+
+
+
+        console.log("mesh.userData.geometryObjectUUID----", mesh.userData.geometryObjectUUID)
 
         geometryElement.add(mesh);
 
@@ -363,11 +367,15 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         lines.defaultColor = lineCommonDataForLine.edgesMaterial.color.clone();
         lines.userData.totalObjVertices = vertices;
         lines.userData.totalObjResults = results;
+        lines.userData.geometryObjectUUID = totalObjectDataElement.uuid;
         lines.userData.maxGeometryResult = maxGeometryResult;
         lines.userData.minGeometryResult = minGeometryResult;
         lines.userData.objectNames = objectNames;
         lines.userData.pointsNumbers = pointsNumbers;
         editor.octree.add(lines);
+
+
+        console.log("lines.userData.geometryObjectUUID----", lines.userData.geometryObjectUUID)
 
         if (!editor.scene.lines) {
             editor.scene.lines = [];
@@ -385,6 +393,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         _.forEach(result, function (value, key) {
 
 
+
+
             meshesData[key] = [];
             var geometryElement = new THREE.Object3D();
             var totalObjectDataElement = value;
@@ -393,6 +403,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var minGeometryResult = totalObjectDataElement.pretenderMinElement.value;
             var lineCommonDataForLine = totalObjectDataElement.lineCommonDataForLine;
             var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
+
+
+
 
 // TODO move to common geometry
 
@@ -677,6 +690,132 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 });
             }
         });
+    };
+
+
+    function parseResultsForGeometryObjectGz(geometryObjectResultsMetadata, file, value) {
+
+        var resultsSize = geometryObjectResultsMetadata.resultsSize;
+        var uvsSize = geometryObjectResultsMetadata.uvsSize;
+        var minResult = geometryObjectResultsMetadata.minResult;
+        var minResultIndex = geometryObjectResultsMetadata.minResultIndex;
+        var maxResult = geometryObjectResultsMetadata.maxResult;
+        var maxResultIndex = geometryObjectResultsMetadata.maxResultIndex;
+
+        return file.async("uint8array").then(
+            function success(contentIn) {
+                var content = pako.ungzip(contentIn);
+                content = content.buffer;
+
+                var dataview = new DataView(content);
+                var currentIndex = 0;
+
+                //
+                // // fill line_positions_iee
+                // if(!geometryObjectResultsMetadata.lineGeometryData){
+                //     geometryObjectResultsMetadata.lineGeometryData = {};
+                // }
+                // geometryObjectResultsMetadata.lineGeometryData.positions  = convertBytesToGeometryMetadata(dataview, linePositionSize, currentIndex);
+                //
+                // currentIndex = linePositionSize * 4;
+
+                // // fill positions_iee
+                // if(!geometryObjectResultsMetadata.faceGeometryData){
+                //     geometryObjectResultsMetadata.faceGeometryData = {};
+                // }
+
+                // fill uvs_iee
+                geometryObjectResultsMetadata.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
+                currentIndex = currentIndex + uvsSize * 4;
+
+                // fill results
+                geometryObjectResultsMetadata.results = convertBytesToGeometryMetadata(dataview, resultsSize, currentIndex);
+
+            },
+            function error(e) {
+                // handle the error↵});"
+            }).finally(function () {
+            editor.onZipUpdateStatus("parsing  " + geometryObjectResultsMetadata.name, value);
+        })
+    }
+
+
+
+
+
+    this.loadBinaryResults = function (url) {
+        var me = this;
+        editor.onZipUpdateStatus("loading binary results content ...");
+        JSZipUtils.getBinaryContent(url, {
+            progress: function(e) {
+                editor.onZipUpdateStatus("loading binary results content " + Math.round(e.percent) +  " % loaded");
+            },
+            callback: function (err, data) {
+                if(err) {
+                    throw err; // or handle err
+                }
+                JSZip.loadAsync(data).then(function (zip) {
+                    me.loadZipResults(zip);
+                });
+            }
+        });
+    };
+
+
+    this.loadZipResults = function (zip) {
+        var me = this;
+        editor.onZipUpdateStatus("loading result configuration...", 0.1);
+        var metadataResults = zip.filter(function (relativePath, file) {
+            var fileName = file.name;
+            return fileName.startsWith('view.json');
+
+        });
+
+        if (metadataResults.length > 0) {
+            var configurationEntry = metadataResults[0];
+
+            configurationEntry.async("string").then(function (dataString) {
+
+                var data = JSON.parse(dataString);
+
+                var pictureData = data.pictureData;
+
+                var promises = [];
+
+
+                var progressValue = 0.7;
+
+                editor.onZipUpdateStatus("loading model metadata...", progressValue);
+
+                for (var i = 0; i < pictureData.length; i++) {
+                    var geometryObjectResultsMetadata = pictureData[i];
+                    var geomObjUuid = geometryObjectResultsMetadata.uuid;
+
+                    var foundedGZArray = zip.filter(function (relativePath, file) {
+                        var fileName = file.name;
+                        return fileName.includes("data_" + geomObjUuid);
+                    });
+
+                    if (foundedGZArray.length > 0) {
+                        var foundedGZ = foundedGZArray[0];
+
+                        var factor = i / pictureData.length;
+
+                        progressValue = progressValue + factor / 100000;
+
+                        promises.push(parseResultsForGeometryObjectGz(geometryObjectResultsMetadata, foundedGZ, progressValue));
+                    }
+                }
+
+                Promise.all(promises).then(function (object) {
+                    setTimeout(function() {
+                        editor.onZipUpdateStatus("loading result...", 0.9);
+                        editor.reloadResultSet(data);
+                        console.log("CHANGE RESULT ARRAY IN USER DATA")
+                    }, 0);
+                });
+            });
+        }
     };
 
 
@@ -1168,6 +1307,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.pointsNumbers = pointsNumbers;
         totalGeometryObj.totalObjVertices = vertices;
         totalGeometryObj.totalObjResults = results;
+        totalGeometryObj.uuid = geometryObject.uuid;
         totalGeometryObj.faces = faces;
         totalGeometryObj.groups  = geometryObject.groups;
 
@@ -1183,6 +1323,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
         totalGeometryObj.name = name;
 
+
+        console.log("this.parseModelPartthis.parseModelPartthis.parseModelPart", totalGeometryObj.uuid);
+
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
 
         pictureInfo.textData[index] = textPositionsData;
@@ -1191,6 +1334,17 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     this.getV = function (result, maxResult, minResult) {
         var normalizedResult = result === "NaN" || _.isUndefined(result) ? 0 : result;
+        return (normalizedResult - minResult) / (maxResult - minResult);
+    };
+
+
+    this.getVLimit = function (result, maxResult, minResult, minUserInput,  maxUserInput) {
+        var normalizedResult = result === "NaN" || _.isUndefined(result) ? 0 : result;
+
+        if (result > minUserInput || result < maxUserInput) {
+            return  0;
+        }
+
         return (normalizedResult - minResult) / (maxResult - minResult);
     };
 
