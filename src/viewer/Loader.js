@@ -333,7 +333,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
 
-        console.log("mesh.userData.geometryObjectUUID----", mesh.userData.geometryObjectUUID)
+        // console.log("mesh.userData.geometryObjectUUID----", mesh.userData.geometryObjectUUID)
 
         geometryElement.add(mesh);
 
@@ -375,7 +375,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         editor.octree.add(lines);
 
 
-        console.log("lines.userData.geometryObjectUUID----", lines.userData.geometryObjectUUID)
+        // console.log("lines.userData.geometryObjectUUID----", lines.userData.geometryObjectUUID)
 
         if (!editor.scene.lines) {
             editor.scene.lines = [];
@@ -709,27 +709,22 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                 var dataview = new DataView(content);
                 var currentIndex = 0;
-
-                //
-                // // fill line_positions_iee
-                // if(!geometryObjectResultsMetadata.lineGeometryData){
-                //     geometryObjectResultsMetadata.lineGeometryData = {};
-                // }
-                // geometryObjectResultsMetadata.lineGeometryData.positions  = convertBytesToGeometryMetadata(dataview, linePositionSize, currentIndex);
-                //
-                // currentIndex = linePositionSize * 4;
-
-                // // fill positions_iee
-                // if(!geometryObjectResultsMetadata.faceGeometryData){
-                //     geometryObjectResultsMetadata.faceGeometryData = {};
-                // }
-
-                // fill uvs_iee
-                geometryObjectResultsMetadata.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
-                currentIndex = currentIndex + uvsSize * 4;
-
                 // fill results
                 geometryObjectResultsMetadata.results = convertBytesToGeometryMetadata(dataview, resultsSize, currentIndex);
+                currentIndex = currentIndex + resultsSize * 4;
+                // fill uvs_iee
+                geometryObjectResultsMetadata.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
+
+
+                geometryObjectResultsMetadata.pretenderMinElement = {position: vertices[minResultIndex],
+                    value: minResult};
+
+                geometryObjectResultsMetadata.pretenderMaxElement = {position: vertices[maxResultIndex],
+                    value: maxResult};
+
+
+                scope.pretenderMins.add(geometryObjectResultsMetadata.pretenderMinElement);
+                scope.pretenderMaxs.add(geometryObjectResultsMetadata.pretenderMaxElement);
 
             },
             function error(e) {
@@ -787,6 +782,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                 editor.onZipUpdateStatus("loading model metadata...", progressValue);
 
+
+                scope.pretenderMins = new Set();
+                scope.pretenderMaxs = new Set();
+
                 for (var i = 0; i < pictureData.length; i++) {
                     var geometryObjectResultsMetadata = pictureData[i];
                     var geomObjUuid = geometryObjectResultsMetadata.uuid;
@@ -810,6 +809,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 Promise.all(promises).then(function (object) {
                     setTimeout(function() {
                         editor.onZipUpdateStatus("loading result...", 0.9);
+
                         editor.reloadResultSet(data);
                         console.log("CHANGE RESULT ARRAY IN USER DATA")
                     }, 0);
@@ -1324,7 +1324,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.name = name;
 
 
-        console.log("this.parseModelPartthis.parseModelPartthis.parseModelPart", totalGeometryObj.uuid);
+        // console.log("this.parseModelPartthis.parseModelPartthis.parseModelPart", totalGeometryObj.uuid);
 
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
 

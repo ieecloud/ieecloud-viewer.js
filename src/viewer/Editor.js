@@ -261,7 +261,8 @@ Editor.prototype = {
         me.reLoadResultAndUvs(this.loader.objectsTree, resultMetaData, function (oNode) {
             if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
         });
-
+        me.setMinMaxResult(resultMetaData.minResult, resultMetaData.maxResult);
+        this.signals.updateCurrentScaleLimits.dispatch(resultMetaData.minResult, resultMetaData.maxResult);
         this.signals.sceneGraphChanged.dispatch();
     },
 
@@ -390,6 +391,7 @@ Editor.prototype = {
         var me = this;
         var aInnerTree = [];
         var oNode;
+
 
         for (var keysTree in aTree) {
             aInnerTree.push(aTree[keysTree]);
