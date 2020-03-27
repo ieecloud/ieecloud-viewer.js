@@ -52,7 +52,7 @@ var Viewport = function (editor) {
     }
 
     var scene = editor.scene;
-    var octree =  editor.octree;
+    var octree = editor.octree;
     var sceneAxis = editor.sceneAxis;
     var sceneResults = editor.sceneResults;
     var sceneHelpers = editor.sceneHelpers;
@@ -135,7 +135,7 @@ var Viewport = function (editor) {
     container3.dom.appendChild(renderer3.domElement);
 
     var initialCameraPosition = new THREE.Vector3(63, -149, 36);
-    var initialCameraUp =  new THREE.Vector3(0, 0, 1);
+    var initialCameraUp = new THREE.Vector3(0, 0, 1);
     var initialCameraLookAt = scene.position;
     var initialFov = 10;
 
@@ -165,11 +165,11 @@ var Viewport = function (editor) {
     // camera3
     var camera3 = new THREE.PerspectiveCamera(50, CANVAS2_WIDTH / CANVAS2_HEIGHT, 1, 2000);
     camera3.up = camera.up; // important!
-    var q = new THREE.Quaternion(0.7163115160988329, 0.07007036877399155,0.06759001875323373, 0.6909555301819401);
+    var q = new THREE.Quaternion(0.7163115160988329, 0.07007036877399155, 0.06759001875323373, 0.6909555301819401);
     camera3.quaternion.copy(q);
-    camera3.position.x= 32.09535616650712;
-    camera3.position.y=-162.48152055744922;
-    camera3.position.z= -5.9702252791992585;
+    camera3.position.x = 32.09535616650712;
+    camera3.position.y = -162.48152055744922;
+    camera3.position.z = -5.9702252791992585;
     camera3.position.setLength(CAM_DISTANCE);
     var selectedResultPoints = {};
     var textResults = {};
@@ -519,17 +519,17 @@ var Viewport = function (editor) {
 
         point.fromArray(array);
 
-        mouse.set(( point.x * 2 ) - 1, -( point.y * 2 ) + 1);
+        mouse.set((point.x * 2) - 1, -(point.y * 2) + 1);
 
         raycaster.setFromCamera(mouse, camera);
 
         var startTime = Date.now();
 
         var searchableObjects = [];
-        if(editor.searchNearestPointMode === 'MESHES') {
+        if (editor.searchNearestPointMode === 'MESHES') {
             raycaster.linePrecision = CONST_LINE_PRECISION_DEFAULT;
             searchableObjects = scene.meshes;
-        } else if(editor.searchNearestPointMode === 'LINES') {
+        } else if (editor.searchNearestPointMode === 'LINES') {
             raycaster.linePrecision = CONST_LINE_PRECISION_FOR_LINES;
             searchableObjects = scene.lines;
         }
@@ -571,7 +571,7 @@ var Viewport = function (editor) {
     var getMousePosition = function (dom, x, y) {
 
         var rect = dom.getBoundingClientRect();
-        return [( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height];
+        return [(x - rect.left) / rect.width, (y - rect.top) / rect.height];
 
     };
 
@@ -764,7 +764,7 @@ var Viewport = function (editor) {
     };
 
     scope.updateMinMaxResultOnTheScene = function (resultVal, originalResultValue, position) {
-        if(_.isUndefined(resultVal) || _.isUndefined(position)){
+        if (_.isUndefined(resultVal) || _.isUndefined(position)) {
             return false;
         }
 
@@ -777,7 +777,7 @@ var Viewport = function (editor) {
         }
 
 
-        var textResultMesh = new THREE.ResultTextObject3d(camera,  {
+        var textResultMesh = new THREE.ResultTextObject3d(camera, {
             value: originalResultValue,
             resultDigits: editor.resultDigits,
             color: editor.options.resultTextColor
@@ -888,15 +888,15 @@ var Viewport = function (editor) {
 
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
-        var toggleSelect = function(aTree, fCompair){
+        var toggleSelect = function (aTree, fCompair) {
             var aInnerTree = [];
             var oNode;
-            for(var keysTree in aTree) {
+            for (var keysTree in aTree) {
                 aInnerTree.push(aTree[keysTree]);
             }
-            while(aInnerTree.length > 0) {
+            while (aInnerTree.length > 0) {
                 oNode = aInnerTree.pop();
-                if( fCompair(oNode) ){
+                if (fCompair(oNode)) {
                     // TODO: in editor mode select tree node
                     if (oNode.selectedFlag) {
                         scope.unSelectObject(oNode)
@@ -904,8 +904,8 @@ var Viewport = function (editor) {
                         scope.selectObject(oNode)
                     }
                 } else { // if (node.children && node.children.length) {
-                    for(var keysNode in oNode){
-                        if(oNode[keysNode] instanceof Array){
+                    for (var keysNode in oNode) {
+                        if (oNode[keysNode] instanceof Array) {
                             for (var i = 0; i < oNode[keysNode].length; i++) {
                                 aInnerTree.push(oNode[keysNode][i]);
                             }
@@ -921,7 +921,9 @@ var Viewport = function (editor) {
                 var intersectMesh = searchNearestIntersect(intersects, THREE.Mesh);
                 var intersectLine = searchNearestIntersect(intersects, THREE.LineSegments);
                 var intersect = getNearestIntersect(intersectLine, intersectMesh);
-                toggleSelect(editor.loader.objectsTree, function(oNode){ if(oNode["parentName"] === intersect.object.parentName) return true; });
+                toggleSelect(editor.loader.objectsTree, function (oNode) {
+                    if (oNode["parentName"] === intersect.object.parentName) return true;
+                });
             } else {
                 editor.select(camera);
             }
@@ -973,7 +975,7 @@ var Viewport = function (editor) {
 
     scope.highlightObject = function (object) {
         if (object !== null) {
-            object.material.color.set( new THREE.Color( 0.5, 0.5, 0.5 ));
+            object.material.color.set(new THREE.Color(0.5, 0.5, 0.5));
             highlightedGeometryObjects.push(object)
         }
     };
@@ -984,9 +986,6 @@ var Viewport = function (editor) {
         }
         highlightedGeometryObjects = [];
     };
-
-
-
 
 
     var onMouseUp = function (event) {
@@ -1059,7 +1058,7 @@ var Viewport = function (editor) {
                     var intersectionNameArray = intersectionName.split('[');
                     var objProperties = {};
                     var objectNameType = intersectionNameArray[0];
-                    var objectNameTypeArray  = objectNameType.split('{');
+                    var objectNameTypeArray = objectNameType.split('{');
                     objProperties.name = objectNameTypeArray[0];
 
                     let regexp = /\{(.*?)\}/g;
@@ -1099,7 +1098,7 @@ var Viewport = function (editor) {
     var lastMove = Date.now();
     var thread;
     scope.onMouseMoveViewerHandler = function (event) {
-        var onmousestop = function() {
+        var onmousestop = function () {
             if (!mainMouseMove) {
                 return;
             }
@@ -1118,7 +1117,7 @@ var Viewport = function (editor) {
                 lastMove = Date.now();
             }
 
-            if(editor.searchNearestPointMode !== undefined && editor.searchNearestPointMode !== '') {
+            if (editor.searchNearestPointMode !== undefined && editor.searchNearestPointMode !== '') {
                 var startTime = Date.now();
                 var intersects = getIntersects(event, objects);
                 console.log('get getIntersects time:' + (Date.now() - startTime));
@@ -1362,7 +1361,7 @@ var Viewport = function (editor) {
         // }
 
         var step = 1.1;
-        var approaching = event.distance > 0 ? 1/step : step;
+        var approaching = event.distance > 0 ? 1 / step : step;
 
         var oldCameraFov = camera.fov;
         var newCameraFov = oldCameraFov * approaching;
@@ -1589,11 +1588,11 @@ var Viewport = function (editor) {
         if ((1 - yNDCPercentCoverage) < (1 - xNDCPercentCoverage)) { // height case
             var bottomLeft = new THREE.Vector3().fromArray(bl.toArray().slice(0, 3));
             var height = upperLeft.distanceTo(bottomLeft);
-            result.newFov = 2 * Math.atan(height / (2 * dist)) * ( 180 / Math.PI );
+            result.newFov = 2 * Math.atan(height / (2 * dist)) * (180 / Math.PI);
         } else {
             var upperRight = new THREE.Vector3().fromArray(ur.toArray().slice(0, 3));
             var width = upperRight.distanceTo(upperLeft);
-            result.newFov = 2 * Math.atan((width / aspect) / (2 * dist)) * ( 180 / Math.PI );
+            result.newFov = 2 * Math.atan((width / aspect) / (2 * dist)) * (180 / Math.PI);
         }
         return result;
     }
@@ -1699,7 +1698,7 @@ var Viewport = function (editor) {
         ctx3.drawImage(canvas2, 0, 0);
         ctx3.drawImage(canvas3, 0, mainHeight - canvas3.height);
 
-        var urlRenderer	= can3.toDataURL("image/png");
+        var urlRenderer = can3.toDataURL("image/png");
         editor.onPrintScreenDone(urlRenderer);
         // var element = document.createElement('a');
         // element.setAttribute('href', urlRenderer);
@@ -1721,7 +1720,6 @@ var Viewport = function (editor) {
 
         scope.updateMinMaxResultOnTheScene(resultVal,
             originalResultValue, resultInfo.maxResult.position);
-
 
 
         resultVal = resultInfo.minResult.value;
@@ -1782,7 +1780,7 @@ var Viewport = function (editor) {
         var resultInfo = editor.getResultInfo();
 
 
-        if(editor.loader.DRAW_RESULTS && resultInfo && resultInfo.maxResult.value > resultInfo.minResult.value){
+        if (editor.loader.DRAW_RESULTS && resultInfo && resultInfo.maxResult.value > resultInfo.minResult.value) {
             resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
             resultScale.addMinMaxResults(resultInfo.minResult.value, resultInfo.maxResult.value);
             resultScale.show();
@@ -1838,7 +1836,7 @@ var Viewport = function (editor) {
                 if (child instanceof THREE.Light) {
                     materialsNeedUpdate = true;
                 }
-                if(deleteFromObjects){
+                if (deleteFromObjects) {
                     objects.splice(objects.indexOf(child), 1);
                 }
 
@@ -1900,9 +1898,8 @@ var Viewport = function (editor) {
     });
 
 
-
     signals.updateCurrentScaleLimits.add(function (minResult, maxResult) {
-        if(editor.loader.DRAW_RESULTS){
+        if (editor.loader.DRAW_RESULTS) {
             resultScale.addMinMaxResults(minResult, maxResult);
             resultScale.show();
         }
@@ -1910,7 +1907,7 @@ var Viewport = function (editor) {
 
 
     signals.materialChanged.add(function (material) {
-        if(editor.loader.DRAW_RESULTS){
+        if (editor.loader.DRAW_RESULTS) {
             resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
             resultScale.show();
         }
@@ -2025,7 +2022,6 @@ var Viewport = function (editor) {
     });
 
 
-
     signals.removeSelectedResults.add(function () {
         var objectToDispose = [];
         for (var key in selectedResultPoints) {
@@ -2038,11 +2034,13 @@ var Viewport = function (editor) {
 
 
     signals.changeResultDigits.add(function () {
-        var objectToDispose = [];
         for (var key in selectedResultPoints) {
-           textResults[key].setResultDigits(editor.resultDigits);
+            textResults[key].setResultDigits(editor.resultDigits);
             textResults[key].update(container.dom);
         }
+
+        resultScale.setResultDigits(editor.resultDigits);
+
         render();
     });
 
@@ -2050,7 +2048,7 @@ var Viewport = function (editor) {
         camera.position.copy(initialCameraPosition);
         camera.up.copy(initialCameraUp);
         camera.lookAt(initialCameraLookAt);
-        if(editor.lastModel){
+        if (editor.lastModel) {
             editor.signals.scaleChanged.dispatch(scope.initialBoundigBox, scope.initialModelRotation);
         }
         render();
@@ -2063,7 +2061,7 @@ var Viewport = function (editor) {
         camera.updateProjectionMatrix();
 
         renderer.setSize(container.dom.offsetWidth, container.dom.offsetHeight);
-        if(editor.lastModel) {
+        if (editor.lastModel) {
             editor.signals.scaleChanged.dispatch(scope.initialBoundigBox, scope.initialModelRotation);
         }
         ruler.update();
@@ -2087,7 +2085,12 @@ var Viewport = function (editor) {
         // The renderer on the left (the red knot) uses a standard linear depth buffer (1 to 1000). Selecting Perspective or Orthographic will re-render the scene with the selected camera type, and both appear to work as expected.
         // The renderer on the right (the green knot) uses a logarithmic depth buffer (1e-6 to 1e27).
 
-        renderer = new THREE.WebGLRenderer({antialias: true, alpha: false, preserveDrawingBuffer: true, logarithmicDepthBuffer: true});
+        renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: false,
+            preserveDrawingBuffer: true,
+            logarithmicDepthBuffer: true
+        });
         // pickingRenderTarget = new THREE.WebGLRenderTarget();
         // pickingRenderTarget.texture.generateMipmaps = false;
         // pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
@@ -2212,6 +2215,6 @@ var Viewport = function (editor) {
 
     }
 
-    return {mainContainer: container, slaveContainer: container2, slave2Container: container3, renderer : renderer};
+    return {mainContainer: container, slaveContainer: container2, slave2Container: container3, renderer: renderer};
 
 };

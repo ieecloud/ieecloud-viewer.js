@@ -2,45 +2,35 @@
 
 
 THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
-    var me = this;
+    let me = this;
 
 
+    let createTextCanvas = function (text, color, font, size) {
 
-    var createTextCanvas = function (text, color, font, size, backColor) {
+        size = size || 24;
+        let radius = 20;
+        let canvas = document.createElement('canvas');
 
-        size = 50;
-        var canvas = document.createElement('canvas');
-
-        var ctx = canvas.getContext('2d');
+        let ctx = canvas.getContext('2d');
 
 
-        var fontStr = (size + 'px ') +   'Tahoma, Geneva, sans-serif';
-        ctx.font = fontStr;
-        ctx.textAlign = 'left';
-        var w = ctx.measureText(text).width;
-        var h = Math.ceil(size);
-
-        canvas.width = w;
-        canvas.height = h;
-
+        let fontStr = (size + 'px ') + (font || 'Arial');
         ctx.font = fontStr;
 
-        if (backColor) {
-            ctx.fillStyle = backColor;
-            ctx.fillRect(0, 0, w, h);
-        }
+        canvas.width = radius * 4;
+        canvas.height = radius * 2;
 
-
+        ctx.font = fontStr;
+        ctx.miterLimit = 1;
         ctx.fillStyle = color || 'black';
-
+        ctx.strokeStyle = 'black';
         ctx.fillText(text, 0, Math.ceil(size * 0.8));
-
         return canvas;
 
     };
 
 
-    var decimalAdjust = function(type, value, exp) {
+    let decimalAdjust = function (type, value, exp) {
         if (typeof exp === 'undefined' || +exp === 0) {
             return Math[type](value);
         }
@@ -54,28 +44,6 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
         value = value.toString().split('e');
         return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
     }
-
-    var reBuildText = function (text) {
-        var radius = 20;
-
-        var canvas = document.createElement('canvas');
-        canvas.width = radius * 4;
-        canvas.height= radius * 2;
-        var context = canvas.getContext('2d');
-        context.font = '14px Arial';
-
-        var metrics = context.measureText(text);
-        var textWidth = metrics.width;
-        context.fillStyle = "black";
-        context.fillText(text, 0, Math.ceil(14 * 0.8));
-
-        var texture = new THREE.Texture(canvas);
-        texture.needsUpdate = true;
-
-        var spriteMaterial = new THREE.SpriteMaterial({map: texture});
-
-        return {material: spriteMaterial, canvas : canvas};
-    };
 
     this.show = function () {
         this.visible = true;
@@ -92,26 +60,30 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
     };
 
     this.createScaleDelimiters = function (maxSizeDelimiters, from, to) {
-        let maxZ = 120;
-        let minZ = -132;
+        let maxZ = 115;
+        let minZ = -137;
         let minResult = from;
         let maxResult = to;
         for (let i = 0; i <= maxSizeDelimiters; i += 1) {
-            let result = minResult + i*(maxResult - minResult)/maxSizeDelimiters;
+            let result = minResult + i * (maxResult - minResult) / maxSizeDelimiters;
             let valueWithoutE = result.toString().split('e');
             let expPartStr = valueWithoutE[1];
             let expPartNum = Number(expPartStr);
-            let toShow = 'unknown'
+            let valueToRender = 'unknown'
             if (_.isNaN(expPartNum)) {
-                toShow = result.round(resultDigits)
+                valueToRender = result.round(this.resultDigits)
             } else {
-                toShow = decimalAdjust('round', result, expPartNum)
+                valueToRender = decimalAdjust('round', result, expPartNum)
             }
-            let textObject = reBuildText(toShow);
-            let textResultMesh = new THREE.Sprite(textObject.material);
+            let canvas = createTextCanvas(valueToRender, this.color, null, 12);
+            let newTexture = new THREE.Texture(canvas);
+            newTexture.needsUpdate = true;
+            let spriteMaterial = new THREE.SpriteMaterial({map: newTexture});
+
+            let textResultMesh = new THREE.Sprite(spriteMaterial);
             me.add(textResultMesh);
-            textResultMesh.position.copy(new THREE.Vector3(44, 0, minZ + i * (maxZ - minZ)/maxSizeDelimiters));
-            textResultMesh.scale.set(textObject.canvas.width - 12, textObject.canvas.height -12, 1);
+            textResultMesh.position.copy(new THREE.Vector3(50, 0, minZ + i * (maxZ - minZ) / maxSizeDelimiters));
+            textResultMesh.scale.set((canvas.width)/** 0.005*/, (canvas.height) /** 0.005*/, 1);
             me.textResults[i] = textResultMesh;
 
         }
@@ -132,6 +104,8 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
     };
 
     this.addMinMaxResults = function (from, to) {
+        this.currentFrom = from;
+        this.currentTo = to;
         this.removeAllDelimiters();
         let nColors = 0;
         if (this.rectangleMesh.material.nColors) {
@@ -145,22 +119,27 @@ THREE.SmallScaleObject3d = function (camera, domElement, resultDigits) {
 
         THREE.Object3D.call(this);
 
-        this.resultInfo  = {};
+        this.resultInfo = {};
         this.textResults = {};
         this.resultInfo.maxResult = {};
         this.resultInfo.maxResult.value = 1;
         this.resultInfo.minResult = {};
         this.resultInfo.minResult.value = 0;
 
-        this.rectangleMesh = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
-        this.rectangleMesh.scale.set( 13, 260, 0 );
-
+        this.rectangleMesh = new THREE.Sprite(new THREE.SpriteMaterial({color: '#69f'}));
+        this.rectangleMesh.scale.set(13, 260, 0);
+        this.resultDigits = resultDigits;
 
         me.add(me.rectangleMesh);
     };
 
     this.update = function () {
         me.rectangleMesh.quaternion.copy(camera.quaternion);
+    };
+
+    this.setResultDigits = function (resultDigits) {
+        this.resultDigits = resultDigits;
+        this.addMinMaxResults(this.currentFrom, this.currentTo);
     };
 
     this.init();
