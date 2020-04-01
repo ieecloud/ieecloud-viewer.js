@@ -399,8 +399,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var geometryElement = new THREE.Object3D();
             var totalObjectDataElement = value;
             var objectGroupElements = totalObjectDataElement.groups;
-            var maxGeometryResult = totalObjectDataElement.pretenderMaxElement.value;
-            var minGeometryResult = totalObjectDataElement.pretenderMinElement.value;
             var lineCommonDataForLine = totalObjectDataElement.lineCommonDataForLine;
             var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
 
@@ -654,7 +652,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                         progressValue = progressValue + factor / 100000;
 
-                        promises.push(parseGeometryObjectGz(geometryObject, foundedGZ, progressValue));
+                        let promise = parseGeometryObjectGz(geometryObject, foundedGZ, progressValue);
+
+                        promises.push(promise);
+
+                        promise.catch(e => {console.log("let it catch here")});
+
                     }
                 }
 
@@ -716,10 +719,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 geometryObjectResultsMetadata.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
 
 
-                geometryObjectResultsMetadata.pretenderMinElement = {position: vertices[minResultIndex],
+                geometryObjectResultsMetadata.pretenderMinElement = {position: new THREE.Vector3(),
                     value: minResult};
 
-                geometryObjectResultsMetadata.pretenderMaxElement = {position: vertices[maxResultIndex],
+                geometryObjectResultsMetadata.pretenderMaxElement = {position: new THREE.Vector3(),
                     value: maxResult};
 
 
@@ -733,9 +736,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             editor.onZipUpdateStatus("parsing  " + geometryObjectResultsMetadata.name, value);
         })
     }
-
-
-
 
 
     this.loadBinaryResults = function (url) {
@@ -802,16 +802,23 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                         progressValue = progressValue + factor / 100000;
 
-                        promises.push(parseResultsForGeometryObjectGz(geometryObjectResultsMetadata, foundedGZ, progressValue));
+
+                        let promise = parseResultsForGeometryObjectGz(geometryObjectResultsMetadata, foundedGZ, progressValue);
+
+                        promises.push(promise);
+
+                        promise.catch(e => {console.log("let it catch here")});
+
                     }
                 }
 
                 Promise.all(promises).then(function (object) {
                     setTimeout(function() {
                         editor.onZipUpdateStatus("loading result...", 0.9);
-
+                        scope.DRAW_RESULTS  = editor.options.drawResults
+                            && data.maxResult > data.minResult;
+                        scope.initTextures();
                         editor.reloadResultSet(data);
-                        console.log("CHANGE RESULT ARRAY IN USER DATA")
                     }, 0);
                 });
             });
@@ -1388,6 +1395,17 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         }
     };
 
+    this.initTextures = function() {
+        let me  = this;
+        let colorMapTexture = null;
+        if (scope.DRAW_RESULTS && scope.textures) {
+            editor.addTextures(scope.textures);
+            var currentTextureName = scope.texture ? scope.texture : me.getDefaultTexture(textures);
+            colorMapTexture = editor.setTexture(currentTextureName);
+        }
+        return colorMapTexture;
+    };
+
     this.parseModel = function (json) {
         var pictureData = json.pictureData; // reading array for all geometry objects
         var minResult = json.minResult;
@@ -1413,12 +1431,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         scope.pretenderMins = new Set();
         scope.pretenderMaxs = new Set();
 
-        var colorMapTexture;
-        if (scope.DRAW_RESULTS && scope.textures) {
-            editor.addTextures(scope.textures);
-            var currentTextureName = scope.texture ? scope.texture : this.getDefaultTexture(textures);
-            colorMapTexture = editor.setTexture(currentTextureName);
-        }
+
+        let colorMapTexture = scope.initTextures();
 
         for (var i = 0; i < pictureData.length; i++) {
 

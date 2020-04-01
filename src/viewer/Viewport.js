@@ -1900,6 +1900,7 @@ var Viewport = function (editor) {
 
     signals.updateCurrentScaleLimits.add(function (minResult, maxResult) {
         if (editor.loader.DRAW_RESULTS) {
+            resultScale.setIsolineMaterial(editor.getIsolineMaterialIfExist());
             resultScale.addMinMaxResults(minResult, maxResult);
             resultScale.show();
         }

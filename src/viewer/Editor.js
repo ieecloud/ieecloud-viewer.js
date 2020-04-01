@@ -256,14 +256,13 @@ Editor.prototype = {
 
     reloadResultSet: function(resultMetaData){
         let me = this;
-        console.log("reloadResultSet------", resultMetaData);
         this.signals.removeSelectedResults.dispatch();
         me.reLoadResultAndUvs(this.loader.objectsTree, resultMetaData, function (oNode) {
             if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
         });
         me.setMinMaxResult(resultMetaData.minResult, resultMetaData.maxResult);
         this.signals.updateCurrentScaleLimits.dispatch(resultMetaData.minResult, resultMetaData.maxResult);
-        this.signals.sceneGraphChanged.dispatch();
+        this.toggleIsolines(true);
     },
 
     selectTree: function (object) {
@@ -307,9 +306,12 @@ Editor.prototype = {
         if (!_.isUndefined(currentSceneObjResultMetadata)) {
             object.userData.totalObjResults = currentSceneObjResultMetadata.results;
             if (object instanceof THREE.Mesh) {
-                object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(object.userData.uvs, 2));
+                object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(currentSceneObjResultMetadata.uvs, 2));
+                object.drawResults = true;
+                if (currentSceneObjResultMetadata.uvsSize === 0 && currentSceneObjResultMetadata.resultsSize === 0) {
+                    object.drawResults = false
+                }
             }
-
         }
     },
 
