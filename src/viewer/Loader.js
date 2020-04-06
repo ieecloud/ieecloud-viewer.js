@@ -758,7 +758,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 
     this.loadZipResults = function (zip) {
-        var me = this;
         editor.onZipUpdateStatus("loading result configuration...", 0.1);
         var metadataResults = zip.filter(function (relativePath, file) {
             var fileName = file.name;
@@ -818,6 +817,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                         scope.DRAW_RESULTS  = editor.options.drawResults
                             && data.maxResult > data.minResult;
                         scope.initTextures();
+                        scope.pretenderMins = new Set(_.orderBy(Array.from(scope.pretenderMins), ['value'], 'desc'));
+                        scope.pretenderMaxs = new Set(_.orderBy(Array.from(scope.pretenderMaxs), ['value'], 'asc'));
                         editor.reloadResultSet(data);
                     }, 0);
                 });

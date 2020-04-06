@@ -260,7 +260,8 @@ Editor.prototype = {
         me.reLoadResultAndUvs(this.loader.objectsTree, resultMetaData, function (oNode) {
             if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
         });
-        me.setMinMaxResult(resultMetaData.minResult, resultMetaData.maxResult);
+        me.setMinMaxResult(_.last(Array.from(me.loader.pretenderMins)), _.last(Array.from(me.loader.pretenderMaxs)));
+
         this.signals.updateCurrentScaleLimits.dispatch(resultMetaData.minResult, resultMetaData.maxResult);
         this.toggleIsolines(true);
     },
@@ -305,6 +306,11 @@ Editor.prototype = {
 
         if (!_.isUndefined(currentSceneObjResultMetadata)) {
             object.userData.totalObjResults = currentSceneObjResultMetadata.results;
+
+            object.parent.userData.extremumResultData = {};
+            object.parent.userData.extremumResultData.minGeometryResult =  currentSceneObjResultMetadata.pretenderMinElement;
+            object.parent.userData.extremumResultData.maxGeometryResult =  currentSceneObjResultMetadata.pretenderMaxElement;
+
             if (object instanceof THREE.Mesh) {
                 object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(currentSceneObjResultMetadata.uvs, 2));
                 object.drawResults = true;
