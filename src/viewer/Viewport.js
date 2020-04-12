@@ -810,6 +810,11 @@ var Viewport = function (editor) {
 
 
     scope.onMouseDblClickViewerHandler = function (event) {
+
+        if (!editor.loader.DRAW_RESULTS ) {
+            return false;
+        }
+
         var rect = container.dom.getBoundingClientRect();
 
         var x = (event.clientX - rect.left) / rect.width;
@@ -1032,7 +1037,7 @@ var Viewport = function (editor) {
                 var resultVal = 10;
                 var resultIndex = list[0].index;
                 var objectName = '';
-                if (resultIndex !== undefined) {
+                if (resultIndex !== undefined && !_.isUndefined(results)) {
                     resultVal = results[resultIndex];
 
                     if (pointsNumbers) {
