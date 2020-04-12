@@ -544,9 +544,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var linePositionSize = geometryObject.linePositionsSize;
         var positionsSize = geometryObject.positionsSize;
         var normalsSize = geometryObject.normalsSize;
-        var uvsSize = geometryObject.uvsSize;
         var coordsSize = geometryObject.coordsSize;
-        var resultsSize = geometryObject.resultsSize;
 
         return file.async("uint8array").then(
             function success(contentIn) {
@@ -576,16 +574,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 geometryObject.faceGeometryData.normals = convertBytesToGeometryMetadata(dataview, normalsSize, currentIndex);
                 currentIndex = currentIndex + normalsSize * 4;
 
-                // fill uvs_iee
-                geometryObject.faceGeometryData.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
-                currentIndex = currentIndex + uvsSize * 4;
-
                 // fill coords
                 geometryObject.coords = convertBytesToGeometryMetadata(dataview, coordsSize, currentIndex);
                 currentIndex = currentIndex + coordsSize * 4;
-
-                // fill results
-                geometryObject.results = convertBytesToGeometryMetadata(dataview, resultsSize, currentIndex);
 
             },
             function error(e) {
