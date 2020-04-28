@@ -260,6 +260,10 @@ Editor.prototype = {
         me.reLoadResultAndUvs(this.loader.objectsTree, resultMetaData, function (oNode) {
             if (oNode.object && oNode.object instanceof THREE.Mesh && oNode.object.visible /*&& oNode.object.isSimpleShape === false*/) return true;
         });
+
+        me.loader.pretenderMins = new Set(_.orderBy(Array.from(me.loader.pretenderMins), ['value'], 'desc'));
+        me.loader.pretenderMaxs = new Set(_.orderBy(Array.from(me.loader.pretenderMaxs), ['value'], 'asc'));
+
         me.setMinMaxResult(_.last(Array.from(me.loader.pretenderMins)), _.last(Array.from(me.loader.pretenderMaxs)));
 
         this.signals.updateCurrentScaleLimits.dispatch(resultMetaData.minResult, resultMetaData.maxResult);
@@ -290,7 +294,7 @@ Editor.prototype = {
     },
 
     reLoadMeshResultAndUvs: function (object, resutsMetadata) {
-
+        var me = this;
         var geometryObjectResultMetadata  = resutsMetadata.pictureData;
 
         let geometryObjectUUID = object.userData.geometryObjectUUID;
@@ -311,6 +315,10 @@ Editor.prototype = {
             object.parent.userData.extremumResultData.minGeometryResult =  currentSceneObjResultMetadata.pretenderMinElement;
             object.parent.userData.extremumResultData.maxGeometryResult =  currentSceneObjResultMetadata.pretenderMaxElement;
 
+            if(object.parent.visible){
+                me.loader.pretenderMins.add(currentSceneObjResultMetadata.pretenderMinElement);
+                me.loader.pretenderMaxs.add(currentSceneObjResultMetadata.pretenderMaxElement);
+            }
             if (object instanceof THREE.Mesh) {
                 object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(currentSceneObjResultMetadata.uvs, 2));
                 object.drawResults = true;

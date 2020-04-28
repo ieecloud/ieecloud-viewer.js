@@ -294,9 +294,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
         var pointsTable = totalObjectDataElement.pointsTable;
         var vertices = totalObjectDataElement.totalObjVertices;
-        var results = totalObjectDataElement.totalObjResults;
-        var maxGeometryResult = totalObjectDataElement.pretenderMaxElement.value;
-        var minGeometryResult = totalObjectDataElement.pretenderMinElement.value;
         var objectNames = totalObjectDataElement.objectNames;
         var pointsNumbers = totalObjectDataElement.pointsNumbers;
         var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
@@ -316,9 +313,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             faceCommonDataForMesh.drawResultsMaterial : faceCommonDataForMesh.facesMaterial);
         mesh.userData.pointsTable = pointsTable;
         mesh.userData.totalObjVertices = vertices;
-        mesh.userData.totalObjResults = results;
-        mesh.userData.maxGeometryResult = maxGeometryResult;
-        mesh.userData.minGeometryResult = minGeometryResult;
         mesh.userData.objectNames = objectNames;
         mesh.userData.pointsNumbers = pointsNumbers;
         mesh.userData.groups = groups;
@@ -350,9 +344,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
         var pointsTable = totalObjectDataElement.pointsTable;
         var vertices = totalObjectDataElement.totalObjVertices;
-        var results = totalObjectDataElement.totalObjResults;
-        var maxGeometryResult = totalObjectDataElement.pretenderMaxElement.value;
-        var minGeometryResult = totalObjectDataElement.pretenderMinElement.value;
         var objectNames = totalObjectDataElement.objectNames;
         var pointsNumbers = totalObjectDataElement.pointsNumbers;
         var lineCommonDataForLine = totalObjectDataElement.lineCommonDataForLine;
@@ -366,10 +357,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         lines.parentName = totalObjectDataElement.name;
         lines.defaultColor = lineCommonDataForLine.edgesMaterial.color.clone();
         lines.userData.totalObjVertices = vertices;
-        lines.userData.totalObjResults = results;
         lines.userData.geometryObjectUUID = totalObjectDataElement.uuid;
-        lines.userData.maxGeometryResult = maxGeometryResult;
-        lines.userData.minGeometryResult = minGeometryResult;
         lines.userData.objectNames = objectNames;
         lines.userData.pointsNumbers = pointsNumbers;
         editor.octree.add(lines);
@@ -686,15 +674,26 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         });
     };
 
+    function parseMinMaxCoordsToVector(coordsArray) {
+        if(!coordsArray){
+            return undefined;
+        }
+        let vertex = new THREE.Vector3();
+        vertex.x = coordsArray[0];
+        vertex.y = coordsArray[1];
+        vertex.z = coordsArray[2];
+        return vertex.divideScalar(scope.coordFactor);
+    }
+
 
     function parseResultsForGeometryObjectGz(geometryObjectResultsMetadata, file, value) {
 
         var resultsSize = geometryObjectResultsMetadata.resultsSize;
         var uvsSize = geometryObjectResultsMetadata.uvsSize;
         var minResult = geometryObjectResultsMetadata.minResult;
-        var minResultIndex = geometryObjectResultsMetadata.minResultIndex;
+        var minResultCoord = geometryObjectResultsMetadata.minResultCoord;
         var maxResult = geometryObjectResultsMetadata.maxResult;
-        var maxResultIndex = geometryObjectResultsMetadata.maxResultIndex;
+        var maxResultCoord = geometryObjectResultsMetadata.maxResultCoord;
 
         return file.async("uint8array").then(
             function success(contentIn) {
@@ -709,16 +708,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 // fill uvs_iee
                 geometryObjectResultsMetadata.uvs = convertBytesToGeometryMetadata(dataview, uvsSize, currentIndex);
 
-
-                geometryObjectResultsMetadata.pretenderMinElement = {position: new THREE.Vector3(),
+                geometryObjectResultsMetadata.pretenderMinElement = {position: parseMinMaxCoordsToVector(minResultCoord),
                     value: minResult};
 
-                geometryObjectResultsMetadata.pretenderMaxElement = {position: new THREE.Vector3(),
+                geometryObjectResultsMetadata.pretenderMaxElement = {position: parseMinMaxCoordsToVector(maxResultCoord),
                     value: maxResult};
-
-
-                scope.pretenderMins.add(geometryObjectResultsMetadata.pretenderMinElement);
-                scope.pretenderMaxs.add(geometryObjectResultsMetadata.pretenderMaxElement);
 
             },
             function error(e) {
@@ -1082,20 +1076,10 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
     }
 
     this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices) {
-
-        var results = geometryObject.results; // results
-
-        var name = geometryObject.name;
-
         var edgeGroups = geometryObject.edges;
         var uvGroups = geometryObject.uvCoords;
         var groupSettings = geometryObject.groupSettings;
         var objectSettings = geometryObject.objectSettings;
-
-        var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
-        var transparencyValue = objectSettings.transparancy > 0 ? true : false;
-        var opacityValue = objectSettings.transparancy > 0 ? (1 - objectSettings.transparancy) : 1;
-
 
         var texture = new THREE.Texture( generateTexture(objectSettings.faceColor) );
         texture.needsUpdate = true; // important
@@ -1113,49 +1097,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             linewidth: objectSettings.lineWidth
         });
 
-
-        var drawResultsMaterial = drawResults ? new THREE.CustomSelectionMaterial({
-            map: colorMapTexture,
-            flatShading: true,
-            side: THREE.FrontSide
-
-        }) : null;
-
-        if(drawResultsMaterial){
-            drawResultsMaterial.setSourceTexture(colorMapTexture);
-        }
-
-        //
-        // drawResultsMaterial.onBeforeCompile = function ( shader ) {
-        //
-        //     shader.uniforms.limitUvs = { value: new THREE.Vector2( 0.0, 1.0 ) };
-        //
-        //     shader.fragmentShader = 'uniform vec2 limitUvs;\n' + shader.vertexShader;
-        //     shader.fragmentShader = shader.fragmentShader.replace(
-        //         '#include <begin_vertex>',
-        //         [
-        //             "vec4 texelColor = texture2D( map, vUv );",
-        //             "if( vUv.y > limitUvs.x && vUv.y < limitUvs.y )",
-        //             "texelColor = mapTexelToLinear( texelColor );",
-        //             "else",
-        //             "texelColor = vec4( color, 1.0 );",
-        //             "diffuseColor *= texelColor;",
-        //         ].join( '\n' )
-        //     );
-        //
-        //     drawResultsMaterial = shader;
-        //
-        // };
-
-
         if (!editor.options.detailModelView) {
-
             geometryObject.facesMaterial = simpleFacesMaterial;
-            if (drawResults) {
-                geometryObject.drawResultsMaterial = drawResultsMaterial;
-                geometryObject.drawResults = true;
-            }
-
             geometryObject.edgesMaterial = simpleLinesMaterial;
 
             var groupsObjects = [];
@@ -1188,18 +1131,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 if (edges) {
                     var uv = uvGroups[j];
                     var drawTexture = (!drawResults) && (uv && uv.length != 0);
-
-                    // pictureGeometryElement.edgesGeometry = lineGeometry;
-                    // pictureGeometryElement.edgesGeometryData = positions;
-                    // pictureGeometryElement.objectGeometryName = name + '.' + geometryObject.groups[j];
-                    // pictureGeometryElement.name = geometryObject.groups[j];
-                    // pictureGeometryElement.parentName = name;
-                    // pictureGeometryElement.drawResults = drawResults;
-                    if (drawResults) { // Draw face with spectral texture according to results
-                        geometryObject.groups[j].drawResultsMaterial = drawResultsMaterial;
-                        geometryObject.groups[j].drawResults = drawResults;
-                        geometryObject.groups[j].facesMaterial = simpleFacesMaterial;
-                    } else {
                         if (drawTexture && settings.texture.name != undefined) {
                             // Draw face with texture
                             scope.createTexture(settings, geometryObject.groups[j])
@@ -1223,7 +1154,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                             }
                         }
-                    }
                 }
 
                 geometryObject.groups[j].edgesMaterial = simpleLinesMaterial;
@@ -1253,8 +1183,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var faces = geometryObject.faces;
         var groups = geometryObject.groups;
         var vertices = [];
-
-        var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
         var offset = 0;
         while (offset < coords.length) { //reading vertices
             var vertex = new THREE.Vector3();
@@ -1314,16 +1242,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         totalGeometryObj.lineCommonDataForLine = lineCommonDataForLine;
         totalGeometryObj.faceCommonDataForMesh = faceCommonDataForMesh;
 
-        totalGeometryObj.pretenderMinElement = {position: vertices[geometryObject.minResultIndex],
-            value: geometryObject.minResult};
-
-        totalGeometryObj.pretenderMaxElement = {position: vertices[geometryObject.maxResultIndex],
-            value: geometryObject.maxResult};
-
         totalGeometryObj.name = name;
-
-
-        // console.log("this.parseModelPartthis.parseModelPartthis.parseModelPart", totalGeometryObj.uuid);
 
         pictureInfo.geometryObjectData[index] = totalGeometryObj;
 
@@ -1430,15 +1349,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
             var geometryObject = pictureData[i];
             scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
-            scope.pretenderMins.add(pictureInfo.geometryObjectData[i].pretenderMinElement);
-            scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].pretenderMaxElement);
         }
-
-        scope.pretenderMins = new Set(_.orderBy(Array.from(scope.pretenderMins), ['value'], 'desc'));
-        scope.pretenderMaxs = new Set(_.orderBy(Array.from(scope.pretenderMaxs), ['value'], 'asc'));
-
-        editor.setMinMaxResult(_.last(Array.from(scope.pretenderMins)), _.last(Array.from(scope.pretenderMaxs)));
-
         return pictureInfo;
     }
 };
