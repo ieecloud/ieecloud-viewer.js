@@ -309,11 +309,18 @@ Editor.prototype = {
 
 
         if (!_.isUndefined(currentSceneObjResultMetadata)) {
-            object.userData.totalObjResults = currentSceneObjResultMetadata.results;
 
             object.parent.userData.extremumResultData = {};
             object.parent.userData.extremumResultData.minGeometryResult =  currentSceneObjResultMetadata.pretenderMinElement;
             object.parent.userData.extremumResultData.maxGeometryResult =  currentSceneObjResultMetadata.pretenderMaxElement;
+            object.userData.totalObjResults = currentSceneObjResultMetadata.results;
+
+
+            if (currentSceneObjResultMetadata.resultsSize === 0 || !currentSceneObjResultMetadata.minResult
+                || !currentSceneObjResultMetadata.maxResult) {
+                object.drawResults = false;
+                return;
+            }
 
             if(object.parent.visible){
                 me.loader.pretenderMins.add(currentSceneObjResultMetadata.pretenderMinElement);
@@ -322,9 +329,6 @@ Editor.prototype = {
             if (object instanceof THREE.Mesh) {
                 object.geometry.addAttribute('uv', new THREE.Float32BufferAttribute(currentSceneObjResultMetadata.uvs, 2));
                 object.drawResults = true;
-                if (currentSceneObjResultMetadata.uvsSize === 0 && currentSceneObjResultMetadata.resultsSize === 0) {
-                    object.drawResults = false
-                }
             }
         }
     },
