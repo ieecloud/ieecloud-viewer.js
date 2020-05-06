@@ -286,6 +286,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             geoCommonMeshGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( faceCommonGeometryData.colors, 3 ) );
             geoCommonMeshGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( faceCommonGeometryData.normals, 3 ));
             geoCommonMeshGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( faceCommonGeometryData.uvs, 2 ));
+            geoCommonMeshGeometry.setIndex(faceCommonGeometryData.indexesData.indexes);
 
 
             var mesh = new THREE.Mesh(geoCommonMeshGeometry, objectElement[0].drawResultsMaterial  ?
@@ -684,125 +685,134 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     this.parseModelFaces = function (faceGeometry, faces, vertices, uv, faceColor, results, maxResult, minResult,
                                      faceCommonGeometryData) {
-        var offset = 0;
-        var drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
-        var drawTexture = (!drawResults) && (uv && uv.length != 0);
+        let offset = 0;
+        let drawResults = (scope.DRAW_RESULTS && results && (results.length != 0));
+        let drawTexture = (!drawResults) && (uv && uv.length != 0);
 
-        var positions = [];
-        var colors = [];
-        var normals = [];
-        var uvs = [];
+        let positions = [];
+        let colors = [];
+        let normals = [];
+        let uvs = [];
+        let indexes = [];
+
+
         while (offset < faces.length) {
-            var cb = new THREE.Vector3();
-            var ab = new THREE.Vector3();
-            var vA = vertices[faces[offset]];
-            var array1 = vA.toArray();
-            positions.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
+            let cb = new THREE.Vector3();
+            let ab = new THREE.Vector3();
 
-            var vB = vertices[faces[offset + 1]];
-            array1 = vertices[faces[offset + 1]].toArray();
-            positions.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
+            let faceTriangleVertexIndexA = faces[offset];
+            let faceTriangleVertexIndexB = faces[offset + 1];
+            let faceTriangleVertexIndexC = faces[offset + 2];
 
-            var vC = vertices[faces[offset + 2]];
-            array1 = vertices[faces[offset + 2]].toArray();
-            positions.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2] );
+            let vA = vertices[faceTriangleVertexIndexA];
+            let vB = vertices[faceTriangleVertexIndexB];
+            let vC = vertices[faceTriangleVertexIndexC];
+
 
             cb.subVectors(vC, vB);
             ab.subVectors(vA, vB);
             cb.cross(ab);
 
             cb.normalize();
-            array1 = cb.toArray();
-            normals.push( array1[0], array1[1], array1[2] );
-            normals.push( array1[0], array1[1], array1[2] );
-            normals.push( array1[0], array1[1], array1[2] );
+            let faceNormalArray = cb.toArray();
+
+            if (!faceCommonGeometryData.indexesData.usedIndexes.hasOwnProperty(faceTriangleVertexIndexA)) {
+
+                let vAArray = vA.toArray();
+                positions.push(vAArray[0], vAArray[1], vAArray[2]);
+                normals.push(faceNormalArray[0], faceNormalArray[1], faceNormalArray[2]);
+                colors.push(faceColor, faceColor, faceColor);
+                indexes.push(faceCommonGeometryData.indexesData.indexCounter);
+                faceCommonGeometryData.positions.push(vAArray[0], vAArray[1], vAArray[2]);
+                faceCommonGeometryData.normals.push(faceNormalArray[0], faceNormalArray[1], faceNormalArray[2]);
+                faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
+
+                if (drawResults) {
+                    let vForPointA = scope.getV(results[faceTriangleVertexIndexA], maxResult, minResult);
+                    uvs.push(0.0, vForPointA);
+                    faceCommonGeometryData.uvs.push(0.0, vForPointA);
+                }
+
+                if (drawTexture) {
+                    uvs.push(uv[offset * 2], uv[offset * 2 + 1]);
+                    faceCommonGeometryData.uvs.push(uv[offset * 2], uv[offset * 2 + 1]);
+                }
+                faceCommonGeometryData.indexesData.usedIndexes[faceTriangleVertexIndexA] =  faceCommonGeometryData.indexesData.indexCounter;
+                faceCommonGeometryData.indexesData.indexes.push(faceCommonGeometryData.indexesData.indexCounter);
+                faceCommonGeometryData.indexesData.indexCounter += 1;
 
 
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2] );
-
-            colors.push(faceColor, faceColor, faceColor);
-            colors.push(faceColor, faceColor, faceColor);
-            colors.push(faceColor, faceColor, faceColor);
-
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-
-            if (drawResults) { // if results exist generating vertex coordinates according to results.
-                uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
-                    0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
-
-                faceCommonGeometryData.uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult),
-                    0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult));
+            } else {
+                let alreadyDefinedIdx = faceCommonGeometryData.indexesData.usedIndexes[faceTriangleVertexIndexA];
+                faceCommonGeometryData.indexesData.indexes.push(alreadyDefinedIdx);
             }
 
-            if (drawTexture) {
-                uvs.push(uv[offset * 2], uv[offset * 2 + 1], uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
-                faceCommonGeometryData.uvs.push(uv[offset * 2], uv[offset * 2 + 1], uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
+
+            if (!faceCommonGeometryData.indexesData.usedIndexes.hasOwnProperty(faceTriangleVertexIndexB)) {
+                let vBArray = vB.toArray();
+                positions.push(vBArray[0], vBArray[1], vBArray[2]);
+                normals.push(faceNormalArray[0], faceNormalArray[1], faceNormalArray[2]);
+                colors.push(faceColor, faceColor, faceColor);
+                indexes.push(faceCommonGeometryData.indexesData.indexCounter);
+                faceCommonGeometryData.positions.push(vBArray[0], vBArray[1], vBArray[2]);
+                faceCommonGeometryData.normals.push(faceNormalArray[0], faceNormalArray[1], faceNormalArray[2]);
+                faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
+
+                if (drawResults) {
+                    let vForPointB = scope.getV(results[faceTriangleVertexIndexB], maxResult, minResult);
+                    uvs.push(0.0, vForPointB);
+                    faceCommonGeometryData.uvs.push(0.0, vForPointB);
+                }
+
+                if (drawTexture) {
+                    uvs.push(uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1]);
+                    faceCommonGeometryData.uvs.push(uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1]);
+                }
+
+
+                faceCommonGeometryData.indexesData.usedIndexes[faceTriangleVertexIndexB] =  faceCommonGeometryData.indexesData.indexCounter;
+                faceCommonGeometryData.indexesData.indexes.push(faceCommonGeometryData.indexesData.indexCounter);
+                faceCommonGeometryData.indexesData.indexCounter += 1;
+            } else {
+                let alreadyDefinedIdx = faceCommonGeometryData.indexesData.usedIndexes[faceTriangleVertexIndexB];
+                faceCommonGeometryData.indexesData.indexes.push(alreadyDefinedIdx);
             }
 
-            // mirror faces
-            cb = new THREE.Vector3();
-            ab = new THREE.Vector3();
-            vA = vertices[faces[offset]];
-            array1 = vA.toArray();
-            positions.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
+            if (!faceCommonGeometryData.indexesData.usedIndexes.hasOwnProperty(faceTriangleVertexIndexC)) {
 
-            vB = vertices[faces[offset + 2]];
-            array1 = vertices[faces[offset + 2]].toArray();
-            positions.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
+                let vСArray = vC.toArray();
+                positions.push(vСArray[0], vСArray[1], vСArray[2]);
+                normals.push(faceNormalArray[0], faceNormalArray[1], faceNormalArray[2]);
+                colors.push(faceColor, faceColor, faceColor);
+                indexes.push(faceCommonGeometryData.indexesData.indexCounter);
+                faceCommonGeometryData.positions.push(vСArray[0], vСArray[1], vСArray[2]);
+                faceCommonGeometryData.normals.push(faceNormalArray[0], faceNormalArray[1], faceNormalArray[2]);
+                faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
 
-            vC = vertices[faces[offset + 1]];
-            array1 = vertices[faces[offset + 1]].toArray();
-            positions.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.positions.push( array1[0], array1[1], array1[2]);
+                if (drawResults) {
+                    let vForPointC = scope.getV(results[faceTriangleVertexIndexC], maxResult, minResult);
+                    uvs.push(0.0, vForPointC);
+                    faceCommonGeometryData.uvs.push(0.0, vForPointC);
 
-            cb.subVectors(vC, vB);
-            ab.subVectors(vA, vB);
-            cb.cross(ab);
+                }
 
-            cb.normalize();
-            array1 = cb.toArray();
-            normals.push( array1[0], array1[1], array1[2]);
-            normals.push( array1[0], array1[1], array1[2]);
-            normals.push( array1[0], array1[1], array1[2]);
+                if (drawTexture) {
+                    uvs.push(uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
+                    faceCommonGeometryData.uvs.push(uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
+                }
 
-
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
-            faceCommonGeometryData.normals.push( array1[0], array1[1], array1[2]);
-
-            colors.push(faceColor, faceColor, faceColor);
-            colors.push(faceColor, faceColor, faceColor);
-            colors.push(faceColor, faceColor, faceColor);
-
-
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-            faceCommonGeometryData.colors.push(faceColor, faceColor, faceColor);
-
-            if (drawResults) { // if results exist generating vertex coordinates according to results.
-                uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult),
-                    0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult));
-
-                faceCommonGeometryData.uvs.push(0.0, scope.getV(results[faces[offset]], maxResult, minResult), 0.0, scope.getV(results[faces[offset + 2]], maxResult, minResult),
-                    0.0, scope.getV(results[faces[offset + 1]], maxResult, minResult));
+                faceCommonGeometryData.indexesData.usedIndexes[faceTriangleVertexIndexC] =  faceCommonGeometryData.indexesData.indexCounter;
+                faceCommonGeometryData.indexesData.indexes.push(faceCommonGeometryData.indexesData.indexCounter);
+                faceCommonGeometryData.indexesData.indexCounter += 1;
+            } else {
+                let alreadyDefinedIdx = faceCommonGeometryData.indexesData.usedIndexes[faceTriangleVertexIndexC];
+                faceCommonGeometryData.indexesData.indexes.push(alreadyDefinedIdx);
             }
 
-            if (drawTexture) {
-                uvs.push(1 - uv[offset * 2], uv[offset * 2 + 1], 1 - uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], 1 - uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
-                faceCommonGeometryData.uvs.push(1 - uv[offset * 2], uv[offset * 2 + 1], 1 - uv[(offset + 1) * 2], uv[(offset + 1) * 2 + 1], 1 - uv[(offset + 2) * 2], uv[(offset + 2) * 2 + 1]);
-            }
             offset = offset + 3;
-
         }
+
+
         faceGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ));
         faceGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
         faceGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ));
@@ -829,7 +839,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var simpleFacesMaterial = new THREE.MeshLambertMaterial({
             color: objectSettings.faceColor,
             flatShading: true,
-            side: THREE.FrontSide,
+            side: THREE.DoubleSide,
             transparent: transparencyValue,
             opacity: opacityValue
 
@@ -892,7 +902,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     pictureGeometryElement.drawResultsMaterial = new THREE.MeshLambertMaterial({
                         map: colorMapTexture,
                         flatShading: true,
-                        side: THREE.FrontSide
+                        // side: THREE.FrontSide
+                        side: THREE.DoubleSide
 
                     });
                     pictureGeometryElement.facesMaterial = simpleFacesMaterial;
@@ -986,6 +997,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         faceCommonGeometryData.colors = [];
         faceCommonGeometryData.normals = [];
         faceCommonGeometryData.uvs = [];
+        faceCommonGeometryData.indexesData = {indexes:[], indexCounter : 0, usedIndexes : {}};
 
         scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices, maxResult, minResult, objectPartsArray, lineCommonPositionsArray,
             faceCommonGeometryData);
