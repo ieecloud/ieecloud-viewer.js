@@ -307,6 +307,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         geoCommonMeshGeometry.addAttribute('position', new THREE.Float32BufferAttribute(faceCommonDataForMesh.positions, 3));
         geoCommonMeshGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(faceCommonDataForMesh.normals, 3));
         geoCommonMeshGeometry.addAttribute('uv', new THREE.Float32BufferAttribute(faceCommonDataForMesh.uvs, 2));
+        geoCommonMeshGeometry.setIndex(Array.from(faceCommonDataForMesh.indexes));
 
 
         var mesh = new THREE.Mesh(geoCommonMeshGeometry, faceCommonDataForMesh.drawResultsMaterial ?
@@ -524,6 +525,15 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         return ints;
     }
 
+    function convertBytesToGeometryIntMetadata(dataview, size, currentIndex) {
+        var ints = new Int32Array(size);
+        for (var i = 0; i < ints.length; i++) {
+            ints[i] = dataview.getInt32(i * 4 + currentIndex);
+        }
+
+        return ints;
+    }
+
 
 
     function parseGeometryObjectGz(geometryObject, file, value) {
@@ -533,6 +543,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var positionsSize = geometryObject.positionsSize;
         var normalsSize = geometryObject.normalsSize;
         var coordsSize = geometryObject.coordsSize;
+        var indexesSize = geometryObject.indexesSize;
 
         return file.async("uint8array").then(
             function success(contentIn) {
@@ -565,6 +576,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 // fill coords
                 geometryObject.coords = convertBytesToGeometryMetadata(dataview, coordsSize, currentIndex);
                 currentIndex = currentIndex + coordsSize * 4;
+
+                // fill indexes
+                geometryObject.faceGeometryData.indexes = convertBytesToGeometryIntMetadata(dataview, indexesSize, currentIndex);
 
             },
             function error(e) {
@@ -1087,7 +1101,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var simpleFacesMaterial = new THREE.MeshLambertMaterial({
             map: texture,
             flatShading: true,
-            side: THREE.FrontSide,
+            side: THREE.DoubleSide,
             color : new THREE.Color( 1, 1, 1 ) // diffuse
         });
 
@@ -1217,6 +1231,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         faceCommonDataForMesh.positions = geometryObject.faceGeometryData.positions;
         faceCommonDataForMesh.normals = geometryObject.faceGeometryData.normals;
         faceCommonDataForMesh.uvs = geometryObject.faceGeometryData.uvs;
+        faceCommonDataForMesh.indexes = geometryObject.faceGeometryData.indexes;
 
         // pass vertices for simpleShapes only
         scope.parseModelObjectEdgesFaces(geometryObject, colorMapTexture, vertices);
