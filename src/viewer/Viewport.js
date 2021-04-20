@@ -938,7 +938,7 @@ var Viewport = function (editor) {
         }
         var array = getMousePosition(container.dom, event.clientX, event.clientY);
         onMouseUpPosition.fromArray(array);
-        if (onMouseDownPosition.distanceTo(onMouseUpPosition) <= 0.005 && nearestPoint.visible) {
+        if (onMouseDownPosition.distanceTo(onMouseUpPosition) <= 0.005) {
             ruler.position.copy(nearestPoint.position);
             editor.select3dPoint(nearestPoint.position.clone().multiplyScalar(editor.loader.coordFactor));
             var intersects = getIntersects(event, objects);
