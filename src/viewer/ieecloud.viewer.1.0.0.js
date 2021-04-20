@@ -52,6 +52,12 @@ function Viewer(target, options) {
             }
         });
 
+        $this.threeEditor.signals.selectSensor.add(function (uniqueId) {
+            if ($this.options.onSelectSensor) {
+                $this.options.onSelectSensor(uniqueId);
+            }
+        });
+
         $this.threeEditor.signals.dispatchModelPosition.add(function (modelPosition) {
             if ($this.options.onSaveModelPosition) {
                 $this.options.onSaveModelPosition(modelPosition);

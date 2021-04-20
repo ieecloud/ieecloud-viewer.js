@@ -18,6 +18,7 @@ var Editor = function (options) {
         objectColorUnSelected: new SIGNALS.Signal(),
         selectTree: new SIGNALS.Signal(),
         select3dPoint: new SIGNALS.Signal(),
+        selectSensor: new SIGNALS.Signal(),
         dispatchModelPosition: new SIGNALS.Signal(),
         endRender: new SIGNALS.Signal(),
         treeLoad: new SIGNALS.Signal(),
@@ -260,6 +261,10 @@ Editor.prototype = {
 
     select3dPoint: function (point) {
         this.signals.select3dPoint.dispatch(point);
+    },
+
+    selectSensor: function (uniqueId) {
+        this.signals.selectSensor.dispatch(uniqueId);
     },
 
     saveModelPosition: function () {

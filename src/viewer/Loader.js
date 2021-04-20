@@ -401,32 +401,17 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 if (!simpleShapes || simpleShapes.length === 0) {
                     return;
                 }
-                var v = 0;
-                var simpleShapesGeometry = new THREE.Geometry();
-                for (var k = 0; k < simpleShapes.length; k++) {
-                    for (var n = 0; n < simpleShapes[k].vertices.length; n++) {
-                        simpleShapesGeometry.vertices.push(simpleShapes[k].vertices[n]);
-                    }
-                    for (var n = 0; n < simpleShapes[k].faces.length; n++) {
-                        var face = simpleShapes[k].faces[n];
-                        face.a += v;
-                        face.b += v;
-                        face.c += v;
+                for (let k = 0; k < simpleShapes.length; k++) {
+                    var shapes = new THREE.Mesh(simpleShapes[k], objElement.facesMaterial);
 
-                        simpleShapesGeometry.faces.push(simpleShapes[k].faces[n]);
-                    }
-                    v += simpleShapes[k].vertices.length;
-                    simpleShapesGeometry.name = simpleShapes[k].name;
+                    shapes.name = simpleShapes[k].name;
+                    meshesData[key].push(shapes);
+
+                    // modelGroup.add(shapes);
+                    shapes.userData = {"type" : 'sensor', uniqueId : simpleShapes[k].uniqueId};
+                    editor.scene.meshes.push(shapes);
+                    geometryElement.add(shapes);
                 }
-
-                var shapes = new THREE.Mesh(simpleShapesGeometry, objElement.facesMaterial);
-
-                shapes.name = simpleShapesGeometry.name;
-                meshesData[key].push(shapes);
-
-                // modelGroup.add(shapes);
-                geometryElement.add(shapes);
-
             });
 
             if (faceCommonDataForMesh.positions.length > 0 && lineCommonDataForLine.positions.length > 0) {
@@ -833,6 +818,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 m.makeTranslation(v.x, v.y, v.z);
                 sphere.applyMatrix(m);
                 sphere.name = simpleShapes[k].name;
+                sphere.uniqueId = simpleShapes[k].id;
                 pictureGeometryElement.simpleShapes.push(sphere);
             }
             if (simpleShapes[k].shape == "cube") {
@@ -844,6 +830,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 m.makeTranslation(v.x, v.y, v.z);
                 cube.applyMatrix(m);
                 cube.name = simpleShapes[k].name;
+                cube.uniqueId = simpleShapes[k].id;
                 pictureGeometryElement.simpleShapes.push(cube);
             }
             if (simpleShapes[k].shape == "cylinder") {
@@ -854,6 +841,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 m.makeTranslation(v.x, v.y, v.z);
                 cylinder.applyMatrix(m);
                 cylinder.name = simpleShapes[k].name;
+                cylinder.uniqueId = simpleShapes[k].id;
                 pictureGeometryElement.simpleShapes.push(cylinder);
             }
         }

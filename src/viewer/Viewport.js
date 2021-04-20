@@ -941,6 +941,13 @@ var Viewport = function (editor) {
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) <= 0.005 && nearestPoint.visible) {
             ruler.position.copy(nearestPoint.position);
             editor.select3dPoint(nearestPoint.position.clone().multiplyScalar(editor.loader.coordFactor));
+            var intersects = getIntersects(event, objects);
+            if (intersects.length > 0) {
+                if (intersects[0].object.userData.type && intersects[0].object.userData.type === 'sensor') {
+                    editor.selectSensor(intersects[0].object.userData.uniqueId);
+
+                }
+            }
             ruler.hide();
             render();
         }
