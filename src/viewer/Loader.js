@@ -909,27 +909,27 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
     };
 
-
-    function generateTexture(color) {
-
-        // draw a circle in the center of the canvas
-        var size = 256;
-
-        // create canvas
-        var canvas = document.createElement( 'canvas' );
-        canvas.width = size;
-        canvas.height = size;
-
-        // get context
-        var context = canvas.getContext( '2d' );
-
-        // draw background
-        context.fillStyle = color;
-        context.fillRect( 0, 0, size, size );
-
-        return canvas;
-
-    }
+    //
+    // function generateTexture(color) {
+    //
+    //     // draw a circle in the center of the canvas
+    //     var size = 256;
+    //
+    //     // create canvas
+    //     var canvas = document.createElement( 'canvas' );
+    //     canvas.width = size;
+    //     canvas.height = size;
+    //
+    //     // get context
+    //     var context = canvas.getContext( '2d' );
+    //
+    //     // draw background
+    //     context.fillStyle = color;
+    //     context.fillRect( 0, 0, size, size );
+    //
+    //     return canvas;
+    //
+    // }
 
     this.parseModelObjectEdgesFaces = function (geometryObject, colorMapTexture, vertices) {
 

@@ -49,14 +49,13 @@ THREE.ResultTextObject3d = function (camera, params) {
 
         ctx.miterLimit = 1;
         ctx.fillStyle = color || 'black';
-        ctx.strokeStyle =  'black';
+        ctx.strokeStyle = 'black';
 
         ctx.fillText(text, 0, Math.ceil(size * 0.8));
 
 
         ctx.lineWidth = 3;
         ctx.strokeText(text, 0, Math.ceil(size * 0.8));
-
 
 
         return canvas;
@@ -81,7 +80,7 @@ THREE.ResultTextObject3d = function (camera, params) {
         this.resultDigits = params.resultDigits;
         this.color = params.color;
         let size = 0.5;
-        let valueToRender  = this.getValueToRender();
+        let valueToRender = this.getValueToRender();
         let canvas = createTextCanvas(valueToRender, this.color, null, 256);
 
         let plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
@@ -123,15 +122,21 @@ THREE.ResultTextObject3d = function (camera, params) {
     };
 
     this.getValueToRender = function () {
-        if (this.resultDigits === 0) {
-            return Math.floor(value);
+
+        if (_.isString(this.value)) {
+            return this.value;
         }
+
+        if (this.resultDigits === 0) {
+            return Math.floor(this.value);
+        }
+
         return this.value && !isNaN(this.value) ? this.value.round(this.resultDigits) : 0;
     };
 
-    this.setResultDigits = function (resultDigits){
+    this.setResultDigits = function (resultDigits) {
         this.resultDigits = resultDigits;
-        let valueToRender  = this.getValueToRender();
+        let valueToRender = this.getValueToRender();
         let canvas = createTextCanvas(valueToRender, this.color, null, 256);
         let plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * 0.5, 0.5);
         let newTexture = new THREE.Texture(canvas);
@@ -144,7 +149,7 @@ THREE.ResultTextObject3d = function (camera, params) {
         this.geometry = plane;
     };
 
-    this.update = function (domElement){
+    this.update = function (domElement) {
         let vFOV = camera.fov * Math.PI / 180;
         let height = 2 * Math.tan(vFOV / 2) * distance;
         let fraction = 0.5 / height;
