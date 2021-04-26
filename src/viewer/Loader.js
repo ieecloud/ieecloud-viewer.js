@@ -947,14 +947,16 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var opacityValue = objectSettings.transparancy > 0 ? (1 - objectSettings.transparancy) : 1;
 
 
-        var texture = new THREE.Texture( generateTexture(objectSettings.faceColor) );
-        texture.needsUpdate = true; // important
+        // var texture = new THREE.Texture( generateTexture(objectSettings.faceColor) );
+        // texture.needsUpdate = true; // important
 
         var simpleFacesMaterial = new THREE.MeshLambertMaterial({
-            map: texture,
+            color: objectSettings.faceColor,
             flatShading: true,
             side: THREE.FrontSide,
-            color : new THREE.Color( 1, 1, 1 ) // diffuse
+            transparent: transparencyValue,
+            opacity: opacityValue
+
         });
 
         var simpleLinesMaterial = new THREE.LineBasicMaterial({
