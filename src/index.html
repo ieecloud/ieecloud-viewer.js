@@ -1880,6 +1880,14 @@
         // $("#viewer").ieecloudEditor('loadBase64Model', data);
     });
 
+    $("#changeColorForSimpleShapes").click(function () {
+        $("#viewer").ieecloudEditor('changeColorForSimpleShapes', "sensor-3", 0x008000);
+    });
+
+    $("#changeMaterialForSimpleShapes ").click(function () {
+        $("#viewer").ieecloudEditor('changeMaterialForSimpleShapes', "sensorId");
+    });
+
     $("#exitFromFullScreen").click(function () {
         $("#viewer-wrapper").removeClass('viewer-full-screen');
         $("#viewer-wrapper").addClass('viewer-small-screen');

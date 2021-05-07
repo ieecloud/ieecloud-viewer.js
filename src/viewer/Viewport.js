@@ -528,7 +528,7 @@ var Viewport = function (editor) {
         var searchableObjects = [];
         if (editor.searchNearestPointMode === 'MESHES') {
             raycaster.linePrecision = CONST_LINE_PRECISION_DEFAULT;
-            searchableObjects = scene.meshes;
+            searchableObjects = _.concat(scene.meshes, scene.simpleShapes);
         } else if (editor.searchNearestPointMode === 'LINES') {
             raycaster.linePrecision = CONST_LINE_PRECISION_FOR_LINES;
             searchableObjects = scene.lines;
@@ -958,7 +958,7 @@ var Viewport = function (editor) {
     scope.selectObject = function (object) {
         if (object !== null) {
             if (object.material) {
-                object.material.color.setHex(0xff0000);
+                object.material.color.setHex(0xFF0000);
                 object.material.transparent = true;
                 object.material.depthTest = false;
                 object.material.opacity = SELECT_OPACITY;
@@ -1453,6 +1453,16 @@ var Viewport = function (editor) {
         highlighterProtractor.hide();
         infoMode.setValue('mode=' + editor.mode + '; searchMode=' + editor.searchNearestPointMode);
         // render();
+    });
+
+    signals.changeSimpleShapeColor.add(function (simpleShape, colorHex) {
+        if (simpleShape !== null) {
+            if (simpleShape.material) {
+                simpleShape.material.color.setHex(colorHex);
+            }
+        }
+        render();
+
     });
 
 

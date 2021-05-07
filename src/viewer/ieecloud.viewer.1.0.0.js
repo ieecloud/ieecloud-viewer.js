@@ -136,6 +136,14 @@ function Viewer(target, options) {
         this.threeEditor.loader.reloadModel(modelJsn);
     };
 
+    Viewer.prototype.changeColorForSimpleShapes = function (simpleShapeId, colorHex) {
+        this.threeEditor.changeColorForSimpleShapes(simpleShapeId, colorHex);
+    };
+
+    Viewer.prototype.changeMaterialForSimpleShapes = function (simpleShapeId) {
+        this.threeEditor.changeMaterialForSimpleShapes(simpleShapeId);
+    };
+
     Viewer.prototype.loadBinaryModel = function (zipModelUrl) {
         this.threeEditor.loader.loadBinaryModel(zipModelUrl);
     };

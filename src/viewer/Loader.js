@@ -396,6 +396,11 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
 // TODO move to common geometry
 
+            // TODO: align different types of meshes collectors
+            if (!editor.scene.simpleShapes) {
+                editor.scene.simpleShapes = [];
+            }
+
             _.forEach(objectGroupElements, function (objElement) {
                 var simpleShapes = objElement.simpleShapes;
                 if (!simpleShapes || simpleShapes.length === 0) {
@@ -409,7 +414,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                     // modelGroup.add(shapes);
                     shapes.userData = {"type" : 'sensor', uniqueId : simpleShapes[k].uniqueId};
-                    editor.scene.meshes.push(shapes);
+                    editor.scene.simpleShapes.push(shapes);
                     geometryElement.add(shapes);
                 }
             });
@@ -818,7 +823,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 m.makeTranslation(v.x, v.y, v.z);
                 sphere.applyMatrix(m);
                 sphere.name = simpleShapes[k].name;
-                sphere.uniqueId = simpleShapes[k].id;
+                sphere.uniqueId = simpleShapes[k].id || "sensor";
                 pictureGeometryElement.simpleShapes.push(sphere);
             }
             if (simpleShapes[k].shape == "cube") {
@@ -1259,7 +1264,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         for (var i = 0; i < pictureData.length; i++) {
 
             var geometryObject = pictureData[i];
-            scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i, maxResult, minResult);
+            scope.parseModelPart(geometryObject, names, pictureInfo, colorMapTexture, i);
             scope.pretenderMins.add(pictureInfo.geometryObjectData[i].pretenderMinElement);
             scope.pretenderMaxs.add(pictureInfo.geometryObjectData[i].pretenderMaxElement);
         }

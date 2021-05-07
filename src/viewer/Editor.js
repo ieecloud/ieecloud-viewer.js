@@ -43,7 +43,8 @@ var Editor = function (options) {
         objectShow: new SIGNALS.Signal(),
         objectHide: new SIGNALS.Signal(),
         updateMinMaxResults: new SIGNALS.Signal(),
-        updateCurrentScaleLimits: new SIGNALS.Signal()
+        updateCurrentScaleLimits: new SIGNALS.Signal(),
+        changeSimpleShapeColor: new SIGNALS.Signal()
     };
 
     this.MODE_FACES_EDGES = "faces_and_nodes";
@@ -759,10 +760,23 @@ Editor.prototype = {
         this.signals.sceneGraphChanged.dispatch();
     },
 
-   hideMinMaxResults: function () {
-        this.signals.removeSelectedResults.dispatch();
-        this.signals.sceneGraphChanged.dispatch();
+    changeColorForSimpleShapes: function (simpleShapeId, colorName) {
+        let me = this;
+
+        let simpleShape = _.find(me.scene.simpleShapes, function(shape) {
+            if(shape.userData.uniqueId){
+               return shape.userData.uniqueId === simpleShapeId;
+            }
+            return false;
+        });
+
+        this.signals.changeSimpleShapeColor.dispatch(simpleShape, colorName);
     },
+
+    changeMaterialForSimpleShapes: function (simpleShapeId) {
+        console.log("changeMaterialForSimpleShapes", simpleShapeId)
+    },
+
 
 
     parent: function (object, parent) {
