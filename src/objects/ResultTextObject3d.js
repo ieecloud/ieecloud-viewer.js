@@ -22,44 +22,60 @@ THREE.ResultTextObject3d = function (camera, params) {
     let camRotation = new THREE.Euler();
     let distance;
     let radius;
-    let me = this;
 
-    var createTextCanvas = function (text, color, font, size, backColor) {
+    this.borderWidth = 0;
+    this.fontSize = 90;
+    this.padding = 0;
+    this.fontWeight = 'normal';
+    this.fontFace = 'Arial';
+    this.strokeWidth = 1;
+    this.strokeColor = 'black';
+    this.color = 'white';
 
-        size = size || 24;
-        var canvas = document.createElement('canvas');
 
-        var ctx = canvas.getContext('2d');
+    this.buildTextCanvas = function (text) {
+        let canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const border = Array.isArray(this.borderWidth) ? this.borderWidth : [this.borderWidth, this.borderWidth]; // x,y border
+        const relBorder = border.map(b => b * this.fontSize * 0.1); // border in canvas units
 
+        const padding = Array.isArray(this.padding) ? this.padding : [this.padding, this.padding]; // x,y padding
+        const relPadding = padding.map(p => p * this.fontSize * 0.1); // padding in canvas units
 
-        var fontStr = (size + 'px ') + (font || 'Arial');
-        ctx.font = fontStr;
-        var w = ctx.measureText(text).width;
-        var h = Math.ceil(size);
+        const lines = text.split('\n');
+        const font = `${this.fontWeight} ${this.fontSize}px ${this.fontFace}`;
 
-        canvas.width = w;
-        canvas.height = h;
+        ctx.font = font; // measure canvas with appropriate font
+        const innerWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+        const innerHeight = this.fontSize * lines.length;
+        canvas.width = innerWidth + relBorder[0] * 2 + relPadding[0] * 2;
+        canvas.height = innerHeight + relBorder[1] * 2 + relPadding[1] * 2;
 
-        ctx.font = fontStr;
+        console.log(canvas.width, canvas.height)
 
-        if (backColor) {
-            ctx.fillStyle = backColor;
-            ctx.fillRect(0, 0, w, h);
+        ctx.translate(...relBorder);
+        ctx.translate(...relPadding);
+
+        // paint text
+        ctx.font = font; // Set font again after canvas is resized, as context properties are reset
+        ctx.fillStyle = this.color;
+        ctx.textBaseline = 'bottom';
+        ctx.miterLimit = 1;
+
+        const drawTextStroke = this.strokeWidth > 0;
+        if (drawTextStroke) {
+            ctx.lineWidth = this.strokeWidth * this.fontSize / 10;
+            ctx.strokeStyle = this.strokeColor;
         }
 
-        ctx.miterLimit = 1;
-        ctx.fillStyle = color || 'black';
-        ctx.strokeStyle = 'black';
+        lines.forEach((line, index) => {
+            const lineX = (innerWidth - ctx.measureText(line).width) / 2;
+            const lineY = (index + 1) * this.fontSize;
 
-        ctx.fillText(text, 0, Math.ceil(size * 0.8));
-
-
-        ctx.lineWidth = 3;
-        ctx.strokeText(text, 0, Math.ceil(size * 0.8));
-
-
+            drawTextStroke && ctx.strokeText(line, lineX, lineY);
+            ctx.fillText(line, lineX, lineY);
+        });
         return canvas;
-
     };
 
 
@@ -81,8 +97,7 @@ THREE.ResultTextObject3d = function (camera, params) {
         this.color = params.color;
         let size = 0.5;
         let valueToRender = this.getValueToRender();
-        let canvas = createTextCanvas(valueToRender, this.color, null, 256);
-
+        let canvas = this.buildTextCanvas(valueToRender);
         let plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
         let tex = new THREE.Texture(canvas);
 
