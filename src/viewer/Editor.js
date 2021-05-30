@@ -115,8 +115,8 @@ Editor.prototype = {
         this.signals.onZipUpdateStatus.dispatch(status, percent);
     },
 
-    onPrintScreenDone: function (urlRenderer) {
-        this.signals.onPrintScreenDone.dispatch(urlRenderer);
+    onPrintScreenDone: function (urlRenderer, visibleSimpleObjects) {
+        this.signals.onPrintScreenDone.dispatch(urlRenderer, visibleSimpleObjects);
     },
 
     onFindNearestObject: function (objProperties) {

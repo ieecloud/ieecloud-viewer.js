@@ -84,9 +84,9 @@ function Viewer(target, options) {
             }
         });
 
-        $this.threeEditor.signals.onPrintScreenDone.add(function (urlRenderer) {
+        $this.threeEditor.signals.onPrintScreenDone.add(function (urlRenderer, visibleSimpleObjects) {
             if ($this.options.onPrintScreenDone) {
-                $this.options.onPrintScreenDone(urlRenderer);
+                $this.options.onPrintScreenDone(urlRenderer, visibleSimpleObjects);
             }
         });
 

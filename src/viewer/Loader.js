@@ -410,6 +410,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     var shapes = new THREE.Mesh(simpleShapes[k], objElement.facesMaterial);
 
                     shapes.name = simpleShapes[k].name;
+                    shapes.position.copy(simpleShapes[k].position);
+
                     meshesData[key].push(shapes);
 
                     // modelGroup.add(shapes);
@@ -818,35 +820,29 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             if (simpleShapes[k].shape == "sphere") {
                 var sphere = new THREE.SphereGeometry(simpleShapes[k].radius / this.coordFactor, simpleShapes[k].segments, simpleShapes[k].segments);
                 var index = simpleShapes[k].index;
-                var m = new THREE.Matrix4();
                 var v = vertices[index];
-                m.makeTranslation(v.x, v.y, v.z);
-                sphere.applyMatrix(m);
                 sphere.name = simpleShapes[k].name;
                 sphere.uniqueId = simpleShapes[k].id || "sensor";
+                sphere.position = v;
                 pictureGeometryElement.simpleShapes.push(sphere);
             }
             if (simpleShapes[k].shape == "cube") {
                 var cubeCoord = simpleShapes[k].divideScalar(this.coordFactor);
                 var cube = new THREE.CubeGeometry(cubeCoord.x, cubeCoord.y, cubeCoord.z);
                 var index = simpleShapes[k].index;
-                var m = new THREE.Matrix4();
                 var v = vertices[index];
-                m.makeTranslation(v.x, v.y, v.z);
-                cube.applyMatrix(m);
                 cube.name = simpleShapes[k].name;
                 cube.uniqueId = simpleShapes[k].id;
+                cube.position = v;
                 pictureGeometryElement.simpleShapes.push(cube);
             }
             if (simpleShapes[k].shape == "cylinder") {
                 var cylinder = new THREE.CylinderGeometry(simpleShapes[k].r1 / this.coordFactor, simpleShapes[k].r2 / this.coordFactor, simpleShapes[k].h / this.coordFactor, simpleShapes[k].segments, 8);
                 var index = simpleShapes[k].index;
-                var m = new THREE.Matrix4();
                 var v = vertices[index];
-                m.makeTranslation(v.x, v.y, v.z);
-                cylinder.applyMatrix(m);
                 cylinder.name = simpleShapes[k].name;
                 cylinder.uniqueId = simpleShapes[k].id;
+                cylinder.position = v;
                 pictureGeometryElement.simpleShapes.push(cylinder);
             }
         }

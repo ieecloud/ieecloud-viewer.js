@@ -1696,6 +1696,28 @@ var Viewport = function (editor) {
         // editor.createJsonModelWithRotation(modelRotation);
     });
 
+    function isCameraSeeSimpleObject(object) {
+        let frustum = new THREE.Frustum();
+        let cameraViewProjectionMatrix = new THREE.Matrix4();
+        camera.updateMatrixWorld(); // make sure the camera matrix is updated
+        camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+        cameraViewProjectionMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+        frustum.setFromMatrix(cameraViewProjectionMatrix);
+        return frustum.intersectsObject(object);
+    }
+
+    function getSimpleObject2dPosition(object, mainWidth, mainHeight) {
+        let widthHalf = mainWidth / 2, heightHalf = mainHeight / 2;
+
+        let vector = new THREE.Vector3();
+        let projector = new THREE.Projector();
+        projector.projectVector(vector.setFromMatrixPosition(object.matrixWorld), camera);
+
+        vector.x = (vector.x * widthHalf) + widthHalf;
+        vector.y = -(vector.y * heightHalf) + heightHalf;
+        return vector;
+    }
+
     signals.printScreen.add(function (toFileName) {
 
 
@@ -1706,6 +1728,7 @@ var Viewport = function (editor) {
         var can3 = document.createElement('canvas');
 
         var mainHeight = canvas1.getContext('webgl').drawingBufferHeight;
+        var mainWidth = canvas1.getContext('webgl').drawingBufferWidth;
 
         can3.width = canvas1.getContext('webgl').drawingBufferWidth;
         can3.height = mainHeight;
@@ -1715,8 +1738,24 @@ var Viewport = function (editor) {
         ctx3.drawImage(canvas2, 0, 0);
         ctx3.drawImage(canvas3, 0, mainHeight - canvas3.height);
 
+        const visibleSimpleObjects = [];
+        for (let i = 0; i < scene.simpleShapes.length; i++) {
+            if(isCameraSeeSimpleObject(scene.simpleShapes[i])){
+                let vector = getSimpleObject2dPosition(scene.simpleShapes[i], mainWidth, mainHeight);
+                let simpleObjectSensor2dPositionData = {};
+                let vector2D = new THREE.Vector2();
+                vector2D.x = vector.x;
+                vector2D.y = vector.y;
+                simpleObjectSensor2dPositionData.position = vector;
+                simpleObjectSensor2dPositionData.uniqueId = scene.simpleShapes[i].userData.uniqueId;
+                simpleObjectSensor2dPositionData.mainCanvasHeight = mainHeight;
+                simpleObjectSensor2dPositionData.mainCanvasWidth = mainWidth;
+                visibleSimpleObjects.push(simpleObjectSensor2dPositionData)
+            }
+        }
+
         var urlRenderer = can3.toDataURL("image/png");
-        editor.onPrintScreenDone(urlRenderer);
+        editor.onPrintScreenDone(urlRenderer, visibleSimpleObjects);
         // var element = document.createElement('a');
         // element.setAttribute('href', urlRenderer);
         // element.setAttribute('download', toFileName);

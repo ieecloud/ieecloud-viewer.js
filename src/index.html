@@ -1596,7 +1596,8 @@
         onSaveModelPosition: function(modelPosition){
             console.log(modelPosition);
         },
-        onPrintScreenDone: function (urlRenderer) {
+        onPrintScreenDone: function (urlRenderer, visibleSimpleObjects) {
+            // console.log(visibleSimpleObjects);
             // console.log(urlRenderer);
             //
             // var dataJson = '{"name":"descript.ion","path":"descript.ion","type":"file","format":"base64","content":"Ny16aXAuY2htIDctWmlwIEhlbHANCjctWmlwLmRsbCA3LVppcCBQbHVnaW4NCjd6LmRsbCA3LVppcCBFbmdpbmUNCjd6LmV4ZSA3LVppcCBDb25zb2xlIA0KN3ouc2Z4IDctWmlwIEdVSSBTRlgNCjd6Q29uLnNmeCA3LVppcCBDb25zb2xlIFNGWA0KN3pGTS5leGUgNy1aaXAgRmlsZSBNYW5hZ2VyDQo3emcuZXhlIDctWmlwIEdVSQ0KZGVzY3JpcHQuaW9uIDctWmlwIEZpbGUgRGVzY3JpcHRpb25zDQpoaXN0b3J5LnR4dCA3LVppcCBIaXN0b3J5DQpMYW5nIDctWmlwIFRyYW5zbGF0aW9ucw0KbGljZW5zZS50eHQgNy1aaXAgTGljZW5zZQ0KcmVhZG1lLnR4dCA3LVppcCBPdmVydmlldw0K"}';
