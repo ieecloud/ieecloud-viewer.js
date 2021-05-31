@@ -52,9 +52,9 @@ function Viewer(target, options) {
             }
         });
 
-        $this.threeEditor.signals.selectSensor.add(function (uniqueId) {
-            if ($this.options.onSelectSensor) {
-                $this.options.onSelectSensor(uniqueId);
+        $this.threeEditor.signals.selectSimpleShape.add(function (id) {
+            if ($this.options.onSelectSimpleShape) {
+                $this.options.onSelectSimpleShape(id);
             }
         });
 
@@ -84,9 +84,9 @@ function Viewer(target, options) {
             }
         });
 
-        $this.threeEditor.signals.onPrintScreenDone.add(function (urlRenderer, visibleSimpleObjects) {
+        $this.threeEditor.signals.onPrintScreenDone.add(function (urlRenderer, printScreenMetadata) {
             if ($this.options.onPrintScreenDone) {
-                $this.options.onPrintScreenDone(urlRenderer, visibleSimpleObjects);
+                $this.options.onPrintScreenDone(urlRenderer, printScreenMetadata);
             }
         });
 

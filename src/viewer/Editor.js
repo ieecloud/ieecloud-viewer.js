@@ -18,7 +18,7 @@ var Editor = function (options) {
         objectColorUnSelected: new SIGNALS.Signal(),
         selectTree: new SIGNALS.Signal(),
         select3dPoint: new SIGNALS.Signal(),
-        selectSensor: new SIGNALS.Signal(),
+        selectSimpleShape: new SIGNALS.Signal(),
         dispatchModelPosition: new SIGNALS.Signal(),
         endRender: new SIGNALS.Signal(),
         treeLoad: new SIGNALS.Signal(),
@@ -115,8 +115,8 @@ Editor.prototype = {
         this.signals.onZipUpdateStatus.dispatch(status, percent);
     },
 
-    onPrintScreenDone: function (urlRenderer, visibleSimpleObjects) {
-        this.signals.onPrintScreenDone.dispatch(urlRenderer, visibleSimpleObjects);
+    onPrintScreenDone: function (urlRenderer, printScreenMetadata) {
+        this.signals.onPrintScreenDone.dispatch(urlRenderer, printScreenMetadata);
     },
 
     onFindNearestObject: function (objProperties) {
@@ -264,8 +264,8 @@ Editor.prototype = {
         this.signals.select3dPoint.dispatch(point);
     },
 
-    selectSensor: function (uniqueId) {
-        this.signals.selectSensor.dispatch(uniqueId);
+    selectSimpleShape: function (id) {
+        this.signals.selectSimpleShape.dispatch(id);
     },
 
     saveModelPosition: function () {

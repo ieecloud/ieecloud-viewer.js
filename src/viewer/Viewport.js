@@ -943,8 +943,8 @@ var Viewport = function (editor) {
             editor.select3dPoint(nearestPoint.position.clone().multiplyScalar(editor.loader.coordFactor));
             var intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
-                if (intersects[0].object.userData.type && intersects[0].object.userData.type === 'sensor') {
-                    editor.selectSensor(intersects[0].object.userData.uniqueId);
+                if (intersects[0].object.userData.type && intersects[0].object.userData.type === 'simpleShape') {
+                    editor.selectSimpleShape(intersects[0].object.userData.id);
 
                 }
             }
@@ -1738,24 +1738,23 @@ var Viewport = function (editor) {
         ctx3.drawImage(canvas2, 0, 0);
         ctx3.drawImage(canvas3, 0, mainHeight - canvas3.height);
 
-        const visibleSimpleObjects = [];
+        const printScreenMetadata = {};
+        printScreenMetadata.canvasSize = {height: mainHeight, width: mainWidth};
+        const cameraVisibleSimpleObjects = [];
         for (let i = 0; i < scene.simpleShapes.length; i++) {
             if(isCameraSeeSimpleObject(scene.simpleShapes[i])){
                 let vector = getSimpleObject2dPosition(scene.simpleShapes[i], mainWidth, mainHeight);
                 let simpleObjectSensor2dPositionData = {};
-                let vector2D = new THREE.Vector2();
-                vector2D.x = vector.x;
-                vector2D.y = vector.y;
-                simpleObjectSensor2dPositionData.position = vector;
-                simpleObjectSensor2dPositionData.uniqueId = scene.simpleShapes[i].userData.uniqueId;
-                simpleObjectSensor2dPositionData.mainCanvasHeight = mainHeight;
-                simpleObjectSensor2dPositionData.mainCanvasWidth = mainWidth;
-                visibleSimpleObjects.push(simpleObjectSensor2dPositionData)
+                simpleObjectSensor2dPositionData.id = scene.simpleShapes[i].userData.id;
+                simpleObjectSensor2dPositionData.x = vector.x;
+                simpleObjectSensor2dPositionData.y = vector.y;
+                cameraVisibleSimpleObjects.push(simpleObjectSensor2dPositionData)
             }
         }
+        printScreenMetadata.simpleShapesPositions = cameraVisibleSimpleObjects;
 
         var urlRenderer = can3.toDataURL("image/png");
-        editor.onPrintScreenDone(urlRenderer, visibleSimpleObjects);
+        editor.onPrintScreenDone(urlRenderer, printScreenMetadata);
         // var element = document.createElement('a');
         // element.setAttribute('href', urlRenderer);
         // element.setAttribute('download', toFileName);

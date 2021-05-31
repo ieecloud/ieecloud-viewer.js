@@ -413,9 +413,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                     shapes.position.copy(simpleShapes[k].position);
 
                     meshesData[key].push(shapes);
-
                     // modelGroup.add(shapes);
-                    shapes.userData = {"type" : 'sensor', uniqueId : simpleShapes[k].uniqueId};
+                    shapes.userData = {"type" : 'simpleShape', id : simpleShapes[k].simpleShapeId};
+
                     editor.scene.simpleShapes.push(shapes);
                     geometryElement.add(shapes);
                 }
@@ -822,7 +822,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
                 sphere.name = simpleShapes[k].name;
-                sphere.uniqueId = simpleShapes[k].id || "sensor";
+                sphere.simpleShapeId = simpleShapes[k].id || null;
                 sphere.position = v;
                 pictureGeometryElement.simpleShapes.push(sphere);
             }
@@ -832,7 +832,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
                 cube.name = simpleShapes[k].name;
-                cube.uniqueId = simpleShapes[k].id;
+                cube.simpleShapeId = simpleShapes[k].id || null;
                 cube.position = v;
                 pictureGeometryElement.simpleShapes.push(cube);
             }
@@ -841,7 +841,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
                 cylinder.name = simpleShapes[k].name;
-                cylinder.uniqueId = simpleShapes[k].id;
+                cylinder.simpleShapeId = simpleShapes[k].id || null;
                 cylinder.position = v;
                 pictureGeometryElement.simpleShapes.push(cylinder);
             }
