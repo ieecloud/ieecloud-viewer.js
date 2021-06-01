@@ -814,15 +814,16 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         delete pictureInfo;
     };
 
-    this.parseSimpleShapes = function (simpleShapes, groupIndex, pictureGeometryElement, vertices) {
-        var simpleShapes = simpleShapes[groupIndex];
+    this.parseSimpleShapes = function (geometryObject, groupIndex, pictureGeometryElement, vertices) {
+        let simpleShapes = geometryObject.simpleShapes[groupIndex];
+        let objectName = geometryObject.objectNames[groupIndex];
         for (var k = 0; k < simpleShapes.length; k++) {
             if (simpleShapes[k].shape == "sphere") {
                 var sphere = new THREE.SphereGeometry(simpleShapes[k].radius / this.coordFactor, simpleShapes[k].segments, simpleShapes[k].segments);
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
                 sphere.name = simpleShapes[k].name;
-                sphere.simpleShapeId = simpleShapes[k].id || null;
+                sphere.simpleShapeId = simpleShapes[k].id || objectName;
                 sphere.position = v;
                 pictureGeometryElement.simpleShapes.push(sphere);
             }
@@ -832,7 +833,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
                 cube.name = simpleShapes[k].name;
-                cube.simpleShapeId = simpleShapes[k].id || null;
+                cube.simpleShapeId = simpleShapes[k].id || objectName;
                 cube.position = v;
                 pictureGeometryElement.simpleShapes.push(cube);
             }
@@ -841,7 +842,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
                 cylinder.name = simpleShapes[k].name;
-                cylinder.simpleShapeId = simpleShapes[k].id || null;
+                cylinder.simpleShapeId = simpleShapes[k].id || objectName;
                 cylinder.position = v;
                 pictureGeometryElement.simpleShapes.push(cylinder);
             }
@@ -1019,7 +1020,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 groupElement.name  = geometryObject.groups[j];
                 groupElement.facesMaterial = simpleFacesMaterial;
                 if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
-                    scope.parseSimpleShapes(geometryObject.simpleShapes, j, groupElement, vertices);
+                    scope.parseSimpleShapes(geometryObject, j, groupElement, vertices);
                 }
 
                 groupsObjects.push(groupElement);
@@ -1085,7 +1086,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                 geometryObject.groups[j].simpleShapes = [];  //Simple shapes
                 if (geometryObject.simpleShapes && geometryObject.simpleShapes[j]) {
-                    scope.parseSimpleShapes(geometryObject.simpleShapes, j, geometryObject.groups[j], vertices);
+                    scope.parseSimpleShapes(geometryObject, j, geometryObject.groups[j], vertices);
                 }
             }
         }
