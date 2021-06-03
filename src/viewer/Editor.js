@@ -762,7 +762,6 @@ Editor.prototype = {
 
     changeColorForSimpleShapes: function (simpleShapeId, colorName) {
         let me = this;
-
         let simpleShape = _.find(me.scene.simpleShapes, function(shape) {
             if(shape.userData.id){
                return shape.userData.id === simpleShapeId;

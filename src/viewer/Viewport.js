@@ -535,7 +535,6 @@ var Viewport = function (editor) {
         }
 
         var resultObjects = getIntersectsByRaycaster(raycaster, searchableObjects);
-        console.log('get getIntersectsByRaycaster1 time:' + (Date.now() - startTime) + ' objects size:' + searchableObjects.length + ' editor.searchNearestPointMode:' + editor.searchNearestPointMode);
         // raycaster.linePrecision = CONST_LINE_PRECISION_FOR_LINES;
         // startTime = Date.now();
         // var resultLines = getIntersectsByRaycaster(raycaster, object);
@@ -941,10 +940,13 @@ var Viewport = function (editor) {
         if (onMouseDownPosition.distanceTo(onMouseUpPosition) <= 0.005) {
             ruler.position.copy(nearestPoint.position);
             editor.select3dPoint(nearestPoint.position.clone().multiplyScalar(editor.loader.coordFactor));
-            var intersects = getIntersects(event, objects);
+            let intersects = getIntersects(event, objects);
             if (intersects.length > 0) {
                 if (intersects[0].object.userData.type && intersects[0].object.userData.type === 'simpleShape') {
+                    intersects[0].object.defaultColor = intersects[0].object.material.color.clone();
+                    scope.selectObject(intersects[0].object, 0xFFFFFF);
                     editor.selectSimpleShape(intersects[0].object.userData.id);
+                    setTimeout(function() { scope.unSelectObject(intersects[0].object);  render();}, 250);
 
                 }
             }
@@ -955,10 +957,10 @@ var Viewport = function (editor) {
     };
 
 
-    scope.selectObject = function (object) {
+    scope.selectObject = function (object, colorHex) {
         if (object !== null) {
             if (object.material) {
-                object.material.color.setHex(0xFF0000);
+                object.material.color.setHex(colorHex || 0xFF0000);
                 object.material.transparent = true;
                 object.material.depthTest = false;
                 object.material.opacity = SELECT_OPACITY;
@@ -1123,12 +1125,12 @@ var Viewport = function (editor) {
             } else {
                 lastMove = Date.now();
             }
+            $('html,body').css('cursor', 'default');
 
             if (editor.searchNearestPointMode !== undefined && editor.searchNearestPointMode !== '') {
-                var startTime = Date.now();
+                nearestPoint.hide();
+                render();
                 var intersects = getIntersects(event, objects);
-                console.log('get getIntersects time:' + (Date.now() - startTime));
-                startTime = Date.now();
                 if (highlightedGeometryObjects.length > 0) {
                     scope.unHighlightHighlightedObjects();
                     nearestPoint.hide();
@@ -1138,8 +1140,14 @@ var Viewport = function (editor) {
 
                 if (intersects.length > 0) {
                     runNearestAlgorithm(intersects);
+
+                    if (intersects[0].object.userData.type && intersects[0].object.userData.type === 'simpleShape') {
+                        $('html,body').css('cursor', 'pointer');
+                    } else {
+                        $('html,body').css('cursor', 'default');
+                    }
+
                 }
-                console.log('runNearestAlgorithm time:' + (Date.now() - startTime));
             }
         };
 

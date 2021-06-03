@@ -276,6 +276,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             _.forEach(textElement, function (value, key) {
                 if (textElement[key].label) {
                     var textMesh = scope.createText2D(textElement[key].label, textElement[key].color, null, textElement[key].size);
+                    textMesh.name = textElement[key].label;
                     textMesh.userData = {};
                     textMesh.userData.quaternion = "camera";
                     textMesh.position.copy(textElement[key].position);
@@ -402,13 +403,12 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             // }
 
             _.forEach(objectGroupElements, function (objElement) {
-                var simpleShapes = objElement.simpleShapes;
+                let simpleShapes = objElement.simpleShapes;
                 if (!simpleShapes || simpleShapes.length === 0) {
                     return;
                 }
                 for (let k = 0; k < simpleShapes.length; k++) {
-                    var shapes = new THREE.Mesh(simpleShapes[k], objElement.facesMaterial);
-
+                    let shapes = new THREE.Mesh(simpleShapes[k], objElement.facesMaterial.clone());
                     shapes.name = simpleShapes[k].name;
                     shapes.position.copy(simpleShapes[k].position);
 
@@ -471,7 +471,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                         color: editor.options.resultTextColor
                     });
 
-
+                    textMesh.name = textElement[key2].label + " (text)";
                     textMesh.userData = {};
                     textMesh.userData = {"text": true};
                     textMesh.position.copy(textElement[key2].position);
@@ -822,7 +822,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var sphere = new THREE.SphereGeometry(simpleShapes[k].radius / this.coordFactor, simpleShapes[k].segments, simpleShapes[k].segments);
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
-                sphere.name = simpleShapes[k].name;
+                sphere.name = simpleShapes[k].name || objectName;
                 sphere.simpleShapeId = simpleShapes[k].id || objectName;
                 sphere.position = v;
                 pictureGeometryElement.simpleShapes.push(sphere);
@@ -832,7 +832,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var cube = new THREE.CubeGeometry(cubeCoord.x, cubeCoord.y, cubeCoord.z);
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
-                cube.name = simpleShapes[k].name;
+                cube.name = simpleShapes[k].name || objectName;
                 cube.simpleShapeId = simpleShapes[k].id || objectName;
                 cube.position = v;
                 pictureGeometryElement.simpleShapes.push(cube);
@@ -841,7 +841,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
                 var cylinder = new THREE.CylinderGeometry(simpleShapes[k].r1 / this.coordFactor, simpleShapes[k].r2 / this.coordFactor, simpleShapes[k].h / this.coordFactor, simpleShapes[k].segments, 8);
                 var index = simpleShapes[k].index;
                 var v = vertices[index];
-                cylinder.name = simpleShapes[k].name;
+                cylinder.name = simpleShapes[k].name || objectName;
                 cylinder.simpleShapeId = simpleShapes[k].id || objectName;
                 cylinder.position = v;
                 pictureGeometryElement.simpleShapes.push(cylinder);
