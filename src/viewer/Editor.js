@@ -764,8 +764,8 @@ Editor.prototype = {
         let me = this;
 
         let simpleShape = _.find(me.scene.simpleShapes, function(shape) {
-            if(shape.userData.uniqueId){
-               return shape.userData.uniqueId === simpleShapeId;
+            if(shape.userData.id){
+               return shape.userData.id === simpleShapeId;
             }
             return false;
         });

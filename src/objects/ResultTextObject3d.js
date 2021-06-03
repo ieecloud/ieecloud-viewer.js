@@ -51,8 +51,6 @@ THREE.ResultTextObject3d = function (camera, params) {
         canvas.width = innerWidth + relBorder[0] * 2 + relPadding[0] * 2;
         canvas.height = innerHeight + relBorder[1] * 2 + relPadding[1] * 2;
 
-        console.log(canvas.width, canvas.height)
-
         ctx.translate(...relBorder);
         ctx.translate(...relPadding);
 
