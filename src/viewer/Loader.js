@@ -397,9 +397,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 // TODO move to common geometry
 
             // TODO: align different types of meshes collectors
-            if (!editor.scene.simpleShapes) {
+            // if (!editor.scene.simpleShapes) {
                 editor.scene.simpleShapes = [];
-            }
+            // }
 
             _.forEach(objectGroupElements, function (objElement) {
                 var simpleShapes = objElement.simpleShapes;
