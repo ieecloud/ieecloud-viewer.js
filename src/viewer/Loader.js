@@ -383,6 +383,9 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
         var result = pictureInfo.geometryObjectData;
         var meshesData = {};
         var modelGroup = new THREE.Object3D();
+        // TODO: align different types of meshes collectors
+        editor.scene.simpleShapes = [];
+        editor.scene.textBelongsMeshes = [];
         _.forEach(result, function (value, key) {
 
 
@@ -396,12 +399,6 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var faceCommonDataForMesh = totalObjectDataElement.faceCommonDataForMesh;
 
 // TODO move to common geometry
-
-            // TODO: align different types of meshes collectors
-            // if (!editor.scene.simpleShapes) {
-                editor.scene.simpleShapes = [];
-            // }
-
             _.forEach(objectGroupElements, function (objElement) {
                 let simpleShapes = objElement.simpleShapes;
                 if (!simpleShapes || simpleShapes.length === 0) {
@@ -473,7 +470,8 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
 
                     textMesh.name = textElement[key2].label + " (text)";
                     textMesh.userData = {};
-                    textMesh.userData = {"text": true};
+                    textMesh.userData = {"text": true, textObjectBelongsId : textElement[key2].objectBelongsId};
+                    editor.scene.textBelongsMeshes.push(textMesh);
                     textMesh.position.copy(textElement[key2].position);
                     meshesData[key1].push(textMesh);
                     modelGroup.add(textMesh);
@@ -1127,6 +1125,7 @@ var Loader = function (editor, textureUrl, textureBase64, texture, textures) {
             var label = text2d[j + 1];
             textPositionsData[ind] = {};
             textPositionsData[ind].label = label;
+            textPositionsData[ind].objectBelongsId = geometryObject.objectNames[ind];
             textPositionsData[ind].position = new THREE.Vector3(0, 0, 0);
             textPositionsData[ind].position.copy(vertices[ind]);
             // textPositionsData[ind].size = objectSettings.textSize / this.coordFactor * 10;

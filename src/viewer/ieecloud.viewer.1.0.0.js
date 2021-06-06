@@ -136,6 +136,10 @@ function Viewer(target, options) {
         this.threeEditor.loader.reloadModel(modelJsn);
     };
 
+    Viewer.prototype.changeTextForSimpleShapes = function (simpleShapeId, text) {
+        this.threeEditor.changeTextForSimpleShapes(simpleShapeId, text);
+    };
+
     Viewer.prototype.changeColorForSimpleShapes = function (simpleShapeId, colorHex) {
         this.threeEditor.changeColorForSimpleShapes(simpleShapeId, colorHex);
     };

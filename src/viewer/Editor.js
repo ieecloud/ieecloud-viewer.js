@@ -34,6 +34,7 @@ var Editor = function (options) {
         saveModelPosition: new SIGNALS.Signal(),
         removeSelectedResults: new SIGNALS.Signal(),
         changeResultDigits: new SIGNALS.Signal(),
+        changeTextValue: new SIGNALS.Signal(),
         resetCameraRotation: new SIGNALS.Signal(),
         printScreen: new SIGNALS.Signal(),
         materialChanged: new SIGNALS.Signal(),
@@ -762,14 +763,30 @@ Editor.prototype = {
 
     changeColorForSimpleShapes: function (simpleShapeId, colorName) {
         let me = this;
-        let simpleShape = _.find(me.scene.simpleShapes, function(shape) {
-            if(shape.userData.id){
-               return shape.userData.id === simpleShapeId;
+        let simpleShape = me.findSimpleShapeById(me, simpleShapeId);
+        this.signals.changeSimpleShapeColor.dispatch(simpleShape, colorName);
+    },
+
+    findSimpleShapeById: function (me, simpleShapeId) {
+        let simpleShape = _.find(me.scene.simpleShapes, function (shape) {
+            if (shape.userData.id) {
+                return shape.userData.id === simpleShapeId;
+            }
+            return false;
+        });
+        return simpleShape;
+    },
+    changeTextForSimpleShapes: function (objectBelongsId, text) {
+        let me = this
+
+        let textBelongsMesh = _.find(me.scene.textBelongsMeshes, function (textMesh) {
+            if (textMesh.userData.textObjectBelongsId) {
+                return textMesh.userData.textObjectBelongsId === objectBelongsId;
             }
             return false;
         });
 
-        this.signals.changeSimpleShapeColor.dispatch(simpleShape, colorName);
+        this.signals.changeTextValue.dispatch(textBelongsMesh, text);
     },
 
     changeMaterialForSimpleShapes: function (simpleShapeId) {

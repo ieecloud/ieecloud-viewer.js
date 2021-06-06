@@ -1473,6 +1473,13 @@ var Viewport = function (editor) {
 
     });
 
+    signals.changeTextValue.add(function (changeTextValue, text) {
+        if (changeTextValue) {
+            changeTextValue.changeText(text)
+        }
+        render();
+    });
+
 
     var getFar = function (box) {
         var matrix = new THREE.Matrix4();
@@ -1812,7 +1819,6 @@ var Viewport = function (editor) {
                 }
 
                 if (child.userData.text) {
-                    // console.log("SDSDSDSDSDSD");
                     child.quaternion.copy(camera.quaternion);
                     unRotatedObjects.push(child);
                     staticTexts.push(child);
@@ -2097,7 +2103,7 @@ var Viewport = function (editor) {
 
 
     signals.changeResultDigits.add(function () {
-        for (var key in selectedResultPoints) {
+        for (let key in selectedResultPoints) {
             textResults[key].setResultDigits(editor.resultDigits);
             textResults[key].update(container.dom);
         }

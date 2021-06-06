@@ -149,8 +149,12 @@ THREE.ResultTextObject3d = function (camera, params) {
 
     this.setResultDigits = function (resultDigits) {
         this.resultDigits = resultDigits;
+        this.rebuildTextToRender();
+    };
+
+    this.rebuildTextToRender = function () {
         let valueToRender = this.getValueToRender();
-        let canvas = createTextCanvas(valueToRender, this.color, null, 256);
+        let canvas = this.buildTextCanvas(valueToRender);
         let plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * 0.5, 0.5);
         let newTexture = new THREE.Texture(canvas);
         newTexture.needsUpdate = true;
@@ -160,6 +164,11 @@ THREE.ResultTextObject3d = function (camera, params) {
         });
         plane.applyMatrix(new THREE.Matrix4().makeTranslation(-plane.attributes.position.array[0] + 0.1, 0, 0));
         this.geometry = plane;
+    };
+
+    this.changeText = function (value) {
+        this.value = value;
+        this.rebuildTextToRender();
     };
 
     this.update = function (domElement) {
