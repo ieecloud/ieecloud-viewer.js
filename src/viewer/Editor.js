@@ -764,7 +764,12 @@ Editor.prototype = {
     changeColorForSimpleShapes: function (simpleShapeId, colorName) {
         let me = this;
         let simpleShape = me.findSimpleShapeById(me, simpleShapeId);
-        this.signals.changeSimpleShapeColor.dispatch(simpleShape, colorName);
+        if (simpleShape !== null && !_.isUndefined(simpleShape)) {
+            this.signals.changeSimpleShapeColor.dispatch(simpleShape, colorName);
+        } else {
+            console.warn("Simple shape with id= " + simpleShapeId + " is not found")
+        }
+
     },
 
     findSimpleShapeById: function (me, simpleShapeId) {

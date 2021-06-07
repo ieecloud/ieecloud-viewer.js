@@ -95,7 +95,7 @@ THREE.ResultTextObject3d = function (camera, params) {
         this.color = params.color;
         let size = 0.5;
         let valueToRender = this.getValueToRender();
-        let canvas = this.buildTextCanvas(valueToRender);
+        let canvas = this.buildTextCanvas(convertToString(valueToRender));
         let plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * size, size);
         let tex = new THREE.Texture(canvas);
 
@@ -152,9 +152,13 @@ THREE.ResultTextObject3d = function (camera, params) {
         this.rebuildTextToRender();
     };
 
+    function convertToString(valueToRender) {
+        return valueToRender + "";
+    }
+
     this.rebuildTextToRender = function () {
         let valueToRender = this.getValueToRender();
-        let canvas = this.buildTextCanvas(valueToRender);
+        let canvas = this.buildTextCanvas(convertToString(valueToRender));
         let plane = new THREE.PlaneBufferGeometry(canvas.width / canvas.height * 0.5, 0.5);
         let newTexture = new THREE.Texture(canvas);
         newTexture.needsUpdate = true;

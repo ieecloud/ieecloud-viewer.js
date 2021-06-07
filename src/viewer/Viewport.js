@@ -1464,7 +1464,7 @@ var Viewport = function (editor) {
     });
 
     signals.changeSimpleShapeColor.add(function (simpleShape, colorHex) {
-        if (simpleShape !== null) {
+        if (simpleShape !== null && !_.isUndefined(simpleShape)) {
             if (simpleShape.material) {
                 simpleShape.material.color.setHex(colorHex);
             }
